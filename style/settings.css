@@ -1,0 +1,92 @@
+/* настройки */
+
+.settings-page {
+  /* width: 100%;
+  height: 100%; */
+}
+
+.settings-page-header {
+  max-width: 900px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  padding: 20px 20px;
+  font-size: 18px;
+  margin-bottom: 40px;
+}
+
+.settings-page-header__title {
+  font-weight: 600;
+}
+
+.settings-page-main {
+  /* height: 100%; */
+  background: #aaaaaa;
+  max-width: 750px;
+  margin: 0 auto;
+  margin-bottom: 40px;
+  padding: 25px 25px;
+  border-radius: 10px;
+  display: block;
+}
+
+.settings-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-item .settings-item__title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.settings-item__colors {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+.settings-item__colors div {
+  cursor: pointer;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 1px solid #000;
+}
+.settings-item__colors div.red {
+  background-color: #ff4f4f;
+}
+.settings-item__colors div.purple {
+  background-color: #c870ff;
+}
+.settings-item__colors div.yellow {
+  background-color: #fcff51;
+}
+
+.settings-item__colors div.active {
+  border: 1px solid #ffffff;
+}
+
+.settings-item:not(:last-child) {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #fff;
+}
+
+/* звуки */
+
+.settings-item__sounds {
+  padding: 0 30px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.settings-item__sounds .settings-item__sounds-item {
+  display: flex;
+  justify-content: space-between;
+}

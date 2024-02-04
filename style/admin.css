@@ -1,0 +1,278 @@
+.admin {
+  padding-bottom: 60px;
+  background-color: #fff;
+}
+
+.admin-room {
+  font-family: Arial, sans-serif;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 30px;
+  background-color: #d4d4d4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+input[type="number"] {
+  padding: 5px;
+  width: 80px;
+  border-radius: 3px;
+}
+
+.addBotBtn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+.addBotBtn:hover {
+  background-color: #0056b3;
+}
+
+.addBotBtn:focus {
+  outline: none;
+}
+
+.bot-stats {
+  background-color: #f2f2f2;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 500px;
+  text-align: center;
+  margin: 0 auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 300px;
+  margin: auto;
+  margin-top: 20px;
+}
+
+th,
+td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.bot-stats h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.bot-stats p {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.bot-stats span {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.admin-stats-container-wrapper {
+  overflow-y: auto;
+}
+
+.admin-stats-container {
+  /* max-width: 800px; */
+  margin: 0 auto;
+  width: 768px;
+  overflow-y: auto;
+}
+
+.admin-stats-title {
+  margin-bottom: 10px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-stats-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.admin-stats-column {
+  flex-basis: calc(100% / 9);
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.admin-stats-header {
+  font-weight: bold;
+  background-color: #f2f2f2;
+}
+
+.admin-stats-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-stats-row:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.admin-date-stats-container-wrapper {
+  margin-top: 40px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  display: block;
+}
+
+.admin-stats-title.black {
+  color: #000;
+}
+
+.date-stats-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-stats-item,
+.date-stats-header {
+  /* display: flex;
+  justify-content: space-between;
+  padding: 5px 0; */
+  display: grid;
+  grid-template-columns: repeat(5, 150px);
+  text-align: center;
+  column-gap: 20px;
+  /* align-items: center;
+  justify-content: center; */
+}
+
+.date-stats-header {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.date-stats-table-wrapper {
+  margin-top: 20px;
+  overflow-y: auto;
+}
+
+.date-stats-table {
+  margin: 0 auto;
+  width: 830px;
+}
+
+.date-stats-item {
+  display: grid;
+  grid-template-columns: repeat(5, 150px);
+  text-align: center;
+  column-gap: 20px;
+  row-gap: 5px;
+}
+.date-stats-body .date-stats-item {
+  padding: 5px 0;
+}
+.date-stats-body .date-stats-item {
+  margin-bottom: 5px;
+  border-bottom: 0.5px solid #333;
+}
+
+.date-stats-domino-classic-table {
+  margin: 0 auto;
+  max-width: max-content;
+}
+
+.date-stats-domino-classic-table .date-stats-item,
+.date-stats-domino-classic-table .date-stats-header {
+  padding: 5px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 150px);
+  text-align: center;
+  column-gap: 20px;
+}
+
+.date-stats-domino-telephone-table {
+  margin: 0 auto;
+  max-width: max-content;
+}
+.date-stats-domino-telephone-table .date-stats-item,
+.date-stats-domino-telephone-table .date-stats-header {
+  padding: 5px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 150px);
+  text-align: center;
+  column-gap: 20px;
+}
+
+.room-management-room {
+  background-color: #fff;
+  padding-bottom: 20px;
+}
+
+.room-management-room * {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.room-management-room header {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.room-management-bets {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.room-management-bets li {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.room-management-bets input {
+  margin-right: 10px;
+}
+
+.room-management-bets span {
+  font-size: 14px;
+}
+
+.room-management-button {
+  background-color: #fff;
+  color: #333;
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}

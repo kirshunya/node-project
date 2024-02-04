@@ -1,0 +1,608 @@
+.games {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.games__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+  gap: 20px;
+}
+
+.game-started {
+  background-color: #c7a5ff;
+}
+
+.room-loader {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.room-loader::before {
+  content: "";
+  width: 50px;
+  height: 50px;
+  border: 5px solid #ccc;
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* .game * {
+  text-decoration: none;
+  color: #000;
+} */
+
+@media (max-width: 767px) {
+  .game {
+    width: 400px;
+    font-size: 20px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 479px) {
+  .game {
+    width: 320px;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .games__container {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 359px) {
+  .game {
+    width: 280px;
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+.loto-room__body {
+  /* display: grid; */
+  /* grid-template-columns: repeat(2, 1fr); */
+  /* grid-template-rows: repeat(4, 1fr); */
+}
+
+/* .game__until-start {
+  display: flex;
+  justify-content: end;
+  gap: 0 10px;
+}
+
+.game__until-finish {
+  display: flex;
+  justify-content: end;
+  gap: 0 10px;
+}
+
+.game__until-start,
+.game__room-bank {
+  text-align: end;
+}
+
+.game__room-jackpot {
+  background-color: #f700ff;
+  display: block;
+  max-width: max-content;
+  padding: 5px 10px;
+} */
+
+/*  newroom styles */
+
+.loto-room {
+  padding: 10px 15px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 35px;
+  background: var(
+    --linear,
+    linear-gradient(180deg, #572451 0%, rgba(71, 100, 204, 0.64) 100%)
+  );
+  border: 4px solid #d6c062;
+  max-width: 500px;
+  width: 100%;
+}
+
+.loto-room.starting {
+  border: 4px solid #8ad6b7;
+}
+
+.loto-room.finishing {
+  border: 4px solid #de2f2f;
+}
+
+.loto-room
+  .loto-room__body
+  .loto-room__body-left
+  .room-left__item-1
+  .room-left__item-timer-block
+  .timer-block__timer {
+  color: #eadf72;
+}
+
+.loto-room.starting
+  .loto-room__body
+  .loto-room__body-left
+  .room-left__item-1
+  .room-left__item-timer-block
+  .timer-block__timer {
+  color: #fff;
+}
+
+.loto-room.finishing
+  .loto-room__body
+  .loto-room__body-left
+  .room-left__item-1
+  .room-left__item-timer-block
+  .timer-block__timer {
+  color: #f84b4b;
+}
+
+.loto-room__body {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.loto-room__body .loto-room__body-left {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  flex: 1 1 auto;
+}
+
+.loto-room__body .loto-room__body-left .room-left__item:not(:last-child) {
+  margin-bottom: 18px;
+}
+
+.loto-room__body .loto-room__body-left .room-left__item-1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.loto-room__body .loto-room__body-left .room-left__item-1 .logo {
+  flex: 0 1 150px;
+  width: 100%;
+  height: auto;
+  margin-right: 10px;
+}
+.loto-room__body .loto-room__body-left .room-left__item-1 .logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.loto-room__body
+  .loto-room__body-left
+  .room-left__item-1
+  .room-left__item-timer-block {
+  border-radius: 18px;
+  border: #87d888 2px solid;
+  padding: 4px 21px;
+  color: #f0e274;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  /* line-height: 109%; */
+  letter-spacing: 1.49px;
+  text-align: center;
+  -webkit-text-stroke-width: medium;
+}
+
+.loto-room__body
+  .loto-room__body-left
+  .room-left__item-1
+  .room-left__item-timer-block
+  .timer-block__text {
+  margin-bottom: 5px;
+}
+
+/* item 2 */
+
+.loto-room__body .loto-room__body-left .room-left__item-2 {
+  display: flex;
+  flex-direction: column;
+  padding-left: 15px;
+
+  /* align-items: center; */
+}
+
+.room-left__item-info-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.room-left__item-info-row.lobby-room-bet img {
+  width: 31px;
+  height: 31px;
+}
+
+.room-left__item-info-row.lobby-room-online p span {
+  font-size: 22px;
+}
+
+@media (max-width: 425px) {
+  .room-left__item-info-row.lobby-room-bet img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .room-left__item-info-row.lobby-room-online p span {
+    font-size: 18px;
+  }
+}
+
+.room-left__item-info-row:not(:last-child) {
+  margin-bottom: 5px;
+}
+.room-left__item-info-row img {
+  flex: 0 0 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+.room-left__item-info-row p {
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 110%; /* 196.758% */
+  letter-spacing: 0.7px;
+  font-weight: 600;
+}
+
+.lobby-room-bet p {
+  font-size: 25px;
+}
+
+.room-left__item-info-row-green p {
+  color: #87d889;
+}
+
+.loto-room__body
+  .loto-room__body-left
+  .room-left__item-3
+  .room-left__item-info-row
+  p {
+  font-size: 11px;
+}
+
+/* right side */
+.loto-room__body .loto-room__body-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 10px;
+  margin-left: 10px;
+}
+
+.loto-room__body .loto-room__body-right .loto-room__body-right__jackpot-text {
+  width: 100px;
+  height: 30px;
+  margin-bottom: 7px;
+}
+
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__jackpot-text
+  img {
+  width: 100%;
+  height: 100%;
+}
+
+.loto-room__body .loto-room__body-right .loto-room__body-right__jackpot {
+  width: 120px;
+  height: 70px;
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.loto-room__body .loto-room__body-right .loto-room__body-right__jackpot img {
+  width: 100%;
+  height: 100%;
+}
+
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__jackpot
+  .loto-room__body-right__jackpot-sum {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  width: 100%;
+  text-align: center;
+}
+
+.loto-room__body .loto-room__body-right .loto-room__body-right__price-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+}
+
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__price-block
+  .price-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 110%;
+  letter-spacing: 0.49px;
+  margin-bottom: 7px;
+}
+
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__price-block
+  .price {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-size: 16px;
+  user-select: none;
+  background-color: inherit;
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 35px;
+}
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__price-block
+  .price-money {
+  border-radius: 2px;
+  background: var(--linear, linear-gradient(180deg, #78010b 0%, #d32433 100%));
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+}
+
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__price-block
+  .price-tockens {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #000 0%, #515151 100%);
+  color: #f0e274;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 110%;
+  letter-spacing: 0.7px;
+  position: relative;
+  padding: 3px 17px 3px 7px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__price-block
+  .price-tockens
+  .price-tockens__decor {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  right: 5px;
+  top: 4px;
+}
+.loto-room__body
+  .loto-room__body-right
+  .loto-room__body-right__price-block
+  .price-tockens
+  .price-tockens__decor
+  img {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 515px) {
+  .games__container {
+    padding: 0 20px;
+  }
+  .loto-room {
+    padding: 10px 10px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .loto-room__body .loto-room__body-left .room-left__item:not(:last-child) {
+    margin-bottom: 14px;
+  }
+
+  .loto-room__body .loto-room__body-left .room-left__item-1 .logo {
+    flex: 0 1 120px;
+    width: 100%;
+    height: auto;
+    margin-right: 10px;
+  }
+
+  .loto-room__body
+    .loto-room__body-left
+    .room-left__item-1
+    .room-left__item-timer-block {
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+
+  .loto-room__body
+    .loto-room__body-left
+    .room-left__item-1
+    .room-left__item-timer-block
+    .timer-block__text {
+    margin-bottom: 5px;
+  }
+
+  /* item 2 */
+
+  .loto-room__body .loto-room__body-left .room-left__item-2 {
+    padding-left: 7px;
+  }
+
+  .room-left__item-info-row:not(:last-child) {
+    margin-bottom: 3px;
+  }
+  .lobby-room-bet p {
+    font-size: 18px !important;
+  }
+
+  .room-left__item-info-row img {
+    flex: 0 0 14px;
+    height: 14px;
+    margin-right: 7px;
+  }
+  .room-left__item-info-row p {
+    /* color: #fff; */
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .room-left__item-info-row-green p {
+    color: #87d889;
+  }
+
+  .loto-room__body
+    .loto-room__body-left
+    .room-left__item-3
+    .room-left__item-info-row
+    p {
+    font-size: 9px;
+  }
+
+  /* right side */
+  .loto-room__body .loto-room__body-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* flex: 0 0 10px; */
+    margin-left: 10px;
+  }
+
+  .loto-room__body .loto-room__body-right .loto-room__body-right__jackpot-text {
+    width: 80px;
+    height: 23px;
+    margin-bottom: 5px;
+  }
+
+  .loto-room__body .loto-room__body-right .loto-room__body-right__jackpot {
+    width: 100px;
+    height: 60px;
+    margin-bottom: 14px;
+  }
+
+  .loto-room__body
+    .loto-room__body-right
+    .loto-room__body-right__jackpot
+    .loto-room__body-right__jackpot-sum {
+    font-size: 16px;
+  }
+
+  .loto-room__body
+    .loto-room__body-right
+    .loto-room__body-right__price-block
+    .price {
+    min-height: 25px;
+  }
+
+  .loto-room__body
+    .loto-room__body-right
+    .loto-room__body-right__price-block
+    .price-tockens {
+    font-size: 14px;
+  }
+
+  .loto-room__body
+    .loto-room__body-right
+    .loto-room__body-right__price-block
+    .price-tockens
+    .price-tockens__decor {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    right: 5px;
+    top: 4px;
+  }
+
+  .loto-room__body
+    .loto-room__body-right
+    .loto-room__body-right__price-block
+    .price-text {
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+
+  .loto-room__body
+    .loto-room__body-right
+    .loto-room__body-right__price-block
+    .price {
+    /* padding: 5px 10px; */
+
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 515px) {
+  .games__container {
+    padding: 0 5px;
+  }
+}
+
+@media (max-width: 375px) {
+  .games__container {
+    padding: 0 3px;
+  }
+
+  .lobby-room-bet p {
+    font-size: 16px !important;
+  }
+
+  .loto-room__body .loto-room__body-left .room-left__item:not(:last-child) {
+    margin-bottom: 14px;
+  }
+
+  .loto-room__body .loto-room__body-left .room-left__item-1 .logo {
+    display: none;
+  }
+
+  /* item 2 */
+
+  .loto-room__body .loto-room__body-left .room-left__item-2 {
+    padding-left: 4px;
+  }
+
+  .room-left__item-info-row p {
+    /* font-size: 10px; */
+    /* font-weight: 600; */
+  }
+}

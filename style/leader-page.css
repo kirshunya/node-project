@@ -1,0 +1,242 @@
+/* стили страницы меню */
+
+.leader-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px 5px;
+  max-width: 440px;
+  width: 100%;
+  gap: 10px;
+  margin: auto;
+}
+
+.leader-page__head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.leader-page__info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #0c60a4;
+  border: 1px solid #f0e274;
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18.808px; /* 376.166% */
+  letter-spacing: 0.55px;
+  padding: 5px 7px;
+  border-radius: 25px;
+}
+
+.leader-page__games {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.leader-page__games button {
+  /* width: calc(25% - 2.5px); */
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  background: #0c60a4;
+  height: 45px;
+  padding: 5px;
+  border: 1px solid #030006;
+  background: var(--linear, linear-gradient(180deg, #78010b 0%, #d32433 100%));
+  padding: 5px;
+  color: #f0e274;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 17.825px; /* 237.665% */
+  letter-spacing: 0.825px;
+  text-transform: uppercase;
+  gap: 5px;
+}
+
+.leader-page-games__season {
+  border: 1px solid #f0e274;
+  background: var(--linear, linear-gradient(180deg, #78010b 0%, #d32433 100%));
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  color: #fff;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  -webkit-text-stroke-width: thick;
+}
+
+.games-season__year {
+  font-size: 17px;
+  letter-spacing: 1.54px;
+}
+
+.leader-page__table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid #f0e274;
+  background: var(
+    --linear,
+    linear-gradient(180deg, #572451 0%, rgba(71, 100, 204, 0.64) 100%)
+  );
+  text-transform: lowercase;
+  height: 30px;
+  color: #fff;
+}
+
+.leader-page__table-head div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.leader-page__table-head div:not(:nth-child(2)) {
+  width: 25%;
+}
+
+.leader-page__table-head hr {
+  width: 1px;
+  height: 100%;
+  background: #f0e274;
+}
+
+.leader-page__table-main-wrapper {
+  /* height: 100%;
+  max-height: calc(100vh - 370px);
+  overflow-y: auto; */
+  margin-top: 10px;
+  width: 100%;
+  position: relative;
+}
+
+.leader-page__table-main {
+  height: 100%;
+  max-height: calc(100vh - 370px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.leader-page__table-main::-webkit-scrollbar {
+  width: 0; /* Устанавливаем ширину скроллбара на 0 */
+  background: transparent; /* Задаем прозрачный фон для скроллбара */
+}
+
+/* Для других браузеров (Firefox и др.) */
+.leader-page__table-main {
+  scrollbar-width: none; /* Устанавливаем ширину скроллбара на 0 */
+}
+
+.leader-page__table-item {
+  border-radius: 10px;
+  border: 1px solid #f0e274;
+  height: 45px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+}
+
+.leader-page__table-item.leader-fixed {
+  position: absolute;
+  background: var(
+    --linear-2-paints,
+    linear-gradient(
+      180deg,
+      rgba(159, 72, 72, 0.2) 0%,
+      rgba(159, 72, 72, 0.14) 27.6%,
+      rgba(159, 72, 72, 0.08) 60.42%,
+      rgba(159, 72, 72, 0) 100%
+    ),
+    linear-gradient(180deg, #572451 0%, rgb(68, 93, 185) 100%)
+  );
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+
+.leader-page__table-item > *:not(:nth-child(2)) {
+  width: 110px;
+}
+
+.leader-table__user {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.leader-table__user .leader-table__user-number .leader-icon {
+  width: 30px;
+  height: 30px;
+}
+
+@media (max-width: 425px) {
+  .leader-table__user .leader-table__user-number .leader-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.leader-table__winsum {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 5px;
+  border: 1px solid #ffffff86;
+  background: linear-gradient(180deg, #37660a 0%, #7bcc2e 100%);
+}
+
+.leader-table__bonuses {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  background: linear-gradient(180deg, #a27114 0%, #f0e274 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 419px) {
+  .leader-page__games {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .leader-page__games > * {
+    min-width: 100px;
+  }
+
+  .leader-page-games__season {
+    flex-direction: row;
+    height: 30px;
+  }
+}

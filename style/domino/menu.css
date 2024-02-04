@@ -1,0 +1,442 @@
+.domino-choose-players {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  gap: 40px;
+}
+
+.choose-players-button {
+  border: 3px solid #d6c062;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.3s;
+  background: var(
+    --linear,
+    linear-gradient(180deg, #572451 0%, rgba(71, 100, 204, 0.64) 100%)
+  );
+  color: #fff;
+  padding: 5px 10px;
+}
+
+.choose-players-button.active {
+  background: #ffd4006e;
+  border: 3px solid #d6c062;
+  color: #fff;
+}
+
+.domino-games {
+  gap: 10px;
+}
+
+.domino-room {
+  padding: 20px 15px 25px 15px;
+  cursor: default;
+  position: relative;
+  border-radius: 35px;
+  background: var(
+    --linear,
+    linear-gradient(180deg, #572451 0%, rgba(71, 100, 204, 0.64) 100%)
+  );
+  border: 4px solid #d6c062;
+  max-width: 500px;
+  width: 100%;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.domino-room-content {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.domino-room-header {
+  display: flex;
+  /* justify-content: space-between; */
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.domino-room-header__img {
+  width: 100%;
+  max-width: 120px;
+  margin-right: 10px;
+}
+
+.domino-room-header__info {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.domino-room-header__title {
+  background: var(
+    --Linear,
+    linear-gradient(180deg, #f5be30 0%, #e6ad1e 51.56%, #b98502 100%)
+  );
+  font-size: 18px;
+  font-weight: 600;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.domino-room-header__title span {
+  font-size: 12px;
+}
+
+.domino-room-header__rules {
+  flex: 0 0 22px;
+  height: 22px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.domino-room-header__rules img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.domino-room-content__tables-swiper {
+  display: flex;
+  flex: 0 0 280px;
+}
+.domino-room-content__tables {
+  display: flex;
+  max-width: 280px;
+  flex: 0 0 280px;
+  padding-bottom: 10px;
+}
+
+.domino-room-content__table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+
+  text-align: center;
+  cursor: pointer;
+  /* max-width: max-content; */
+}
+
+/* ||||||||||||||||||||||||||||||||скролбар|||||||||||||||||||||||||||||||||||||||| */
+.domino-room-swiper-scrollbar {
+  position: absolute;
+  height: 3px !important;
+  background-color: #333 !important;
+  border-radius: 5px !important;
+  bottom: 0 !important;
+  /* transform: translateY(100%); */
+}
+
+.swiper-scrollbar-drag {
+  background: #e7d069 !important;
+  position: absolute !important;
+}
+
+/* |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| */
+
+.domino-room-content__table-info {
+  line-height: 1.2;
+  width: 100%;
+}
+
+.domino-room-content__table-image {
+  display: flex;
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  border: 3px solid #d6c062;
+  margin-bottom: 5px;
+}
+
+.domino-room-content__table-image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 2fr);
+  grid-template-rows: repeat(2, 2fr);
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  border: 3px solid #d6c062;
+}
+
+.domino-room-table-part.filled {
+  background-image: none;
+  background-color: #da5e5e;
+}
+.domino-room-table-part.filled::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #000;
+  top: calc(50% - 10px);
+  left: calc(50% - 10px);
+}
+
+.domino-room-table-part .table-admin__userid-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.domino-room-table-quater {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border: 1px solid #d6c062;
+  background-color: #2e8f43;
+  background-image: url("../../img/domino-scene-bg.png");
+  background-position: center;
+  background-size: cover;
+}
+
+.domino-room-table-info__players {
+  margin: 0 auto;
+  gap: 2px;
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  justify-content: center;
+}
+.domino-room-table-info__players-item {
+  display: block;
+  flex: 0 0 15px;
+  /* width: 15px; */
+  height: 15px;
+  position: relative;
+}
+.domino-room-table-info__players-item img {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.domino-room-table-quater.filled {
+  background-image: none;
+  background-color: #da5e5e;
+}
+
+/* .domino-room-table-quater.filled::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  top: calc(50% - 7.5px);
+  left: calc(50% - 7.5px);
+} */
+.domino-room__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.domino-room-bet__text {
+  /* margin-top: auto; */
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+.domino-room-bet {
+  border-radius: 10px;
+  background: var(--Linear, linear-gradient(180deg, #78010b 0%, #d32433 100%));
+  box-shadow: 0px 2.56477px 5.12953px 1.70984px rgba(0, 0, 0, 0.24);
+  max-width: max-content;
+  padding: 5px 10px;
+  margin: 0 auto;
+  /* margin-top: auto; */
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.domino-room-duration {
+  /* margin-top: auto; */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  margin: 0;
+}
+.domino-room-table-half {
+  width: 50%;
+  height: 100%;
+  background-color: #2e8f43;
+  background-image: url("../../img/domino-scene-bg.png");
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  border: 1px solid #d6c062;
+}
+
+@media (max-width: 479px) {
+  .domino-room-content__tables-swiper {
+    display: flex;
+    flex: 0 0 220px;
+  }
+  .domino-room-content__tables {
+    max-width: 220px;
+    flex: 0 0 220px;
+  }
+
+  .domino-room-header__img {
+    width: 100%;
+    max-width: 100px;
+    margin-right: 10px;
+  }
+
+  .domino-room-content__table-image {
+    display: flex;
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+    border: 3px solid #d6c062;
+  }
+
+  .domino-room-content__table-image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 2fr);
+    grid-template-rows: repeat(2, 2fr);
+    width: 65px;
+    height: 65px;
+    border-radius: 10px;
+    border: 3px solid #d6c062;
+  }
+
+  .domino-room-bet__text {
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .domino-room-bet {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 5px 7px;
+  }
+  .domino-room-duration {
+    text-align: center;
+    font-size: 10px;
+  }
+
+  .domino-room-table-info__players-item {
+    flex: 0 0 12px;
+    height: 12px;
+  }
+
+  .domino-room-header__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 15px;
+  }
+  .domino-room-header__title span {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 425px) {
+  .domino-room-content__tables-swiper {
+    display: flex;
+    flex: 0 0 210px;
+  }
+  .domino-room-content__tables {
+    max-width: 210px;
+    flex: 0 0 210px;
+  }
+  .domino-room-content__table-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .domino-room-content__table-image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 2fr);
+    grid-template-rows: repeat(2, 2fr);
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    border: 3px solid #d6c062;
+  }
+}
+
+@media (max-width: 375px) {
+  .domino-room-content__tables-swiper {
+    display: flex;
+    flex: 0 0 190px;
+  }
+  .domino-room-content__tables {
+    max-width: 190px;
+    flex: 0 0 190px;
+  }
+
+  .domino-room-header__img {
+    /* width: 100%; */
+    max-width: 90px;
+    /* margin-right: 10px; */
+  }
+  .domino-room-content__tables {
+    max-width: 240px;
+  }
+  .domino-room-content__table-image {
+    width: 55px;
+    height: 55px;
+  }
+
+  .domino-room-content__table-image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 2fr);
+    grid-template-rows: repeat(2, 2fr);
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    border: 3px solid #d6c062;
+  }
+
+  .domino-room-bet__text {
+    font-weight: 500;
+    font-size: 10px;
+  }
+  .domino-room-bet {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 7px;
+  }
+  .domino-room-duration {
+    text-align: center;
+    font-size: 10px;
+  }
+
+  .domino-room-table-info__players-item {
+    flex: 0 0 12px;
+    height: 12px;
+  }
+
+  .domino-room-header__title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 15px;
+  }
+  .domino-room-header__title span {
+    font-size: 12px;
+  }
+}
