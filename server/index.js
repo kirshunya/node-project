@@ -21,7 +21,7 @@ const {
 } = require("./models/db-models");
 const AdminLotoService = require("./service/loto-admin-service");
 const gameService = require("./service/game-service");
-const lotoAdminService = require("./service/loto-admin-service");
+// const lotoAdminService = require("./service/loto-admin-service");
 const roomsFunctions = require("./service/loto-rooms-functions");
 
 const PORT = process.env.PORT || 5001;
@@ -34,6 +34,8 @@ app.use(
     origin: process.env.CLIENT_URL,
   })
 );
+console.log(__dirname);
+app.use('/', express.static(__dirname+'/../'))
 app.use("/api", router);
 app.use(errorMiddleware);
 
