@@ -41,8 +41,8 @@ class StaticImg {
             selectable: false,
             // scaleX: checkerSize/66 * scaleFactor,
             // scaleY: checkerSize/66 * scaleFactor,
-            scaleX: scaleFactor/1.82,
-            scaleY: scaleFactor/1.82,
+            scaleX: scaleFactor/2,
+            scaleY: scaleFactor/2,
         }, attributes)
     }
 }
@@ -51,26 +51,31 @@ const $PageSnapshotData = {
     Graphics: {
         // whitecheckerpicurl: `img/checker-white.png`, 
         // blackcheckerpicurl: `img/checker-black.png`,
-        whitecheckerpicurl: `img/whitepcell3.png`, 
-        blackcheckerpicurl: `img/blackpcell3.png`,
+        whitecheckerpicurl: `img/blackcell4.png`, 
+        blackcheckerpicurl: `img/whitecell4.png`,
         ghostcheckerpicurl: `img/checker-white.png`, 
         gameboardpic: `img/backgrback.png`
     }
 }
 const BoardSize = 512;
-const BordersByX = [24,30,28];
-const BordersByY = [28,0,28];
+const BordersByX = [26,30,28];
+const BordersByY = [26,0,26];
 const slotWidth = (BoardSize - BordersByX.reduce((acc,n)=>acc+n))/12;
 const slotHeight = (BoardSize - BordersByY.reduce((acc,n)=>acc+n))/2;
-const slotMargin = -2;
+const BoardSidesSize = [215, 215];
+
+const slotMargin = 2;
 const checkerSize = slotWidth - slotMargin*2;
 const stepY = checkerSize / 2.5;
-// const MaxStep = checkerSize / 2;
-// const stepY = slotHeight / 8;
 const TopY = BordersByY[0];
 const BottomY = BoardSize - BordersByY[2] - slotWidth; 
 const LeftX = BordersByX[0];
-const __posX = (slotIndex) => LeftX + slotWidth*slotIndex + ((slotIndex > 5)?BordersByX[1]:0)-1;
+const __posX$ = (slotIndex) => LeftX + slotWidth*slotIndex + ((slotIndex > 5)?BordersByX[1]:0)-1;
+const __posX = (slotIndex) => {
+    const slotSize = (BoardSidesSize[+(slotIndex>6)] + slotMargin)/6;
+    const LeftX = slotIndex<6?BordersByX[0]:BordersByX[0]+BoardSidesSize[0]+BordersByX[1];
+    return LeftX + (slotSize)*(slotIndex%6);
+}
 const posX = (slotIndex) => __posX(slotIndex < 12 ? 11 - slotIndex : slotIndex - 12);
 const posY = (slotIndex, CheckerIndex) => (slotIndex<12)
                                                 ? TopY  +  stepY*CheckerIndex
