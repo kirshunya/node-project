@@ -51,6 +51,7 @@ router.get("/bot-wins", authMiddleware, userController.getBotWins);
 // game
 
 router.use("/game", authMiddleware, gameRouter);
+router.get("/is-page-available/:page", userController.isPageAvailable);
 
 // loto settings
 

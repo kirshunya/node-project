@@ -12,10 +12,10 @@ const loadCaskSounds = () => {
       language = `AZ-TR`;
     }
 
-    let audio = new Audio(
-      `${path}/${language}/${i}${language.split(`-`)[0].toLowerCase()}.mp3`
-    );
-    casksSounds.push(audio);
+    // let audio = new Audio(
+    //   `${path}/${language}/${i}${language.split(`-`)[0].toLowerCase()}.mp3`
+    // );
+    // casksSounds.push(audio);
   }
 };
 
