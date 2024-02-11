@@ -28,7 +28,7 @@ class Slot {
         return this.checkers.length;
     }
 }
-class StaticImg {
+const genStaticImgClass = (scF)=>class {
     constructor(attributes) {
         return Object.assign({
             hasControls: false,
@@ -41,8 +41,8 @@ class StaticImg {
             selectable: false,
             // scaleX: checkerSize/66 * scaleFactor,
             // scaleY: checkerSize/66 * scaleFactor,
-            scaleX: scaleFactor/2,
-            scaleY: scaleFactor/2,
+            scaleX: scF,
+            scaleY: scF,
         }, attributes)
     }
 }
@@ -54,21 +54,23 @@ const $PageSnapshotData = {
         whitecheckerpicurl: `img/blackcell4.png`, 
         blackcheckerpicurl: `img/whitecell4.png`,
         ghostcheckerpicurl: `img/checker-white.png`, 
-        gameboardpic: `img/backgrback.png`
+        gameboardpic: `img/backunigr.png`
     }
 }
-const BoardSize = 512;
-const BordersByX = [26,30,28];
-const BordersByY = [26,0,26];
-const slotWidth = (BoardSize - BordersByX.reduce((acc,n)=>acc+n))/12;
-const slotHeight = (BoardSize - BordersByY.reduce((acc,n)=>acc+n))/2;
-const BoardSidesSize = [215, 215];
+const BoardWidth = 1600;
+const BoardHeight = 1560;
+const BordersByX = [45,85,40];
+const BordersByY = [26,0,-26];
+const slotWidth = (BoardWidth - BordersByX.reduce((acc,n)=>acc+n))/12;
+const slotHeight = (BoardHeight - BordersByY.reduce((acc,n)=>acc+n))/2;
+const BoardSidesSize = [718, 717];
 
-const slotMargin = 2;
+const slotMargin = -4;
 const checkerSize = slotWidth - slotMargin*2;
+const StaticImg = genStaticImgClass(66/checkerSize);
 const stepY = checkerSize / 2.5;
 const TopY = BordersByY[0];
-const BottomY = BoardSize - BordersByY[2] - slotWidth; 
+const BottomY = BoardHeight - BordersByY[2] - checkerSize; 
 const LeftX = BordersByX[0];
 const __posX$ = (slotIndex) => LeftX + slotWidth*slotIndex + ((slotIndex > 5)?BordersByX[1]:0)-1;
 const __posX = (slotIndex) => {
@@ -112,7 +114,7 @@ class BoardCanvas {
         const canvas = this.canvas = new fabric.Canvas('canvas', {preserveObjectStacking: true});
         canvas.setWidth(512);
         canvas.setHeight(512);
-        scaleFactor = 512/512;
+        scaleFactor = 512/1600;
         let GetCanvasAtResoution;
         const reinit = self.reinit = async function (GSlots, GDropped) {
             canvas.clear();
