@@ -54,23 +54,25 @@ const $PageSnapshotData = {
         whitecheckerpicurl: `img/blackcell4.png`, 
         blackcheckerpicurl: `img/whitecell4.png`,
         ghostcheckerpicurl: `img/checker-white.png`, 
-        gameboardpic: `img/backunigr.png`
+        gameboardpic: `img/bcbg.png`
     }
 }
+const [initWidth, initHeight] = [360, 480];
 const BoardWidth = 1600;
-const BoardHeight = 1560;
-const BordersByX = [45,85,40];
-const BordersByY = [26,0,-26];
+const BoardHeight = 1900;
+const BordersByX = [43,100,40];
+const BordersByY = [56,0,-56];
 const slotWidth = (BoardWidth - BordersByX.reduce((acc,n)=>acc+n))/12;
 const slotHeight = (BoardHeight - BordersByY.reduce((acc,n)=>acc+n))/2;
-const BoardSidesSize = [718, 717];
+const BoardSidesSize = [712, 712];
 
-const slotMargin = -4;
+const slotMargin = -10;
 const checkerSize = slotWidth - slotMargin*2;
-const StaticImg = genStaticImgClass(66/checkerSize);
+let StaticImg 
+
 const stepY = checkerSize / 2.5;
 const TopY = BordersByY[0];
-const BottomY = BoardHeight - BordersByY[2] - checkerSize; 
+const BottomY = BoardHeight - BordersByY[2]// - checkerSize; 
 const LeftX = BordersByX[0];
 const __posX$ = (slotIndex) => LeftX + slotWidth*slotIndex + ((slotIndex > 5)?BordersByX[1]:0)-1;
 const __posX = (slotIndex) => {
@@ -107,14 +109,16 @@ class BoardCanvas {
                     self.enabledGhosts.map(ghost=>canvas.remove(ghost.img))
                 );//enabledGhosts.map.bind(enabledGhosts, canvas.remove.bind(canvas, Extract.$1.img))
                 resolve(bgImg);
-            }));
+            })); 
         
         const vg = document.getElementsByClassName('domino-game-page__body-wrapper');
         // function init() {
         const canvas = this.canvas = new fabric.Canvas('canvas', {preserveObjectStacking: true});
-        canvas.setWidth(512);
-        canvas.setHeight(512);
-        scaleFactor = 512/1600;
+        canvas.setWidth(initWidth);
+        canvas.setHeight(initHeight);
+        scaleFactor = initWidth/BoardWidth;
+        StaticImg = genStaticImgClass(66/checkerSize*0.8);
+
         let GetCanvasAtResoution;
         const reinit = self.reinit = async function (GSlots, GDropped) {
             canvas.clear();
