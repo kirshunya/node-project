@@ -26,7 +26,7 @@ window.addEventListener('load', async()=>{
             document.getElementById('TopPan')
                         .getElementsByClassName('buttons')[0]
                             .children[0]
-                                .addEventListener('click', req.bind({method:'restart'}));
+                                .addEventListener('click', req.bind(null, {method:'restart'}));
             canva = new BoardCanvas(
                     gm.Slots,
                     // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
