@@ -25,10 +25,10 @@ class SharedRoom0 {
     send(event, obj) {
         const msg = Object.assign(obj, {event});
 
-        this.Listeners.map(({send})=>send(msg));
+        this.Listeners.map(async({send})=>send(msg));
     }
 }
-class Game extends SharedRoom0 {
+class TGame extends SharedRoom0 {
     constructor(GameID=-1) {
         super();
         this.GameID = GameID;
@@ -42,7 +42,7 @@ class Game extends SharedRoom0 {
      * 
      * @param {[{from,to,points}]} step 
      */
-    stepIfValid(step) {
+    stepIfValid(step, code) {
         const {ActiveTeam, Dices} = this.info;
         const TempSlots = adv0_range(0, 24, {null:()=>[0,0]});
         // const Skin = new Proxy(this.Slots, {
@@ -63,7 +63,7 @@ class Game extends SharedRoom0 {
             // typeof to === 'string' && to = 
         });
         const prevstate = this.info;
-        this.send('step', {step, prevstate, newstate: this.nextState()});
+        this.send('step', {step, prevstate, newstate: this.nextState(), code});
         return {result:'success'};
     }
     nextState() {
@@ -95,22 +95,29 @@ class Game extends SharedRoom0 {
         }
     }
 }
-const Games = [ new Game() ];//probe
+const Games = [ new TGame() ];//probe
 
 const WSPipelineCommands = {
-    step({Game}, {step}) {
-        Game.stepIfValid(step);
-        return
+    step({Game}, {step, code}) {
+        return Game.stepIfValid(step, code);
     },
     get({Game}) {
         const event = 'board';
         return {event, slots: Game.Slots, state: Game.info};
+    },
+    restart(ctx) {
+        const lastGame = ctx.Game;
+        const Game = ctx.Game = Games[ctx.GameID] = new TGame();
+        Game.Listeners = lastGame.Listeners;
+        Game.send('restart', {slots: Game.Slots, state: Game.info});
     }
 }
-
+var fs = require('fs');
 module.exports = function(ws, req) {
+    fs.writeFile('/test.log', 'connection', console.log.bind(console));
+
     ws._socket.setKeepAlive(true);
-    console.log('Hello');
+    // console.log('Hello');
     const ctx = {
         GameID: 0,//probe
         Game: Games[0], //probe //maybe upgrd to Property or Proxy on Game.. 

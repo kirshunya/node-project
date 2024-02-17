@@ -3,6 +3,11 @@
 var canva;
 var rq;
 const API_URL_PART = `://127.0.0.1:5001`
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 window.addEventListener('load', async()=>{
     const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
     const req = obj=>ws.send(JSON.stringify(obj));
@@ -10,6 +15,8 @@ window.addEventListener('load', async()=>{
     const WSEventPool = new JustEnoughEvents();
     WSEventPool.fon('board').then(
         event=>{
+            let ncode = 'np';
+            const gencode = ()=>ncode = getRandomInt(-65000, 65000);
             const dropped = [];
             const {slots} = event;
             const gm = new GameModel(slots, dropped);
@@ -18,7 +25,7 @@ window.addEventListener('load', async()=>{
             document.getElementById('TopPan')
                         .getElementsByClassName('buttons')[0]
                             .children[0]
-                                .addEventListener('click',alert.bind(window))
+                                .addEventListener('click', req.bind({method:'restart'}));
             canva = new BoardCanvas(
                     gm.Slots,
                     // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
@@ -27,16 +34,16 @@ window.addEventListener('load', async()=>{
             gc.start([{id:100, pteam:1, team:1}, {id:100, pteam:2, team:2}], event.state.Dices);
             canva.createDices(event.state.Dices[0], event.state.Dices[1], [white, black][event.state.ActiveTeam-1]);
             gc._set(event.state.ActiveTeam, event.state.Dices);
-            WSEventPool.on('step', ({step, prevstate, newstate})=>{
-                step.map(({from,to})=>{
+            WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
+                if(code !== ncode) step.map(({from,to})=>{
                     gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));
                     canva.moveChecker(from, to);
                 })
                 gc._set(newstate.ActiveTeam, newstate.Dices)
                 canva.createDices(newstate.Dices[0], newstate.Dices[1], [white, black][newstate.ActiveTeam-1]);
-
             });
-            sendstep = async(step)=>req({method:'step', step});
+            WSEventPool.on('restart', ()=>window.location.reload());
+            sendstep = async(step)=>req({method:'step', step, code:gencode()});
             //Tabulations
             const [mobile, pc] = Array(2).keys();
             let state = mobile;

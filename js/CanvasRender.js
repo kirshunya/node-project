@@ -275,7 +275,7 @@ class BoardCanvas {
                 img.on('added', () => img.moveTo(checkerIndex));
                 img.on('mousedown', () => {
                     self.gc.move(fromSlot, slotIndex);
-                    // self.moveChecker(fromSlot, slotIndex);
+                    self.moveChecker(fromSlot, slotIndex);
                     for (let ghost of self.enabledGhosts) canvas.remove(ghost.img);
                 });
                 canvas.add(img);
