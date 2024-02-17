@@ -43,7 +43,7 @@ export async function addHashListeners(ws = null) {
 
   switch (currentGames.currGame) {
     case "free":
-      preloader.classList.add("d-none");
+      preloader?.classList.add("d-none");
       break;
     case "loto":
       if (currentGames.gameStarted) {
@@ -81,7 +81,7 @@ export async function addHashListeners(ws = null) {
 
 export async function hashNavigation() {
   // console.log("location changed", location.hash);
-
+  
   let localUser = localStorage.getItem("user");
 
   if (localUser) {

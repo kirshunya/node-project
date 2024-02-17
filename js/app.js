@@ -20,23 +20,25 @@ window.siteLanguage = siteLanguage;
 impLocalization.translateAuthPage();
 impLocalization.translateGameChooseMenu();
 
-impAuth.registrationForm();
-impAuth.createLoginForm();
-
+try {
+  impAuth.registrationForm();
+  impAuth.createLoginForm();
+} catch (e) {}
 impNav.applyDefaultSettings();
 
 impNav.addUnauthorizedHashListeners();
 
 window.scrollTo(0, 0);
 
-if (await impAuth.isAuth()) {
+// if (await impAuth.isAuth()) 
+{
   // preloader.classList.remove("d-none");
   location.hash = "";
-  impNav.hideAuthorization();
+  // impNav.hideAuthorization();
 
-  if (await impAuth.isAdmin()) {
-    impAdminNav.createAdminButton();
-  }
+  // if (await impAuth.isAdmin()) {
+  //   impAdminNav.createAdminButton();
+  // }
   let ws = impWSNavigation.connectWebsocketFunctions();
   // setInterval(() => {
   //   ws.send(JSON.stringify({ method: "ping" }));
@@ -49,7 +51,7 @@ if (await impAuth.isAuth()) {
   // impNav.addListeners(ws);
 
   location.hash = "#gamemode-choose";
-  impDominoNav.dominoChoosePageListeners();
+  // impDominoNav.dominoChoosePageListeners();
 
   window.scrollTo(0, 0);
 
@@ -64,9 +66,10 @@ if (await impAuth.isAuth()) {
   // }
 
   // impDominoNav.openDominoChoosePage();
-} else {
-  console.log("not auth");
-}
+} 
+// else {
+//   console.log("not auth");
+// }
 
 // розблокировать чат после f5 а то он будет заблочен
 window.isChatBlocked = false;

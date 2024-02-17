@@ -46,7 +46,7 @@ const genStaticImgClass = (scF)=>class {
         }, attributes)
     }
 }
-const range = (from, len) => [...Array(len).keys()].map(x => x + from);
+// const range = (from, len) => [...Array(len).keys()].map(x => x + from);
 const $PageSnapshotData = {
     Graphics: {
         // whitecheckerpicurl: `img/checker-white.png`, 
@@ -59,9 +59,9 @@ const $PageSnapshotData = {
 }
 const [initWidth, initHeight] = [360, 480];
 const BoardWidth = 1600;
-const BoardHeight = 1900;
+const BoardHeight = 1850;
 const BordersByX = [43,100,40];
-const BordersByY = [56,0,-56];
+const BordersByY = [56,0,-112];
 const slotWidth = (BoardWidth - BordersByX.reduce((acc,n)=>acc+n))/12;
 const slotHeight = (BoardHeight - BordersByY.reduce((acc,n)=>acc+n))/2;
 const BoardSidesSize = [712, 712];
@@ -201,7 +201,7 @@ class BoardCanvas {
         if (from !== "whiteOver" && from !== "blackOver")  checker = this.slots[from].getRemoveLast();
         else checker = dropped[from === "whiteOver" ? 0 : 1].getRemoveLast();
         let checkerIndex = isOver ? this.dropped[to === "whiteOver" ? 0 : 1].count()
-            : this.slots[to].count() - 1;
+            : this.slots[to].count();
         checker.img.animate('left', this.posXFromIndex(to), {
             duration: 400,
             onChange: canvas.renderAll.bind(canvas)
@@ -239,7 +239,7 @@ class BoardCanvas {
                 this.createGhost(key, this.dropped[team].count(), fromSlot)
                 continue;
             }
-            this.createGhost(key, this.slots[key].count() - 1, fromSlot);
+            this.createGhost(key, this.slots[key].count(), fromSlot);
         }
     }
     createImg(texture, slotIndex, checkerIndex, ) {//TODO: rebase
@@ -275,7 +275,7 @@ class BoardCanvas {
                 img.on('added', () => img.moveTo(checkerIndex));
                 img.on('mousedown', () => {
                     self.gc.move(fromSlot, slotIndex);
-                    self.moveChecker(fromSlot, slotIndex);
+                    // self.moveChecker(fromSlot, slotIndex);
                     for (let ghost of self.enabledGhosts) canvas.remove(ghost.img);
                 });
                 canvas.add(img);
@@ -284,20 +284,21 @@ class BoardCanvas {
             });
     }
     diceImageUrl(diceNumber){
+        return `/img/dices${diceNumber}.png`;
         return $PageSnapshotData.Graphics[`dice${diceNumber}url`];
     }
     createDice(diceUrl, currentPlayer, diceIndex){ // TODO: приватный метод, не вызывать извне.
         const {canvas, dices} = this;
-        let stepBetweenDices = diceIndex * 35 * scaleFactor;
-        let whitePosX = 350 * scaleFactor + stepBetweenDices;
-        let blackPosX = 100 * scaleFactor + stepBetweenDices;
+        let stepBetweenDices = diceIndex * 200 * scaleFactor;
+        let whitePosX = BoardWidth/1.7 * scaleFactor + stepBetweenDices;
+        let blackPosX = BoardWidth/6 * scaleFactor + stepBetweenDices;
         let image;
         fabric.Image.fromURL(diceUrl, function (rawImage) {
             let img = rawImage.set(new StaticImg({
                 left: currentPlayer === "white" ? whitePosX : blackPosX, // TODO: смени "white" на то, с чем будешь работать.
-                top: 187 * scaleFactor,
-                scaleX: 0.1 * scaleFactor,
-                scaleY: 0.1 * scaleFactor,
+                top: (BoardHeight/2 - 328/6) * scaleFactor,
+                scaleX: 0.7*scaleFactor,
+                scaleY: 0.7*scaleFactor,
                 hoverCursor: 'pointer'
             }));
     
@@ -333,40 +334,6 @@ class BoardCanvas {
         return this.diceImageUrl(getRandomInt(6) + 1);
     }
 }
-var canva;
-window.addEventListener('load', ()=>{
-    canva = new BoardCanvas(
-            range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
-                        .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
-            [0,0], null);
-    const [mobile, pc] = Array(2).keys();
-    const vg = document.getElementsByClassName('domino-game-page__body-wrapper')[0];
-    const TopPan = document.getElementById(`TopPan`);
-    const BottomPan = document.getElementById(`BottomPan`);
-    const righcol = document.getElementsByClassName('rightcol')[0];
-    const ddt = document.getElementsByClassName('ddt')[0];
-    const canvas = document.getElementsByClassName('canvas-container')[0];
-    const space = document.getElementsByClassName('tabspaces')[0];
-    let state = mobile;
-    function PaginationValidate() {
-        const width = vg.clientWidth;
-        if(width < 950 && state !== mobile) {
-            state = mobile;
-            ddt.classList.toggle('horize', state);
-            ddt.replaceChildren(...[
-                TopPan, canvas, BottomPan, righcol
-            ])
-        } else if(width >= 950 && state !== pc) {
-            state = pc;
-            ddt.classList.toggle('horize', state);
-            righcol.replaceChildren(...[
-                TopPan, space, BottomPan
-            ])
-        }
-    }
-    PaginationValidate();
-    window.addEventListener('resize', PaginationValidate);
-});
 
 // function resetGame(){
 //     for (let team = 0; team < 2; team++){
