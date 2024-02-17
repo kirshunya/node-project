@@ -2,7 +2,8 @@
 
 var canva;
 var rq;
-const API_URL_PART = `://127.0.0.1:5001`
+// const API_URL_PART = `://127.0.0.1:5001`
+const API_URL_PART = `://194.87.244.199:5001`
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
