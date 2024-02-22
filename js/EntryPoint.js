@@ -1,146 +1,145 @@
-// const { drop } = require("../server/db");
-
 var canva;
-var rq;
-// const API_URL_PART = `://127.0.0.1:5001`
-const API_URL_PART = `://194.87.244.199:5001`
+const API_URL_PART = `://127.0.0.1:5001`
+// const API_URL_PART = `://194.87.244.199:5001`
+
+const siteLanguage = {
+    dominoRoomsMenu:{
+        gamePrice:'Цена комнаты',
+        gameDuration:'Длительность игры 5 минут',
+        classicDurationLabel:'Одна игра',
+        classic: 'Нарды'
+    }
+}
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-window.addEventListener('load', async()=>{
-    const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
-    const req = obj=>ws.send(JSON.stringify(obj));
-    rq = req;
-    const WSEventPool = new JustEnoughEvents();
-    WSEventPool.fon('board').then(
-        event=>{
-            let ncode = 'np';
-            const gencode = ()=>ncode = getRandomInt(-65000, 65000);
-            const dropped = [];
-            const {slots} = event;
-            const gm = new GameModel(slots, dropped);
-            const {GameController} = GameControllerCtxWithGmEntries(gm);
-            const gc = new GameController({id:100});
-            document.getElementById('TopPan')
-                        .getElementsByClassName('buttons')[0]
-                            .children[0]
-                                .addEventListener('click', req.bind(null, {method:'restart'}));
-            canva = new BoardCanvas(
-                    gm.Slots,
-                    // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
-                    //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
-                    [0, 0], gc);
-            gc.start([{id:100, pteam:1, team:1}, {id:100, pteam:2, team:2}], event.state.Dices);
-            canva.createDices(event.state.Dices[0], event.state.Dices[1], [white, black][event.state.ActiveTeam-1]);
-            gc._set(event.state.ActiveTeam, event.state.Dices);
-            WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
-                if(code !== ncode) step.map(({from,to})=>{
-                    gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));
-                    canva.moveChecker(from, to);
-                })
-                gc._set(newstate.ActiveTeam, newstate.Dices)
-                canva.createDices(newstate.Dices[0], newstate.Dices[1], [white, black][newstate.ActiveTeam-1]);
-            });
-            WSEventPool.on('restart', ()=>window.location.reload());
-            sendstep = async(step)=>req({method:'step', step, code:gencode()});
-            //Tabulations
-            const [mobile, pc] = Array(2).keys();
-            let state = mobile;
-            //initials..
-            const vg = document.getElementsByClassName('domino-game-page__body-wrapper')[0];
-            const TopPan = document.getElementById(`TopPan`);
-            const BottomPan = document.getElementById(`BottomPan`);
-            const righcol = document.getElementsByClassName('rightcol')[0];
-            const ddt = document.getElementsByClassName('ddt')[0];
-            const canvas = document.getElementsByClassName('canvas-container')[0];
-            const space = document.getElementsByClassName('tabspaces')[0];
-        
-            function PaginationValidate() {
-                const width = vg.clientWidth;
-                if(width < 950 && state !== mobile) {
-                    state = mobile;
-                    ddt.classList.toggle('horize', state);
-                    ddt.replaceChildren(...[
-                        TopPan, canvas, BottomPan, righcol
-                    ])
-                } else if(width >= 950 && state !== pc) {
-                    state = pc;
-                    ddt.classList.toggle('horize', state);
-                    righcol.replaceChildren(...[
-                        TopPan, space, BottomPan
-                    ])
-                }
+function createClientId() {//impNav.createClientId
+    // текущее время в миллисекундах
+    const currentTimeMs = Date.now();
+  
+    //случайное число для обеспечения уникальности
+    const randomValue = Math.floor(Math.random() * 100000);
+  
+    // уникальный идентификатор, объединив текущее время и случайное число
+    const uniqueId = `${currentTimeMs}-${randomValue}`;
+  
+    return uniqueId;
+}
+const OEPromise = ()=>{
+    let resolve, reject;
+    const promise = new Promise((r,e)=>(resolve=r)&&(reject=e));
+    return [promise, (...args)=>resolve(...args), (...args)=>reject(...args)];
+}
+
+const WSEventPool = new JustEnoughEvents();
+const WS = new class {
+    constructor() {
+        const self = this;
+        const [onopen, __onopen] = OEPromise();
+        const [onfirstclose, __onfirstclose] = OEPromise();
+        const [onauth, __onauth] = OEPromise();
+        Object.defineProperties(
+            this, {
+                onopen: {
+                    get:()=>onopen,
+                    set:()=>false
+                },
+                onfirstclose: {
+                    get:()=>onfirstclose,
+                    set:()=>false
+                },
+                onauth: {
+                    get:()=>onauth,
+                    set:()=>false
+                },
             }
-            PaginationValidate();
-            window.addEventListener('resize', PaginationValidate);
-        }
-    );
-    ws.onopen = () => {
-        req({method:'get'});
-    };
-    ws.onmessage = async (event) => {
-        const msg = JSON.parse(event.data);
+        );
+
+        this.onopen.then((args) => {
+            const localUser = JSON.parse(localStorage.getItem("user"));
+            self.req({
+                clientId: createClientId(),
+                username: localUser.username,
+                userId: localUser.userId,
+                method: "auth",
+            });
+            __onauth();
+        });
+        this.onauth.then((args) => self.req({method: "openLobby"}));
+
+        const ws = this.ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
+        WS.req = obj=>ws.send(JSON.stringify(obj));
+        ws.onopen = __onopen;
+        ws.onmessage = async (event) => {
+            const msg = JSON.parse(event.data);
+            
+            'event' in msg ?
+                WSEventPool.$$send({send}, msg.event, msg):console.log;
+        };
         
-        'event' in msg ?
-            WSEventPool.$$send(msg.event, msg):console.log;
-    };
-    
-    ws.onclose = (info) => {
-    // console.log(info);
-    
-    // если вебсокет был закрыт изза проблем с интернетом или другими проблемами клиента
-    if (info.code == 1006) {
-        if (navigator.onLine) {
-        const newWs = connectWebsocketFunctions();
-        window.ws = newWs;
-        location.hash = "#gamemode-choose";
-        impNav.pageNavigation(newWs);
-        impNav.addHashListeners();
-        }
-        return;
+        ws.onclose = (info) => {
+            // console.log(info);
+            
+            // если вебсокет был закрыт изза проблем с интернетом или другими проблемами клиента
+            if (info.code == 1006) {
+                if (navigator.onLine) {
+                const newWs = connectWebsocketFunctions();
+                window.ws = newWs;
+                location.hash = "#gamemode-choose";
+                impNav.pageNavigation(newWs);
+                impNav.addHashListeners();
+                }
+                return;
+            }
+            
+            // проверяем на reason ответ от вебсокетов
+            if (info.reason != "" && info.reason != " ") {
+                let infoReason = JSON.parse(info.reason);
+                if (infoReason != "" && infoReason.reason == "anotherConnection") {
+                return;
+                } else {
+                if (window.ws) {
+                    let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
+                    window.ws.close(1000, JSON.stringify(disconnectMsg));
+                }
+                // const newWs = connectWebsocketFunctions();
+                // window.ws = newWs;
+                // impNav.pageNavigation(newWs);
+                // impNav.addHashListeners();
+                // return;
+                }
+            } else {
+            //   if (window.ws) {
+            //     let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
+            //     window.ws.close(1000, JSON.stringify(disconnectMsg));
+            //   }
+            //   switch (infoReason.page) {
+            //     case "mainLotoPage":
+            //       location.hash = "#loto-menu";
+            //       break;
+            
+            //     case "mainPage":
+            //       location.hash = "#gamemode-choose";
+            //       break;
+            //     default:
+            //       location.hash = "#gamemode-choose";
+            //       break;
+            //   }
+            //   const newWs = connectWebsocketFunctions();
+            //   window.ws = newWs;
+            //   impNav.pageNavigation(newWs);
+            //   impNav.addHashListeners();
+            }
+        };
+        // this.onmessage = {Listens:{}}
     }
-    
-    // проверяем на reason ответ от вебсокетов
-    if (info.reason != "" && info.reason != " ") {
-        let infoReason = JSON.parse(info.reason);
-        if (infoReason != "" && infoReason.reason == "anotherConnection") {
-        return;
-        } else {
-        if (window.ws) {
-            let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
-            window.ws.close(1000, JSON.stringify(disconnectMsg));
-        }
-        // const newWs = connectWebsocketFunctions();
-        // window.ws = newWs;
-        // impNav.pageNavigation(newWs);
-        // impNav.addHashListeners();
-        // return;
-        }
-    } else {
-    //   if (window.ws) {
-    //     let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
-    //     window.ws.close(1000, JSON.stringify(disconnectMsg));
-    //   }
-    //   switch (infoReason.page) {
-    //     case "mainLotoPage":
-    //       location.hash = "#loto-menu";
-    //       break;
-    
-    //     case "mainPage":
-    //       location.hash = "#gamemode-choose";
-    //       break;
-    //     default:
-    //       location.hash = "#gamemode-choose";
-    //       break;
-    //   }
-    //   const newWs = connectWebsocketFunctions();
-    //   window.ws = newWs;
-    //   impNav.pageNavigation(newWs);
-    //   impNav.addHashListeners();
-    }
-    };
+}
+WSEventPool.on('BackgammonConnection', function() {
+
+});
+window.addEventListener('DOMContentLoaded', async()=>{
 });
 
 // class DelegateList {

@@ -6,6 +6,7 @@ const { body } = require("express-validator");
 const authMiddleware = require("../middlewares/auth-middleware");
 
 const gameRouter = require("./game-router");
+const backgamons = require("../backgamons");
 
 // user
 router.post(
@@ -62,7 +63,6 @@ router.put("/rooms-control/:mode", userController.updateRoomsControl);
 // game
 
 router.use("/game", authMiddleware, gameRouter);
-
 router.get("/is-page-available/:page", userController.isPageAvailable);
 
 // loto settings

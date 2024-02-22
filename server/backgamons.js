@@ -6,7 +6,8 @@ const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make it
 const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
 const CONSTANTS = {
     WHITEID: 1,
-    BLACKID: 2
+    BLACKID: 2,
+    RoomStates:{Waiting:0, Started:1},
 }
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -15,9 +16,13 @@ function getRandomInt(min, max) {
 }
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
 class SharedRoom0 {
-    Listeners = []
+    Connections = [];
+    RoomState = CONSTANTS.RoomStates.Waiting;
 
     constructor() {}
+    connect() {
+
+    }
     sub(send) {
         const record = {send};
         record.id = this.Listeners.push(record);
@@ -25,7 +30,7 @@ class SharedRoom0 {
     send(event, obj) {
         const msg = Object.assign(obj, {event});
 
-        this.Listeners.map(async({send})=>send(msg));
+        this.Connections.map(async({send})=>send(msg));
     }
 }
 class TGame extends SharedRoom0 {
@@ -72,7 +77,6 @@ class TGame extends SharedRoom0 {
             [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
             [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
         }
-        console.log(ActiveTeam, nextTeam[ActiveTeam]);
         return this.info = {
             ActiveTeam: nextTeam[ActiveTeam],
             Dices: randdice()
@@ -95,9 +99,37 @@ class TGame extends SharedRoom0 {
         }
     }
 }
-const Games = [ new TGame() ];//probe
-
+const BETsList = [0.5,1,3,5,10]
+const Games = BETsList.map(bet=>range(0, 7).map(()=>new TGame()));
+const LobbyListeners = [];
+const Lobby = {
+    ListenLobby(user, ws) {
+        LobbyListeners[ctx.user.clientID] = Object.assign(ctx.user, ws.send.bind(ws));//is safety?
+    },
+    UnlistenLobby(user) {
+        delete LobbyListeners[ctx.user.clientID];
+    }
+}
 const WSPipelineCommands = {
+    /* this -> ws of connection */
+    auth(ctx, msg) {
+        const {clientID, userId, method} = msg;
+        ctx.user = {clientID, userId, method};
+            /////////////////////<<add auth check by token or pagetoken.. later
+        this.externalPipes.push(LobbyPipe);
+        return ctx.user;
+    },
+    openLobby(ctx, msg) {
+        Lobby.ListenLobby(ctx.user);
+        return 
+    },
+    connect(ctx, msg) {
+        this.unsub(ctx, msg);
+        const Game = Games[ctx.RoomID = msg.tableid];
+    },
+    // unsub(ctx, msg) {
+    //     Externals.UnlistenLobby(ctx.user);
+    // }
     step({Game}, {step, code}) {
         return Game.stepIfValid(step, code);
     },
@@ -107,27 +139,36 @@ const WSPipelineCommands = {
     },
     restart(ctx) {
         const lastGame = ctx.Game;
-        const Game = ctx.Game = Games[ctx.GameID] = new TGame();
-        Game.Listeners = lastGame.Listeners;
+        const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
+        // Game.Listeners = lastGame.Listeners;
         Game.send('restart', {slots: Game.Slots, state: Game.info});
-    }
+    },
+}
+const TWSPipelineCommands = ()=>{
+    const wlist = ['auth']
+    const authmsg = ()=>({result:'error', msg:'u need auth'})
+    return new Proxy(WSPipelineCommands, {
+        get:(t,key, proxyer)=>{
+            if(key in wlist) {
+                return t[key];
+            } else return function(ctx, ...args){
+                if(ctx.user)
+                    return t[key].call(this, ctx, ...args);
+                return authmsg;
+            }
+        }
+    })
 }
 var fs = require('fs');
 module.exports = function(ws, req) {
-    fs.writeFile('/test.log', 'connection', console.log.bind(console));
-
+    // fs.writeFile('/test.log', 'connection', console.log.bind(console));
     ws._socket.setKeepAlive(true);
-    // console.log('Hello');
-    const ctx = {
-        GameID: 0,//probe
-        Game: Games[0], //probe //maybe upgrd to Property or Proxy on Game.. 
-    };
+    const ctx = {};
+    const WSPipelineCommands = new TWSPipelineCommands();
     const send = response=>ws.send(JSON.stringify(response));
-    ctx.Game.sub(send);
-    // ws.send(JSON.stringify(WSPipelineCommands.get.call(ws,ctx,{})));
+
     ws.on('message', function(_msgblob) {
         const msg = JSON.parse(_msgblob);
-
         try{
             const response = WSPipelineCommands[msg.method]?.call(ws, ctx, msg);
             response && send(response);//skips undeifned n' nulls..
