@@ -96,7 +96,7 @@ const BotStats = sequelize.define("botstat", {
 
 const Token = sequelize.define("token", {
   userId: { type: DataTypes.INTEGER },
-  refreshToken: { type: DataTypes.STRING },
+  refreshToken: { type: DataTypes.STRING(1024) },
 });
 
 const LotoCard = sequelize.define("card", {
