@@ -1,12 +1,79 @@
-const main__container = document.createElement("div");
-main__container.classList.add(
-  "main__container",
-  "header__padding",
-  "footer__padding"
-);
-const Rooms = formTwoPlayersMenu(document.getElementsByTagName('main')[0], main__container, null, 'CLASSIC');
+export function setOnlineToTable(roomId, tableId, players) {
+    // const playerMode = getPlayerMode();
+  
+    // const hash = window.location.hash.split("/");
+    // const gameMode = hash[0] == "#domino-menu" ? "CLASSIC" : "TELEPHONE";
+  
+    const hash = window.location.hash;
+    // let gameMode = "CLASSIC";
+    // //  hash[0] == "#domino-menu" ? "CLASSIC" : "TELEPHONE";
+  
+    // if (hash.includes("domino-menu-telephone")) {
+    //   gameMode = "TELEPHONE";
+    // } else {
+    //   gameMode = "CLASSIC";
+    // }
+  
+    // check if user is on right page
+    // if (
+    //   (!hash.includes("domino-menu") &&
+    //     !hash.includes("domino-menu-telephone")) ||
+    //   playerMode !== msg.playerMode ||
+    //   gameMode.toUpperCase() !== msg.gameMode.toUpperCase()
+    // ) {
+    //   return;
+    // }
+  
+    const tableBlock = document.querySelector(
+        `.domino-room[dominoRoomId="${roomId}"] .domino-room-content__table[tableId="${tableId}"]`
+    );
+    if (!tableBlock) return;
+    const playersOnline = tableBlock.querySelector(
+        ".domino-room-table-info__players"
+    );
+    if (playersOnline) {
+        let peopleItems = playersOnline.querySelectorAll(
+            ".domino-room-table-info__players-item"
+        );
+  
+        let roomHalfs = tableBlock.querySelectorAll(".domino-room-table-part");
+    
+        playersOnline.innerHTML += `
+            <div class="domino-room-table-info__players-item">
+            <img src="./img/domino-online-icon.png" alt="" />
+            </div>
+        `;
+  
+        peopleItems = playersOnline.querySelectorAll(
+            ".domino-room-table-info__players-item"
+        );
+    
+        for (let i = 0; i < players.length; i++) {
+            let roomHalf = roomHalfs[i];
+            if (roomHalf) {
+                roomHalf.classList.add("filled");
+                if (window.isAdmin == true && i == peopleItems.length - 1) {
+                roomHalf.innerHTML = `<div class="table-admin__userid-item">${/*players[i].userId//msg.userId*/1}</div>`;
+                }
+            }
+        }
+  
+      // playersOnline.innerHTML = Number(playersOnline.innerHTML) + 1;
+    }
+}
 
-function formTwoPlayersMenu(main, main__container, ws, gameMode) {
+export function openBackgammonsMenuPage() {
+    const main__container = document.createElement("div");
+    main__container.classList.add(
+      "main__container",
+      "header__padding",
+      "footer__padding"
+    );
+    const main = document.getElementsByTagName('main')[0];
+    main.innerHTML = '';
+    const Rooms = formTwoPlayersMenu(main, main__container, 'CLASSIC');
+}
+function formTwoPlayersMenu(main, main__container, gameMode='CLASSIC') {
     //   const siteLanguage = window.siteLanguage;
         const gamesBlock = document.createElement("div");
         gamesBlock.classList.add("domino-games", "games");
@@ -115,9 +182,9 @@ function formTwoPlayersMenu(main, main__container, ws, gameMode) {
     //       });
     //     });
     //   }
-        const rooms = document.querySelectorAll(".domino-room");
+        const rooms = [...document.querySelectorAll(".domino-room")];
         rooms.map((room) => {
-            const tables = room.querySelectorAll(".domino-room-content__table");
+            const tables = [...room.querySelectorAll(".domino-room-content__table")];
             const dominoRoomId = +room.getAttribute("dominoRoomId");
             return {
                 [dominoRoomId]: tables.map((table) => {
@@ -126,7 +193,15 @@ function formTwoPlayersMenu(main, main__container, ws, gameMode) {
                 return {[tableId]:table};
             })};
         });
-    }
-function onclick() {
-    
+}
+function onclick([dominoRoomId, tableId]) {
+    const [room, table] = this;
+    alert(dominoRoomId);
+    window.ws.send(
+      JSON.stringify({
+        method: "backgammons/connect",
+        dominoRoomId,
+        tableId,
+      })
+    );
 }

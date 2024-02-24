@@ -8,6 +8,8 @@ import * as impLotoNav from "./loto/loto-navigation.js";
 import * as impPopup from "./pages/popup.js";
 import * as impMoveElement from "./move-element.js";
 import * as impAudio from "./audio.js";
+import * as BackgammonMenu from "../LobbyPool.js";
+import * as BackgammonGameTable from "../GamePool.js";
 let preloader = document.querySelector(".page-preloader");
 let header = document.querySelector("header");
 let main = document.querySelector("main");
@@ -310,6 +312,53 @@ export async function hashNavigation() {
         impPopup.openErorPopup("Ошибка подключения");
         setTimeout(() => location.reload(), 3000);
       }
+    } else {
+      console.error("Ошибка при получании даных комнаты! попробуйте еще раз");
+    }
+  } else if (hash === "#backgammons-menu") {
+    setTimeout(() => {
+      window.ws.send(
+        JSON.stringify({
+          method: "clearWS",
+        })
+      );
+      window.ws.send(
+        JSON.stringify({
+          method: "backgammons/openLobby",
+        })
+      );
+      BackgammonMenu.openBackgammonsMenuPage();
+      // const dominoPopup = document.querySelector(
+      //   ".domino-waiting-popup-wrapper"
+      // );
+      // if (dominoPopup) {
+      //   dominoPopup.remove();
+      // }
+    }, 50);
+  } else if (hash.includes("#backgammon-room-table")) {
+    hideNavigation();
+    const dominoRoomId = +hash.split("/")[1];
+    const tableId = +hash.split("/")[2];
+    if (dominoRoomId && tableId) {
+      BackgammonGameTable.ShowGameTable();
+      // try {
+      //   ws.send(
+      //     JSON.stringify({
+      //       dominoRoomId,
+      //       tableId,
+      //       playerMode,
+      //       gameMode,
+      //       username: localUser.username,
+      //       userId: localUser.userId,
+      //       avatar: localUser.avatar,
+      //       method: "connectDomino",
+      //     })
+      //   );
+      //   preloader.classList.add("d-none");
+      // } catch {
+      //   impPopup.openErorPopup("Ошибка подключения");
+      //   setTimeout(() => location.reload(), 3000);
+      // }
     } else {
       console.error("Ошибка при получании даных комнаты! попробуйте еще раз");
     }

@@ -108,9 +108,14 @@ export function openDominoChoosePage() {
 
 export function dominoChoosePageListeners() {
   const siteLanguage = window.siteLanguage;
-  const lockedBackgammon = document.querySelector(".mode-item__locked");
-  lockedBackgammon.addEventListener("click", () => {
-    impPopup.openErorPopup(siteLanguage.popups.comingSoon);
+  const Backgammon = document.querySelector(".domino-choose__button.backgamons");
+  Backgammon.addEventListener("click", async () => {
+    // const response = await impHttp.getIsPageAvailable("dominoClassic");
+    // if (!response.data.isAvailable) {
+    //   impPopup.openErorPopup(siteLanguage.popups.pageUnavailable);
+    //   return;
+    // }
+    location.hash = "#backgammons-menu";
   });
 
   let lotoButton = document.querySelector(".mode-item.loto");

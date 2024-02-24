@@ -160,13 +160,13 @@ function GameControllerCtxWithGmEntries(gm) {
             this.CurrentStep = new StepRecord(activePlayer, this._Dice(dices));
         }
 
-        start(players, dices) {
+        start(players, dices, ActiveTeam=1) {
             gm.players = players;
             gm.User = players.reduce((x, p) => p.id === this.User.id ? p : x)
             gm.whiteplayer = players.reduce((x, p) => p.team === 1 ? p : x);
             gm.blackplayer = players.reduce((x, p) => p.team === 2 ? p : x);
-
-            this.CurrentStep = new StepRecord(gm.whiteplayer, this._Dice(dices));
+            const activePlayer = ActiveTeam === 1 ? gm.whiteplayer : gm.blackplayer;
+            this.CurrentStep = new StepRecord(activePlayer, this._Dice(dices));
         }
 
         nextPlayer(player = null) {

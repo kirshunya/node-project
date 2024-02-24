@@ -219,7 +219,8 @@ const timeouts = [
   { roomId: 4, timeoutId: null, timeoutStarted: false },
   { roomId: 5, timeoutId: null, timeoutStarted: false },
 ];
-app.ws("/backgammons", require("./backgamons"));
+const backgammonwss = require("./backgamons");
+app.ws("/backgammons", backgammonwss);
 // web sockets для подключения к играм
 app.ws("/game", (ws, req) => {
   ws._socket.setKeepAlive(true);
@@ -475,8 +476,8 @@ app.ws("/game", (ws, req) => {
 
       // ============ DOMINO ============ //
     }
-    
   });
+  backgammonwss(ws, req);
   dominoWsNavService.addDominoWsListeners(ws, aWss);
 
   ws.on("close", async (status, msg) => {
@@ -657,6 +658,7 @@ function disconnectexistingClient(array) {
 const broadcastMenu = async (ws, msg) => {
   ws.loginUsername = msg.username;
   ws.clientId = msg.clientId;
+  ws.userId = msg.userId;
 
   // проверка сущестуют ли другие сесии с этого аккаунта
   for (const client of aWss.clients) {

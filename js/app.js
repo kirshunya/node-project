@@ -48,7 +48,7 @@ if (await impAuth.isAuth())
   // impNav.addHashListenersWS(ws);
 
   // надо для лото на первой странице
-  impNav.addListeners(ws);
+  // impNav.addListeners(ws);
 
   location.hash = "#gamemode-choose";
   impDominoNav.dominoChoosePageListeners();
