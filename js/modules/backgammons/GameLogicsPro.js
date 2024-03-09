@@ -1,12 +1,13 @@
 // import { black, white } from "./Utilities.js";
-import { BoardConstants, refToArr, slotinfo } from './BoardConstants.js';
+import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './BoardConstants.js';
 import { BoardCanvas } from './CanvasRender.js'
+
 
 const SlotsIterator = (slots, CB)=>(
                                 slots = new Proxy(slots, {get:(slots,key)=>slots[key]||[0,0]}), 
                                 [...Array(24).keys()].map(index=>CB(slots[index]))
                             );
-const { WHITE, BLACK, EMPTY, CHECKERS } = BoardConstants;
+const { WHITE, BLACK, EMPTY, CHECKERS, MAP } = BoardConstants;
 class Board {
     FartherOpponentCheckerPos
     Slots
@@ -21,67 +22,20 @@ class Board {
         this.User = User;//need field @team -> BoardConstant[WHITE||BLACK];
         this.Slots = SlotsIterator(BoardInits.Slots, data=>data);
 
-        class Slot {
-            index
-            refToArr
-            Sloter
-
-            constructor(ref, index, Sloter) {
-                this.refToArr = new refToArr(ref);
-                this.index = index;
-                this.Sloter = Sloter;
-            }
-            ismy() {
-                const [count, colour] = this.refToArr;
-                return c===User?.colour;
-            }
-            permPushChecker(colour) {
-                if(++this.refToArr.Count === 1)
-                    this.refToArr.Colour = colour;
-            }
-            permTakeChecker() {
-                const colour = this.refToArr.Colour;
-                if(--this.refToArr.Count === 0)
-                    this.refToArr.Colour = EMPTY;
-                return colour;
-            }
-            permMoveTo(toIndex) {
-                this.Sloter[toIndex].permPushChecker(this.permTakeChecker());
-            }
-            next(point) {
-                function up(from, point) {
-                    const isBlack = gc.CurrentStep.player.team === 2;
-                    const pos = from + (isBlack&&(pos<12?24:-12)) + point;
-                    
-                    //validating
-                    const isover = pos > 23;
-
-                    const index = isover?User.team.over:isBlack?(pos+12)%24:pos;
-                    
-                    return {pos, isover, index};
-                }
-                const {pos, isover, index} = up(this.index, point);
-                return this.Sloter[index];
-            }
-        }
-        class DropSlot {
-            index
-            count = 0
-            isover=true
-            constructor(index) {
-                this.index = index;
-            }
-
-            permPushChecker() {
-                this.count++;
-            }
-        }
         this.Drops = [
-            new DropSlot(-1), new DropSlot(WHITE.over), new DropSlot(BLACK.over)
+            new DropSlot(EMPTY.id), new DropSlot(WHITE.over), new DropSlot(BLACK.over)
         ];
 
         this.Slots0 = new Proxy({}, {
+            /**
+             * 
+             * @param {*} _t 
+             * @param {*} SlotIndex 
+             * @param {*} _proxy 
+             * @returns {Slot}
+             */
             get:(_t, SlotIndex, _proxy) => {
+                if(SlotIndex === 'User') return User;
                 if(SlotIndex === WHITE.over) return this.Drops[WHITE.id];
                 if(SlotIndex === BLACK.over) return this.Drops[BLACK.id];
                 return new Slot(self.Slots[SlotIndex], SlotIndex, _proxy)
@@ -93,15 +47,22 @@ class Board {
         const {PTS, ActivePlayer, CurrentStepCash} = GameState;
         const FromSlot = this.Slots0[fromIndex];
 
-        if(ActivePlayer.team.id === User.team.id) return;
+        if(ActivePlayer.team.id !== User.team.id) return;
         if(!FromSlot.ismy()) return;
+        if(fromIndex===0&&GameState.headed) return;
 
         const AccMoves = {
             moves:{},
-
+            /**
+             * 
+             * @param {int} toIndex 
+             * @param {int[]} Points array of used points
+             * @returns {int} -1 if PermanentSetReturnCode
+             */
             push(toIndex, Points) {
+                const PermanentSetReturnCode = -1
                 const {moves} = this;
-                if(toIndex !== User.team.over) return (moves[toIndex] = Points, -1);
+                if(toIndex !== User.team.over) return (moves[toIndex] = Points, PermanentSetReturnCode);
                 else if(moves[toIndex] === undefined) 
                     moves[toIndex] = [];//if isover we should ask user to choose which point he spend to step
                 return moves[toIndex].push(Points);
@@ -116,7 +77,12 @@ class Board {
                 return this.moves;
             }
         };
-
+        /**
+         * 
+         * @param {int[]} PTS 
+         * @param {Slot} FromSlot 
+         * @param {int[]} spendedPoints 
+         */
         function StepByStep(PTS, FromSlot, spendedPoints) {
             for(const point of new Set(PTS)) {
                 const curSlot = FromSlot.next(point);
@@ -124,7 +90,7 @@ class Board {
                     AccMoves.push(curSlot.index, [...spendedPoints, point]); 
                     continue;
                 };
-                if(curSlot.ismy()) {
+                if(curSlot.ismy()||curSlot.isempty()) {
                     const curSpended = [...spendedPoints, point];
                     if(1) {/* if 6 пешек одного цвета подряд и противник дальше не зашёл */}
                     AccMoves.push(curSlot.index, curSpended);
@@ -138,15 +104,25 @@ class Board {
         }
         StepByStep(PTS, FromSlot, []);
 
-        return AccMoves.optimize();
+        
+        function sixchecker(to, from) {
+            return false;
+        }
+
+        return CurrentStepCash.MovesCash = AccMoves.optimize();
     }
     UserMovesByDice(GameState, Dice) {
 
     }
+    /**
+     * 
+     * @param {GameState} GameState 
+     * @param {{from:int, to:int}} param1 
+     */
     UserMove(GameState, {from, to}) {
         const {CurrentStepCash} = GameState;
-        CurrentStepCash.MovesStack.push({from,to});
-        this.Slots0[from].moveTo(to);
+        CurrentStepCash.MovesStack.push({from, to, points:CurrentStepCash.MovesCash[to]});
+        this.Slots0[from].permMoveTo(to);
     }
     UserStepComplete() {
 
@@ -171,24 +147,45 @@ class GameState {
     }
 
     GameState = BoardConstants.GAMESTATE.Waiting;
-    constructor(GameStateInits) {
-        Object.defineProperty(this, 'PTS', {
-            get:(target)=>{
-                const [f, s] = target.Dices;
-                return f===s?[f, f, s, s]:[f, s];
-            }
+    get PTS() {
+        const [f, s] = this.Dices;
+        const sum = (acc, num) => acc + num;
+        const clearPTS = f===s?[f, f, s, s]:[f, s];
+        const usedPTS = this.CurrentStepCash.MovesStack.map(({points})=>points).flat(10);
+        let renewalPTS = clearPTS; let used = false;
+        usedPTS.map(point=>{//TODO: переписат до лаконичного использования редьюс
+            used = false;
+            renewalPTS = renewalPTS.filter(cp=>{
+                if(cp===point && !used) {
+                    used = true
+                    return false
+                }
+                return true;
+            });
         })
+        return renewalPTS;
     }
+    get headed() {
+        return this.CurrentStepCash.MovesStack.reduce(
+            ({from})=>from===this.ActivePlayer.team.id===WHITE.id?0:12)//TODO rename 0 and 12
+    }
+    constructor(GameStateInits) {}
 
-    start(...data){
+    start(state, players){
         this.GameState = BoardConstants.GAMESTATE.GameStarted;
-        this.state(...data);
+        this.players = [{},...players].reduce((acc, player)=>
+            (acc[player.team] = (player.team = [WHITE, BLACK][player.team-1], player), acc)
+        );
+        console.log(this.players);
+        this.state(state);
     }
-    state(...data){
+    state({ActiveTeam, Dices}) {
         this.CurrentStepCash = {
             MovesStack: [],
             MovesCash: {}
         }
+        this.ActivePlayer = this.players[ActiveTeam];
+        this.Dices = Dices;
     }
     finish(WinnerTeam) {
 
@@ -196,6 +193,11 @@ class GameState {
 }
 
 export class GameProvider {
+    /**
+     * 
+     * @param {{User, Slots, sendstep:Function}} BoardInits 
+     * @param {*} GameStateInits 
+     */
     constructor(BoardInits, GameStateInits) {
         const self = this;
         this.Board = new Board(BoardInits);
@@ -203,18 +205,25 @@ export class GameProvider {
         this.GameCanvas = new BoardCanvas(
             BoardInits.Slots, [CHECKERS.empty, CHECKERS.empty], {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
-            move: (...args)=>UserMove(this.GameState, ...args)
+            move: (from, to)=>{
+                this.Board.UserMove(this.GameState, {from:+from, to:+to})
+                if(this.GameState.PTS.length===0)
+                    BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
+            }
         });
             // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
             //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
 
         this.eventHandlers = {
-            start() {
-                
+            start(GameStateData, players) {
+                self.GameState.start(GameStateData, players);
             },
             step(Step, newGameStateData) {
                 self.Board.PermStep(Step, self.GameState);
                 self.GameCanvas.step(Step);
+                self.GameState.state(newGameStateData);
+            },
+            ustep(Step, newGameStateData) {
                 self.GameState.state(newGameStateData);
             },
             end() {

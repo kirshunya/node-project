@@ -1,4 +1,4 @@
-import { ondom } from './Utilities.js';
+import { ondom, getRandomInt } from './Utilities.js';
 import { WSEventPool } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
@@ -74,11 +74,12 @@ export function ShowGameTable() {
     if(!GameInitData) {
         alert('no GameInitData in GamePool.js')
     }
-    else InitGame(GameInitData, localUser);
+    else InitGame(GameInitData, localUser, ws);
 }
 const User = {userId: 0, username: 'debug'};
+const Uspe = (team)=>({userId: User.userId, username: User.username, team})
 let ef = {
-    players: [User, User],
+    players: [Uspe(BoardConstants.WHITE.id), Uspe(BoardConstants.BLACK.id)],
     state: {ActiveTeam: BoardConstants.WHITE.id, Dices: [1,1]}
 };
 window.addEventListener('DOMContentLoaded', 
@@ -86,13 +87,13 @@ window.addEventListener('DOMContentLoaded',
 );
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
-export function InitGame(GameInitData, {userId, username}) {
+export function InitGame(GameInitData, {userId, username}, ws) {
     const {slots, dropped, players, state} = GameInitData;
-    const req = msg=>window.ws.send(JSON.stringify(msg));
+    const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
 
-    const gp = new GameProvider({ User, Slots:slots,  });
-    const { Board, GameState, GameCanvas } = gp;
+    const gp = new GameProvider({ User, Slots:slots, sendstep });
+    const { GameCanvas } = gp;
     // const gm = new GameModel(slots, dropped, sendstep);
     // const {GameController} = GameControllerCtxWithGmEntries(gm);
     // const gc = new GameController({id:userId, username});
@@ -108,21 +109,30 @@ export function InitGame(GameInitData, {userId, username}) {
 
     WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices))
     if(GameInitData.GameState === 1) GameStart(GameInitData.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices)
-    if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
+    // if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
+    if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices);//debug----TODO
     function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices) {
+        User.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
+        gp.eventHandlers.start({ActiveTeam, Dices}, [firstPlayer, secondPlayer]);
         // gc.User = secondPlayer;
-        GameState.start([
-                {id:firstPlayer.userId, pteam:firstPlayer.team, team:firstPlayer.team}, 
-                {id:secondPlayer.userId, pteam:secondPlayer.team, team:secondPlayer.team}
-            ], Dices, ActiveTeam);
+        // GameState.start([
+        //         {id:firstPlayer.userId, pteam:firstPlayer.team, team:firstPlayer.team}, 
+        //         {id:secondPlayer.userId, pteam:secondPlayer.team, team:secondPlayer.team}
+        //     ], Dices, ActiveTeam);
         
-        canva.createDices(Dices[0], Dices[1], [white, black][ActiveTeam-1]);
+        GameCanvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].name);
         const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
         document.getElementById('TopPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = whiteplayer.username;
         document.getElementById('BottomPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = blackplayer.username;
     }
+    WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
+            User.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];
+            code !== ncode && gp.eventHandlers.step(step, newstate)
+                           || gp.eventHandlers.ustep(step, newstate)
+                    GameCanvas.createDices(newstate.Dices[0], newstate.Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1].name);
+        });
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
     //     if(code !== ncode) step.map(({from,to})=>{
     //             gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));

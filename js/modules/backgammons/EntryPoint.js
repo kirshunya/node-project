@@ -27,7 +27,7 @@ function createClientId() {//impNav.createClientId
 }
 WSEventPool.on('backgammons::connection::self', function(GameInitData) {
     // GamePool.ShowGameTable(GameInitData);
-    GamePool.InitGame(GameInitData, {userId:0,username:''})
+    GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
 });
 WSEventPool.on('backgammons::game::init', function() {
     GamePool.ShowGameTable(GameInitData);

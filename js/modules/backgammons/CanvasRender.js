@@ -238,7 +238,7 @@ export class BoardCanvas {
     }
     showGUI(fromSlot) { //TODO: rebase
         for (let ghost of this.enabledGhosts) this.canvas.remove(ghost.img);
-        let availableKeys = this.gc.UserMovesFrom(fromSlot).keys;
+        let availableKeys = Object.keys(this.gc.UserMovesFrom(fromSlot));
         for (let key of availableKeys) {
             if (key === 'whiteOver' || key === 'blackOver') {
                 let team = key === 'whiteOver' ? 0 : 1;
