@@ -57,36 +57,37 @@ const $PageSnapshotData = {
         gameboardpic: `img/bcbg.png`
     }
 }
-const [initWidth, initHeight] = [360, 480];
-const BoardWidth = 1600;
-const BoardHeight = 1850;
-const BordersByX = [43,100,40];
-const BordersByY = [56,0,-112];
-const slotWidth = (BoardWidth - BordersByX.reduce((acc,n)=>acc+n))/12;
-const slotHeight = (BoardHeight - BordersByY.reduce((acc,n)=>acc+n))/2;
-const BoardSidesSize = [712, 712];
+//Выделить в отдельный класс позиционирования и масштабирования
+    const [initWidth, initHeight] = [360, 480];
+    const BoardWidth = 1600;
+    const BoardHeight = 1850;
+    const BordersByX = [43,100,40];
+    const BordersByY = [56,0,-112];
+    const slotWidth = (BoardWidth - BordersByX.reduce((acc,n)=>acc+n))/12;
+    const slotHeight = (BoardHeight - BordersByY.reduce((acc,n)=>acc+n))/2;
+    const BoardSidesSize = [712, 712];
 
-const slotMargin = -10;
-const checkerSize = slotWidth - slotMargin*2;
-let StaticImg 
+    const slotMargin = -10;
+    const checkerSize = slotWidth - slotMargin*2;
+    let StaticImg 
 
-const stepY = checkerSize / 2.5;
-const TopY = BordersByY[0];
-const BottomY = BoardHeight - BordersByY[2]// - checkerSize; 
-const LeftX = BordersByX[0];
-const __posX$ = (slotIndex) => LeftX + slotWidth*slotIndex + ((slotIndex > 5)?BordersByX[1]:0)-1;
-const __posX = (slotIndex) => {
-    const slotSize = (BoardSidesSize[+(slotIndex>6)] + slotMargin)/6;
-    const LeftX = slotIndex<6?BordersByX[0]:BordersByX[0]+BoardSidesSize[0]+BordersByX[1];
-    return LeftX + (slotSize)*(slotIndex%6);
-}
-const posX = (slotIndex) => __posX(slotIndex < 12 ? 11 - slotIndex : slotIndex - 12);
-const posY = (slotIndex, CheckerIndex) => (slotIndex<12)
-                                                ? TopY  +  stepY*CheckerIndex
-                                                : BottomY  -  stepY*CheckerIndex;
+    const stepY = checkerSize / 2.5;
+    const TopY = BordersByY[0];
+    const BottomY = BoardHeight - BordersByY[2]// - checkerSize; 
+    const LeftX = BordersByX[0];
+    const __posX$ = (slotIndex) => LeftX + slotWidth*slotIndex + ((slotIndex > 5)?BordersByX[1]:0)-1;
+    const __posX = (slotIndex) => {
+        const slotSize = (BoardSidesSize[+(slotIndex>6)] + slotMargin)/6;
+        const LeftX = slotIndex<6?BordersByX[0]:BordersByX[0]+BoardSidesSize[0]+BordersByX[1];
+        return LeftX + (slotSize)*(slotIndex%6);
+    }
+    const posX = (slotIndex) => __posX(slotIndex < 12 ? 11 - slotIndex : slotIndex - 12);
+    const posY = (slotIndex, CheckerIndex) => (slotIndex<12)
+                                                    ? TopY  +  stepY*CheckerIndex
+                                                    : BottomY  -  stepY*CheckerIndex;
 const {whitecheckerpicurl, blackcheckerpicurl, 
     ghostcheckerpicurl, gameboardpic} = $PageSnapshotData.Graphics
-class BoardCanvas {
+export class BoardCanvas {
     dropped = [new Slot(), new Slot()]
     slots = []
     enabledGhosts = []
@@ -125,7 +126,8 @@ class BoardCanvas {
             const canvasbackimgProm = setBackgroundImage();
             canvas.selection = false;
             //iterates for GameModel.Slots
-            const PromisesOfCreatingPictures = Promise.all(GSlots.map((slot,slotIndex)=>{
+            const PromisesOfCreatingPictures = Promise.all(GSlots.map(([n,c],slotIndex)=>{
+                    const slot = { Count:n, Colour:c };
                     self.slots[slotIndex] = new Slot();
                     const pic = slot.Colour === "white" ? whitecheckerpicurl : blackcheckerpicurl;
                     return range(0,slot.Count)

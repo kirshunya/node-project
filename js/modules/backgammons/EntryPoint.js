@@ -1,15 +1,18 @@
-var canva;
-const API_URL_PART = `://127.0.0.1:5001`
+import { sleep, range, JustEnoughEvents, OEPromise, FCPromise } from './Utilities.js';
+import { WSEventPool, onnewmsg } from './WSEP.js';
+import * as GamePool from './GamePool.js';
+import { API_URL_PART } from './../config.js'
+// const siteLanguage = {
+//     dominoRoomsMenu:{
+//         gamePrice:'Цена комнаты',
+//         gameDuration:'Длительность игры 5 минут',
+//         classicDurationLabel:'Одна игра',
+//         classic: 'Нарды'
+//     }
+// }
+// var canva;
 // const API_URL_PART = `://194.87.244.199:5001`
 
-const siteLanguage = {
-    dominoRoomsMenu:{
-        gamePrice:'Цена комнаты',
-        gameDuration:'Длительность игры 5 минут',
-        classicDurationLabel:'Одна игра',
-        classic: 'Нарды'
-    }
-}
 function createClientId() {//impNav.createClientId
     // текущее время в миллисекундах
     const currentTimeMs = Date.now();
@@ -22,120 +25,140 @@ function createClientId() {//impNav.createClientId
   
     return uniqueId;
 }
-const OEPromise = ()=>{
-    let resolve, reject;
-    const promise = new Promise((r,e)=>(resolve=r)&&(reject=e));
-    return [promise, (...args)=>resolve(...args), (...args)=>reject(...args)];
-}
+WSEventPool.on('backgammons::connection::self', function(GameInitData) {
+    // GamePool.ShowGameTable(GameInitData);
+    GamePool.InitGame(GameInitData, {userId:0,username:''})
+});
+WSEventPool.on('backgammons::game::init', function() {
+    GamePool.ShowGameTable(GameInitData);
+});
+const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
+const req = msg=>ws.send(JSON.stringify(msg));
+const send = req;
+ws.onopen = () => {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    req({
+        clientId: createClientId(),
+        username: localUser.username,
+        userId: localUser.userId,
+        method: "backgammons/auth",
+    });
+    req({
+        method: "backgammons/connect", dominoRoomId:0, tableId:0
+    })
+    req({
+        method: "backgammons/connectPage", dominoRoomId:0, tableId:0
+    })
+};
+ws.onmessage = async (event) => {
+    const msg = JSON.parse(event.data); 
+    
+    'event' in msg 
+        ? WSEventPool.$$send(msg.event, msg, {send})
+        : console.log();
+};
+// const WS = new class {
+//     constructor() {
+//         const self = this;
+//         const [onopen, __onopen] = OEPromise();
+//         const [onfirstclose, __onfirstclose] = OEPromise();
+//         const [onauth, __onauth] = OEPromise();
+//         Object.defineProperties(
+//             this, {
+//                 onopen: {
+//                     get:()=>onopen,
+//                     set:()=>false
+//                 },
+//                 onfirstclose: {
+//                     get:()=>onfirstclose,
+//                     set:()=>false
+//                 },
+//                 onauth: {
+//                     get:()=>onauth,
+//                     set:()=>false
+//                 },
+//             }
+//         );
 
-const WSEventPool = new JustEnoughEvents();
-const WS = new class {
-    constructor() {
-        const self = this;
-        const [onopen, __onopen] = OEPromise();
-        const [onfirstclose, __onfirstclose] = OEPromise();
-        const [onauth, __onauth] = OEPromise();
-        Object.defineProperties(
-            this, {
-                onopen: {
-                    get:()=>onopen,
-                    set:()=>false
-                },
-                onfirstclose: {
-                    get:()=>onfirstclose,
-                    set:()=>false
-                },
-                onauth: {
-                    get:()=>onauth,
-                    set:()=>false
-                },
-            }
-        );
+//         this.onopen.then((args) => {
+//             const localUser = JSON.parse(localStorage.getItem("user"));
+//             self.req({
+//                 clientId: createClientId(),
+//                 username: localUser.username,
+//                 userId: localUser.userId,
+//                 method: "auth",
+//             });
+//             __onauth();
+//         });
+//         this.onauth.then((args) => self.req({method: "openLobby"}));
 
-        this.onopen.then((args) => {
-            const localUser = JSON.parse(localStorage.getItem("user"));
-            self.req({
-                clientId: createClientId(),
-                username: localUser.username,
-                userId: localUser.userId,
-                method: "auth",
-            });
-            __onauth();
-        });
-        this.onauth.then((args) => self.req({method: "openLobby"}));
-
-        const ws = this.ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
-        WS.req = obj=>ws.send(JSON.stringify(obj));
-        ws.onopen = __onopen;
-        ws.onmessage = async (event) => {
-            const msg = JSON.parse(event.data);
+//         const ws = this.ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
+//         WS.req = obj=>ws.send(JSON.stringify(obj));
+//         ws.onopen = __onopen;
+//         ws.onmessage = async (event) => {
+//             const msg = JSON.parse(event.data);
             
-            'event' in msg ?
-                WSEventPool.$$send({send}, msg.event, msg):console.log;
-        };
+//             'event' in msg ?
+//                 WSEventPool.$$send({send}, msg.event, msg):console.log;
+//         };
         
-        ws.onclose = (info) => {
-            // console.log(info);
+//         ws.onclose = (info) => {
+//             // console.log(info);
             
-            // если вебсокет был закрыт изза проблем с интернетом или другими проблемами клиента
-            if (info.code == 1006) {
-                if (navigator.onLine) {
-                const newWs = connectWebsocketFunctions();
-                window.ws = newWs;
-                location.hash = "#gamemode-choose";
-                impNav.pageNavigation(newWs);
-                impNav.addHashListeners();
-                }
-                return;
-            }
+//             // если вебсокет был закрыт изза проблем с интернетом или другими проблемами клиента
+//             if (info.code == 1006) {
+//                 if (navigator.onLine) {
+//                 const newWs = connectWebsocketFunctions();
+//                 window.ws = newWs;
+//                 location.hash = "#gamemode-choose";
+//                 impNav.pageNavigation(newWs);
+//                 impNav.addHashListeners();
+//                 }
+//                 return;
+//             }
             
-            // проверяем на reason ответ от вебсокетов
-            if (info.reason != "" && info.reason != " ") {
-                let infoReason = JSON.parse(info.reason);
-                if (infoReason != "" && infoReason.reason == "anotherConnection") {
-                return;
-                } else {
-                if (window.ws) {
-                    let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
-                    window.ws.close(1000, JSON.stringify(disconnectMsg));
-                }
-                // const newWs = connectWebsocketFunctions();
-                // window.ws = newWs;
-                // impNav.pageNavigation(newWs);
-                // impNav.addHashListeners();
-                // return;
-                }
-            } else {
-            //   if (window.ws) {
-            //     let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
-            //     window.ws.close(1000, JSON.stringify(disconnectMsg));
-            //   }
-            //   switch (infoReason.page) {
-            //     case "mainLotoPage":
-            //       location.hash = "#loto-menu";
-            //       break;
+//             // проверяем на reason ответ от вебсокетов
+//             if (info.reason != "" && info.reason != " ") {
+//                 let infoReason = JSON.parse(info.reason);
+//                 if (infoReason != "" && infoReason.reason == "anotherConnection") {
+//                 return;
+//                 } else {
+//                 if (window.ws) {
+//                     let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
+//                     window.ws.close(1000, JSON.stringify(disconnectMsg));
+//                 }
+//                 // const newWs = connectWebsocketFunctions();
+//                 // window.ws = newWs;
+//                 // impNav.pageNavigation(newWs);
+//                 // impNav.addHashListeners();
+//                 // return;
+//                 }
+//             } else {
+//             //   if (window.ws) {
+//             //     let disconnectMsg = { reason: "createNewWs", page: "mainLotoPage" };
+//             //     window.ws.close(1000, JSON.stringify(disconnectMsg));
+//             //   }
+//             //   switch (infoReason.page) {
+//             //     case "mainLotoPage":
+//             //       location.hash = "#loto-menu";
+//             //       break;
             
-            //     case "mainPage":
-            //       location.hash = "#gamemode-choose";
-            //       break;
-            //     default:
-            //       location.hash = "#gamemode-choose";
-            //       break;
-            //   }
-            //   const newWs = connectWebsocketFunctions();
-            //   window.ws = newWs;
-            //   impNav.pageNavigation(newWs);
-            //   impNav.addHashListeners();
-            }
-        };
-        // this.onmessage = {Listens:{}}
-    }
-}
-WSEventPool.on('BackgammonConnection', function() {
-
-});
-window.addEventListener('DOMContentLoaded', async()=>{
-});
+//             //     case "mainPage":
+//             //       location.hash = "#gamemode-choose";
+//             //       break;
+//             //     default:
+//             //       location.hash = "#gamemode-choose";
+//             //       break;
+//             //   }
+//             //   const newWs = connectWebsocketFunctions();
+//             //   window.ws = newWs;
+//             //   impNav.pageNavigation(newWs);
+//             //   impNav.addHashListeners();
+//             }
+//         };
+//         // this.onmessage = {Listens:{}}
+//     }
+// }
 
 // class DelegateList {
 //     list=[];

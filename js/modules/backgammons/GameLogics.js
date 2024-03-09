@@ -44,8 +44,8 @@ class StepRecord {
         return this.Moves.map(({points}) => points).flat(1);
     }
 }
-
-class GameModel {
+var sendstep;
+export class GameModel {
     Slots = []
     Dropped = []
     Steps = []
@@ -53,9 +53,10 @@ class GameModel {
     whiteplayer = null
     blackplayer = null
 
-    constructor(slots, Dropped) {
+    constructor(slots, Dropped, _sendstep) {
         this.init(slots);
         this.Dropped = Dropped
+        sendstep = _sendstep;
     }
 
     init(actualSlots){
@@ -131,7 +132,7 @@ function PositionCtxWithGcGm(gc, gm) {
     }
 }
 
-function GameControllerCtxWithGmEntries(gm) {
+export function GameControllerCtxWithGmEntries(gm, sendstep) {
     const {Slots, Dropped} = gm;
     let Position;
 

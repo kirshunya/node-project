@@ -1,7 +1,6 @@
-const { debug } = require("console");
-const { constants } = require("crypto");
-const { response } = require("express");
-
+// const {sleep, range, getRandomInt} = import('../js/modules/backgammons/Utilities.mjs')
+// import {sleep, range, getRandomInt} from '../js/modules/backgammons/Utilities.mjs';
+// const BoardContants = require('./../js/modules/backgammons/');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make iterator with Array methods?
 const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
@@ -69,7 +68,7 @@ class TGame extends SharedRoom0 {
     connect(user, ctx, ws) {
         // const __u = {user.}
         super.connect(user, ctx, ws);
-        ctx.event('backgammons::connection::self', { 
+        ctx.event('backgammons::connection::self', {
                     slots: this.Slots, 
                     dropped: [],
                     state: this.info, 
@@ -95,6 +94,9 @@ class TGame extends SharedRoom0 {
                 this.startGame();
             }
         }
+    }
+    connectPage() {
+
     }
     startGame() {
         const cc = this.Players[0].team = getRandomInt(1,2);
@@ -163,13 +165,14 @@ class TGame extends SharedRoom0 {
     }
 }
 const BETsList = [0.5, 1, /*3, 5, 10*/];
-const Games = Object.assign({},...Object.keys(BETsList).map(betId=>({
-                            [+betId+1]: Object.assign({},...range(1, 7).map(
-                                tableid=>({
-                                    [tableid]: new TGame([+betId+1, tableid])
-                                })
-                        ))})));
-console.log(Games);
+const GamesLobby = new class {
+    Games = new TGame();//probe
+    constructor() {}
+
+    getGameByID() {
+        return this.Games;//probe
+    }
+}
 const WSPipelineCommands = {
     /* this -> ws of connection */
     // auth(ctx, msg) {
@@ -200,19 +203,19 @@ const WSPipelineCommands = {
     },
     ['backgammons/connect'](ctx, {dominoRoomId, tableId}) {
         Lobby.UnlistenLobby(ctx, this);
-        ctx.GameID = [dominoRoomId, tableId];
-        console.log(JSON.stringify(Object.keys(Games)));
-        const Game = ctx.Game = Games[dominoRoomId][tableId];
+
+        const GameID = [dominoRoomId, tableId];
+        const Game = GamesLobby.getGameByID(GameID);
+
         Game.connect(ctx.user, ctx, this);
-        console.log('connect', Game);
-        return;
         //'backgammons::connection'
     },
-    step({Game}, {step, code}) {
-        return Game.stepIfValid(step, code);
+    step(ctx, {step, code}) {
+        return GamesLobby.getGameByID(ctx.GameID).stepIfValid(step, code);
     },
-    get({Game}) {
+    get(ctx) {
         const event = 'board';
+        const Game = GamesLobby.getGameByID(ctx.GameID);
         return {event, slots: Game.Slots, state: Game.info};
     },
     restart(ctx) {
@@ -222,27 +225,14 @@ const WSPipelineCommands = {
         // Game.send('restart', {slots: Game.Slots, state: Game.info});
     },
 }
-// const TWSPipelineCommands = ()=>{
-//     const wlist = ['auth']
-//     const authmsg = ()=>({result:'error', msg:'u need auth'})
-//     return new Proxy(WSPipelineCommands, {
-//         get:(t,key, proxyer)=>{
-//             if(key in wlist) {
-//                 return t[key];
-//             } else return function(ctx, ...args){
-//                 if(ctx.user)
-//                     return t[key].call(this, ctx, ...args);
-//                 return authmsg;
-//             }
-//         }
-//     })
-// }
+
 var fs = require('fs');
-const { eventNames } = require("process");
 module.exports = function(ws, req) {
     // fs.writeFile('/test.log', 'connection', console.log.bind(console));
+    console.log('new Connection')
     ws._socket.setKeepAlive(true);
     const ctx = {user:{}};
+
     // const WSPipelineCommands = new TWSPipelineCommands();
     const send = ctx.send = response=>ws.send(JSON.stringify(response));
     const event = ctx.event = (event, response)=>send(Object.assign(response, {event, method:'backgammons::event'}))

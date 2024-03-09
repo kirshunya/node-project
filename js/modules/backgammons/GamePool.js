@@ -1,5 +1,10 @@
+import { ondom } from './Utilities.js';
+import { WSEventPool } from './WSEP.js'
+// import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
+import { GameProvider } from './GameLogicsPro.js';
+import { BoardConstants } from './BoardConstants.js';
+
 var GameInitData = null;
-import { WSEventPool } from './WSEP.js';
 export function setGameInitData(data) {
     GameInitData = data;
 }
@@ -37,11 +42,6 @@ export function ShowGameTable() {
                 </div>
                 <canvas id="canvas"></canvas>
                 <script>console.clear()</script>
-                <script src="https://cdn.jsdelivr.net/npm/fabric"></script>
-                <script src="js/GameLogics.js"></script>
-                <script src="js/EntryPoint.js"></script>
-                <script src="js/Utilities.js"></script>
-                <script src="js/CanvasRender.js"></script>
                 <div id="BottomPan" class="TopLink">
                     <div class="pcontrs">
                         <div class="buttons">
@@ -76,29 +76,32 @@ export function ShowGameTable() {
     }
     else InitGame(GameInitData, localUser);
 }
+const User = {userId: 0, username: 'debug'};
 let ef = null;
 window.addEventListener('DOMContentLoaded', 
     ()=>WSEventPool.on('backgammons::GameStarted', ({players, state})=>ef = {players, state})
 );
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
-function InitGame(GameInitData, {userId, username}) {
+export function InitGame(GameInitData, {userId, username}) {
     const {slots, dropped, players, state} = GameInitData;
     const req = msg=>window.ws.send(JSON.stringify(msg));
-    sendstep = async(step)=>req({method:'step', step, code:gencode()});
+    const sendstep = async(step)=>req({method:'step', step, code:gencode()});
 
-    const gm = new GameModel(slots, dropped);
-    const {GameController} = GameControllerCtxWithGmEntries(gm);
-    const gc = new GameController({id:userId, username});
+    const gp = new GameProvider({ User, Slots:slots,  });
+    const { Board, GameState, GameCanvas } = gp;
+    // const gm = new GameModel(slots, dropped, sendstep);
+    // const {GameController} = GameControllerCtxWithGmEntries(gm);
+    // const gc = new GameController({id:userId, username});
     document.getElementById('TopPan')
                 .getElementsByClassName('buttons')[0]
                     .children[0]
                         .addEventListener('click', req.bind(null, {method:'restart'}));
-    const canva = new BoardCanvas(
-                gm.Slots,
-                // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
-                //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
-                [0, 0], gc);
+    // const canva = new BoardCanvas(
+    //             gm.Slots,
+    //             // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
+    //             //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
+    //             [0, 0], gc);
 
     WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices))
     if(GameInitData.GameState === 1) GameStart(GameInitData.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices)

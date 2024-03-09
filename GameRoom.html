@@ -28,15 +28,6 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
     />
-  <!-- </head>
-  <div class="page-preloader">
-    <div class="lds-ring">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  </div> -->
   <body>
     <main>
       <div class="main__container footer__padding">
@@ -267,10 +258,8 @@
               <canvas id="canvas"></canvas>
               <script>console.clear()</script>
               <script src="https://cdn.jsdelivr.net/npm/fabric"></script>
-              <script src="js/GameLogics.js"></script>
-              <script src="js/EntryPoint.js"></script>
-              <script src="js/Utilities.js"></script>
-              <script src="js/CanvasRender.js"></script>
+              <!-- <script src="js/Utilities.js"></script> -->
+              <script src="js/modules/backgammons/EntryPoint.js" type="module" defer></script>
               <div id="BottomPan" class="TopLink">
                 <div class="pcontrs">
                   <div class="buttons">
@@ -305,6 +294,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <script src="libs/eventSource/eventsource-polyfill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fabric"></script>
     <!-- <script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script> -->
     <!-- <script src="js/app.js" type="module"></script> -->
   </body>
