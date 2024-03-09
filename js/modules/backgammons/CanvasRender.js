@@ -223,6 +223,9 @@ export class BoardCanvas {
     }
     
     posXFromIndex(index) {
+        if(typeof index === 'string') {
+            return BoardWidth/2;
+        }
         return posX(index,) * scaleFactor;
         if (index === WHITE.over) return 272.5 * scaleFactor + 34.3 * 6 * scaleFactor;
         if (index === BLACK.over) return 193.5 * scaleFactor - 34.3 * 6 * scaleFactor;
@@ -232,6 +235,9 @@ export class BoardCanvas {
         if (index >= 18 && index < 24) return 272.5 * scaleFactor + 34.3 * (index - 18) * scaleFactor;
     }
     posYFromIndex(index, checkerIndex, indentTop, indentDown) {
+        if(typeof index === 'string') {
+            return BoardHeight/2;
+        }
         return posY(index, checkerIndex) * scaleFactor;
         if (index === BLACK.over || index >= 0 && index < 12) return 24 * scaleFactor + 10 * checkerIndex * scaleFactor + indentTop;
         if (index === WHITE.over || index >= 12 && index < 24) return 349 * scaleFactor - 10 * checkerIndex * scaleFactor + indentDown;

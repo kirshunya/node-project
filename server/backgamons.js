@@ -59,10 +59,10 @@ class TGame extends SharedRoom0 {
     Players = [];
     constructor(GameID) {
         super(GameID);
-        this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
+        this.Slots = adv0_range(0, 24, { 17:[15,1], 5:[15,2], null:()=>[0,0] });
         this.info = {
             ActiveTeam: CONSTANTS.WHITEID,
-            Dices: [0,0]
+            Dices: [1,1]
         }
     }
     connect(user, ctx, ws) {

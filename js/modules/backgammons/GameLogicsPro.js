@@ -108,8 +108,8 @@ class Board {
         function sixchecker(to, from) {
             return false;
         }
-
-        return CurrentStepCash.MovesCash = AccMoves.optimize();
+        CurrentStepCash.MovesCash = AccMoves.optimize()
+        return CurrentStepCash.MovesCash;
     }
     UserMovesByDice(GameState, Dice) {
 
