@@ -1,3 +1,7 @@
+import { range } from "./Utilities.js";
+import { BoardConstants, refToArr } from "./BoardConstants.js";
+const { WHITE, BLACK, EMPTY } = BoardConstants; 
+
 var scaleFactor = 1.3;
 var indent = 14;
 
@@ -126,16 +130,16 @@ export class BoardCanvas {
             const canvasbackimgProm = setBackgroundImage();
             canvas.selection = false;
             //iterates for GameModel.Slots
-            const PromisesOfCreatingPictures = Promise.all(GSlots.map(([n,c],slotIndex)=>{
-                    const slot = { Count:n, Colour:c };
+            const PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
+                    const slot = new refToArr(slotinfo);
                     self.slots[slotIndex] = new Slot();
-                    const pic = slot.Colour === "white" ? whitecheckerpicurl : blackcheckerpicurl;
+                    const pic = slot.Colour === WHITE.id ? whitecheckerpicurl : blackcheckerpicurl;
                     return range(0,slot.Count)
                             .map(checkerIndex=>self.createImg(pic, slotIndex, checkerIndex));
                 }).flat(1))
             const PromiseOfCreatingDroppedPictures = Promise.all(GDropped.map((Count, teamLeft)=>{
                     const droppedPic = teamLeft===0?whitecheckerpicurl:blackcheckerpicurl;
-                    const droppedTeam = teamLeft===0? "whiteOver" : "blackOver";
+                    const droppedTeam = teamLeft===0? WHITE.over : BLACK.over;
                     return range(0, Count)
                             .map(checkerIndex=>self.createImg(droppedPic, droppedTeam, checkerIndex))
                 }).flat(1));
@@ -198,11 +202,11 @@ export class BoardCanvas {
     }
     moveChecker(from, to) {
         const {canvas, dropped} = this;
-        let isOver = to === "whiteOver" || to === "blackOver";
+        let isOver = to === WHITE.over || to === BLACK.over;
         let checker = null
-        if (from !== "whiteOver" && from !== "blackOver")  checker = this.slots[from].getRemoveLast();
-        else checker = dropped[from === "whiteOver" ? 0 : 1].getRemoveLast();
-        let checkerIndex = isOver ? this.dropped[to === "whiteOver" ? 0 : 1].count()
+        if (from !== WHITE.over && from !== BLACK.over)  checker = this.slots[from].getRemoveLast();
+        else checker = dropped[from === WHITE.over ? 0 : 1].getRemoveLast();
+        let checkerIndex = isOver ? this.dropped[to === WHITE.over ? 0 : 1].count()
             : this.slots[to].count();
         checker.img.animate('left', this.posXFromIndex(to), {
             duration: 400,
@@ -215,13 +219,13 @@ export class BoardCanvas {
         checker.slot = to;
         canvas.bringToFront(checker.img)
         if(!isOver) this.slots[to].add(checker);
-        else dropped[to === "whiteOver" ? 0 : 1].add(checker);
+        else dropped[to === WHITE.over ? 0 : 1].add(checker);
     }
     
     posXFromIndex(index) {
         return posX(index,) * scaleFactor;
-        if (index === "whiteOver") return 272.5 * scaleFactor + 34.3 * 6 * scaleFactor;
-        if (index === "blackOver") return 193.5 * scaleFactor - 34.3 * 6 * scaleFactor;
+        if (index === WHITE.over) return 272.5 * scaleFactor + 34.3 * 6 * scaleFactor;
+        if (index === BLACK.over) return 193.5 * scaleFactor - 34.3 * 6 * scaleFactor;
         if (index >= 0 && index < 6) return 444 * scaleFactor - 34.3 * index * scaleFactor;
         if (index >= 6 && index < 12) return 193.5 * scaleFactor - 34.3 * (index - 6) * scaleFactor;
         if (index >= 12 && index < 18) return 22 * scaleFactor + 34.3 * (index - 12) * scaleFactor;
@@ -229,12 +233,12 @@ export class BoardCanvas {
     }
     posYFromIndex(index, checkerIndex, indentTop, indentDown) {
         return posY(index, checkerIndex) * scaleFactor;
-        if (index === "blackOver" || index >= 0 && index < 12) return 24 * scaleFactor + 10 * checkerIndex * scaleFactor + indentTop;
-        if (index === "whiteOver" || index >= 12 && index < 24) return 349 * scaleFactor - 10 * checkerIndex * scaleFactor + indentDown;
+        if (index === BLACK.over || index >= 0 && index < 12) return 24 * scaleFactor + 10 * checkerIndex * scaleFactor + indentTop;
+        if (index === WHITE.over || index >= 12 && index < 24) return 349 * scaleFactor - 10 * checkerIndex * scaleFactor + indentDown;
     }
     showGUI(fromSlot) { //TODO: rebase
         for (let ghost of this.enabledGhosts) this.canvas.remove(ghost.img);
-        let availableKeys = this.gc.moveFrom(fromSlot).keys;
+        let availableKeys = this.gc.UserMovesFrom(fromSlot).keys;
         for (let key of availableKeys) {
             if (key === 'whiteOver' || key === 'blackOver') {
                 let team = key === 'whiteOver' ? 0 : 1;
@@ -254,13 +258,13 @@ export class BoardCanvas {
                 }));
                 let checkerFromImg = new Checker(img, slotIndex);
                 img.on('mousedown', () => {
-                    if (slotIndex !== "whiteOver" && slotIndex !== "blackOver")
+                    if (slotIndex !== WHITE.over && slotIndex !== BLACK.over)
                         self.showGUI(checkerFromImg.slot);
                 });
-                if (slotIndex !== "whiteOver" && slotIndex !== "blackOver")
+                if (slotIndex !== WHITE.over && slotIndex !== BLACK.over)
                     self.slots[slotIndex].checkers[checkerIndex]=checkerFromImg;
                 else
-                    self.dropped[slotIndex === "whiteOver" ? 0 : 1].add(checkerFromImg);
+                    self.dropped[slotIndex === WHITE.over ? 0 : 1].add(checkerFromImg);
                 self.canvas.add(img)
                 resolve([img, slotIndex, checkerIndex]);
             }));
@@ -341,7 +345,7 @@ export class BoardCanvas {
 //     for (let team = 0; team < 2; team++){
 //         let length =  dropped[team].count();
 //         for (let checkerIndex = 0; checkerIndex < length; checkerIndex++){
-//             moveChecker(team === 0 ? "whiteOver" : "blackOver", team === 0 ? 0 : 12);
+//             moveChecker(team === 0 ? WHITE.over : BLACK.over, team === 0 ? 0 : 12);
 //         }
 //     }
 // }

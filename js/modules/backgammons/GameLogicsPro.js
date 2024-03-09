@@ -1,12 +1,12 @@
-import { black, white } from "./Utilities.js";
-import { BoardConstants } from './BoardConstants.js';
+// import { black, white } from "./Utilities.js";
+import { BoardConstants, refToArr, slotinfo } from './BoardConstants.js';
 import { BoardCanvas } from './CanvasRender.js'
 
 const SlotsIterator = (slots, CB)=>(
                                 slots = new Proxy(slots, {get:(slots,key)=>slots[key]||[0,0]}), 
                                 [...Array(24).keys()].map(index=>CB(slots[index]))
                             );
-const { WHITE, BLACK } = BoardConstants;
+const { WHITE, BLACK, EMPTY, CHECKERS } = BoardConstants;
 class Board {
     FartherOpponentCheckerPos
     Slots
@@ -26,8 +26,8 @@ class Board {
             refToArr
             Sloter
 
-            constructor(refToArr, index, Sloter) {
-                this.refToArr = refToArr;
+            constructor(ref, index, Sloter) {
+                this.refToArr = new refToArr(ref);
                 this.index = index;
                 this.Sloter = Sloter;
             }
@@ -36,13 +36,13 @@ class Board {
                 return c===User?.colour;
             }
             permPushChecker(colour) {
-                if(this.refToArr[0]++===1)
-                    this.refToArr[1] = colour;
+                if(++this.refToArr.Count === 1)
+                    this.refToArr.Colour = colour;
             }
             permTakeChecker() {
-                const colour = this.refToArr[1];
-                if(this.refToArr[0]--===0)
-                    this.refToArr[1] = 0;
+                const colour = this.refToArr.Colour;
+                if(--this.refToArr.Count === 0)
+                    this.refToArr.Colour = EMPTY;
                 return colour;
             }
             permMoveTo(toIndex) {
@@ -107,12 +107,13 @@ class Board {
                 return moves[toIndex].push(Points);
             },
             optimize() {
-                Object.entries(this.moves).map(([toIndex,listOfPointsList])=>{
-                    listOfPointsList.reduce((acc, cur)=>{
-                        if(acc.length < cur.length) return acc;
-                        if(acc.reduce((s,p)=>s+p) < cur.reduce((s,p)=>s+p)) return acc;
-                    });
-                });
+                // Object.entries(this.moves).map(([toIndex,listOfPointsList])=>{
+                //     listOfPointsList.reduce((acc, cur)=>{
+                //         if(acc.length < cur.length) return acc;
+                //         if(acc.reduce((s,p)=>s+p) < cur.reduce((s,p)=>s+p)) return acc;
+                //     });
+                // });
+                return this.moves;
             }
         };
 
@@ -199,7 +200,11 @@ export class GameProvider {
         const self = this;
         this.Board = new Board(BoardInits);
         this.GameState = new GameState(GameStateInits);
-        this.GameCanvas = new BoardCanvas(BoardInits.slots, [0, 0], Board);
+        this.GameCanvas = new BoardCanvas(
+            BoardInits.Slots, [CHECKERS.empty, CHECKERS.empty], {
+            UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
+            move: (...args)=>UserMove(this.GameState, ...args)
+        });
             // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
             //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
 

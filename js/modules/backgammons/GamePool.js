@@ -77,7 +77,10 @@ export function ShowGameTable() {
     else InitGame(GameInitData, localUser);
 }
 const User = {userId: 0, username: 'debug'};
-let ef = null;
+let ef = {
+    players: [User, User],
+    state: {ActiveTeam: BoardConstants.WHITE.id, Dices: [1,1]}
+};
 window.addEventListener('DOMContentLoaded', 
     ()=>WSEventPool.on('backgammons::GameStarted', ({players, state})=>ef = {players, state})
 );
@@ -108,7 +111,7 @@ export function InitGame(GameInitData, {userId, username}) {
     if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
     function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices) {
         // gc.User = secondPlayer;
-        gc.start([
+        GameState.start([
                 {id:firstPlayer.userId, pteam:firstPlayer.team, team:firstPlayer.team}, 
                 {id:secondPlayer.userId, pteam:secondPlayer.team, team:secondPlayer.team}
             ], Dices, ActiveTeam);
@@ -120,14 +123,14 @@ export function InitGame(GameInitData, {userId, username}) {
         document.getElementById('BottomPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = blackplayer.username;
     }
-    WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
-        if(code !== ncode) step.map(({from,to})=>{
-            gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));
-            canva.moveChecker(from, to);
-        })
-        gc._set(newstate.ActiveTeam, newstate.Dices)
-        canva.createDices(newstate.Dices[0], newstate.Dices[1], [white, black][newstate.ActiveTeam-1]);
-    });
+    // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
+    //     if(code !== ncode) step.map(({from,to})=>{
+    //             gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));
+    //             canva.moveChecker(from, to);
+    //         })
+    //     GameState._set(newstate.ActiveTeam, newstate.Dices);
+    //     canva.createDices(newstate.Dices[0], newstate.Dices[1], [white, black][newstate.ActiveTeam-1]);
+    // });
 }
 
 // WSEventPool.fon('board').then(
