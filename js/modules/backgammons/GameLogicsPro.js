@@ -54,13 +54,17 @@ class Board {
     UserMovesFrom(GameState, fromIndex) {
         const Sloter = this.Slots0;
         const {User} = this;
-        const {PTS, ActivePlayer, CurrentStepCash} = GameState;
+        const {PTS, ActivePlayer, CurrentStepCash, Dices} = GameState;
         const FromSlot = this.Slots0[fromIndex];
+        const headSlotIndex = ActivePlayer.team.id===WHITE.id?0:12;
+        const headSlotCheckersCount = this.Slots0[headSlotIndex].refToArr.Count;
+        const [f, s] = Dices;
+        const fstepapplied = (f===s&&(f===3||f===4||f==6))&&(headSlotCheckersCount===14);
 
         if(ActivePlayer.team.id !== User.team.id) return;
         if(!FromSlot.ismy()) return;
         const TeamFirstSlot = ActivePlayer.team.id===WHITE.id?0:12;
-        if(fromIndex===TeamFirstSlot&&GameState.headed) return;
+        if(fromIndex===TeamFirstSlot&&GameState.headed||fstepapplied) return;
 
         const AccMoves = {
             moves:{},
