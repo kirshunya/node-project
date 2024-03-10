@@ -184,6 +184,11 @@ class Board {
         CurrentStepCash.MovesCash = AccMoves.optimize()
         return CurrentStepCash.MovesCash;
     }
+    CheckersWhichCanMove(GameState) {
+        return [...Array(24).keys()]
+                    .map(i=>Object.keys(this.UserMovesFrom(GameState, i)).length)
+                    .reduce((acc,k)=>acc+k);
+    }
     UserMovesByDice(GameState, Dice) {
 
     }
@@ -299,7 +304,7 @@ export class GameProvider {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
                 this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
-                if(this.GameState.PTS.length===0)
+                if(this.GameState.PTS.length===0 || this.Board.CheckersWhichCanMove(this.GameState))
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
             }
         });

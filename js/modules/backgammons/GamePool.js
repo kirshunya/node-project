@@ -139,6 +139,10 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
         window.location.reload();
     })
+    WSEventPool.on('restart', ({})=>{
+        alert(`Кто-то нажал на рестарт игры`);
+        window.location.reload();
+    })
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
     //     if(code !== ncode) step.map(({from,to})=>{
     //             gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));
