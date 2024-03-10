@@ -241,7 +241,7 @@ const WSPipelineCommands = {
         // Game.Listeners = lastGame.Listeners;
         // this.Games[GAMESCOUNT];
         GAMESCOUNT++;
-        ctx.send('restart__', {});
+        ctx.event('restart__', {});
     },
 }
 
