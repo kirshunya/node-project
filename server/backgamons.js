@@ -70,6 +70,7 @@ class TGame extends SharedRoom0 {
         // const __u = {user.}
         super.connect(user, ctx, ws);
         ctx.event('backgammons::connection::self', {
+            GAMESCOUNT,
                     slots: this.Slots, 
                     dropped: this.Drops,
                     state: this.info, 
