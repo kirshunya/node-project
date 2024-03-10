@@ -136,9 +136,10 @@ class TGame extends SharedRoom0 {
         });
         const prevstate = this.info;
         this.event('step', {step, prevstate, newstate: this.nextState(), code});
-        if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) 
+        if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
             this.event('end', {winner: ActiveTeam});
-        GAMESCOUNT++;
+            GAMESCOUNT++;
+        }
         return {result:'success'};
     }
     nextState() {
