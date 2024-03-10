@@ -139,7 +139,7 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
         window.location.reload();
     })
-    WSEventPool.on('restart', ({})=>{
+    WSEventPool.on('restart__', ({})=>{
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
     })
