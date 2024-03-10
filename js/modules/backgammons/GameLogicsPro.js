@@ -263,6 +263,7 @@ class GameState {
      */
     get headed() {
         const headSlotIndex = this.ActivePlayer.team.id===WHITE.id?0:12;
+        if(this.CurrentStepCash.MovesStack.length===0) return false;
         return this.CurrentStepCash.MovesStack.reduce(
             ({from})=>from===headSlotIndex)//TODO rename 0 and 12
     }
