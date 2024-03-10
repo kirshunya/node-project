@@ -263,9 +263,9 @@ class GameState {
      */
     get headed() {
         const headSlotIndex = this.ActivePlayer.team.id===WHITE.id?0:12;
-        if(this.CurrentStepCash.MovesStack.length===0) return false;
-        return this.CurrentStepCash.MovesStack.reduce(
-            ({from})=>from===headSlotIndex)//TODO rename 0 and 12
+        for(const {from} of this.CurrentStepCash.MovesStack)
+            if(from===headSlotIndex) return true;
+        return false;
     }
     constructor(GameStateInits) {}
 
