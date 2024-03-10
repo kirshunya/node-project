@@ -234,7 +234,7 @@ const WSPipelineCommands = {
         const Game = GamesLobby.getGameByID(ctx.GameID);
         return {event, slots: Game.Slots, state: Game.info};
     },
-    restart(ctx) {
+    restart__(ctx) {
         // const lastGame = ctx.Game;
         // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
         // Game.Listeners = lastGame.Listeners;
