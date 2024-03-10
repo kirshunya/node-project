@@ -239,7 +239,8 @@ const WSPipelineCommands = {
         // const lastGame = ctx.Game;
         // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
         // Game.Listeners = lastGame.Listeners;
-        this.Games[GAMESCOUNT];
+        // this.Games[GAMESCOUNT];
+        GAMESCOUNT++;
         Game.send('restart__', {});
     },
 }
