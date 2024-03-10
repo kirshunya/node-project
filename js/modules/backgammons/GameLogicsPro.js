@@ -304,7 +304,7 @@ export class GameProvider {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
                 this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
-                if(this.GameState.PTS.length===0 || this.Board.CheckersWhichCanMove(this.GameState))
+                if(this.GameState.PTS.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
             }
         });
