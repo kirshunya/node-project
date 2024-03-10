@@ -61,10 +61,10 @@ class Board {
         const [f, s] = Dices;
         const fstepapplied = (f===s&&(f===3||f===4||f==6))&&(headSlotCheckersCount===14);
 
-        if(ActivePlayer.team.id !== User.team.id) return;
-        if(!FromSlot.ismy()) return;
+        if(ActivePlayer.team.id !== User.team.id) return {};
+        if(!FromSlot.ismy()) return {};
         const TeamFirstSlot = ActivePlayer.team.id===WHITE.id?0:12;
-        if(fromIndex===TeamFirstSlot&&GameState.headed||fstepapplied) return;
+        if(fromIndex===TeamFirstSlot&&GameState.headed||fstepapplied) return {};
 
         const AccMoves = {
             moves:{},
