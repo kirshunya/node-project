@@ -236,7 +236,7 @@ export class BoardCanvas {
     }
     posYFromIndex(index, checkerIndex, indentTop, indentDown) {
         if(typeof $myeval(index) === 'string') {
-            return BoardHeight/2*scaleFactor + checkerIndex*33;
+            return BoardHeight/3*scaleFactor + checkerIndex*33;
         }
         return posY(index, checkerIndex) * scaleFactor;
         if (index === BLACK.over || index >= 0 && index < 12) return 24 * scaleFactor + 10 * checkerIndex * scaleFactor + indentTop;

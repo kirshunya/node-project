@@ -15,7 +15,7 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
-
+var GAMESCOUNT = 0;
 const LobbyListeners = {};
 const Lobby = {
     ListenLobby(ctx, ws) {
@@ -135,6 +135,9 @@ class TGame extends SharedRoom0 {
         });
         const prevstate = this.info;
         this.event('step', {step, prevstate, newstate: this.nextState(), code});
+        if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) 
+            this.event('end', {winner: ActiveTeam});
+        GAMESCOUNT++;
         return {result:'success'};
     }
     nextState() {
@@ -176,11 +179,13 @@ class TGame extends SharedRoom0 {
 }
 const BETsList = [0.5, 1, /*3, 5, 10*/];
 const GamesLobby = new class {
-    Games = new TGame();//probe
+    Games = [new TGame()];//probe
     constructor() {}
 
     getGameByID() {
-        return this.Games;//probe
+        if(this.Games[GAMESCOUNT] === undefined)
+            this.Games[GAMESCOUNT] = new TGame(); 
+        return this.Games[GAMESCOUNT];//probe
     }
 }
 const WSPipelineCommands = {

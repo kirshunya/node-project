@@ -49,8 +49,7 @@ export class slotinfo {
         return [Count, Colour];
     }
 }
-export 
-class Slot {
+export class Slot {
     index
     refToArr
     Sloter
@@ -84,13 +83,15 @@ class Slot {
      * @param {int} point 
      * @returns {Slot}
      */
-    next(point) {
+    next(point=1) {
         const blackEndShift = 12
         const blackStartShift = -12
+        // 24 -> MaxSlotIndex
+        // +12 -> blackStartShiftReturning
         const {User} = this.Sloter
         function up(from, point) {
             const isBlack = User.team.id === BoardConstants.BLACK.id;
-            const pos = +from + +(isBlack&&((from<BoardConstants.MAP.blackend)?blackEndShift:blackStartShift)) + +point;
+            const pos = +from + +(isBlack&&((from<BoardConstants.MAP.blackend)?blackEndShift:blackStartShift)) + point;
             
             //validating
             const isover = pos > BoardConstants.MAP.lastPostionNumber;
@@ -101,6 +102,24 @@ class Slot {
         }
         const {pos, isover, index} = up(this.index, point);
         return this.Sloter[index];
+    }
+    down() {
+        const blackEndShift = 12
+        const blackStartShift = -12
+        const {User} = this.Sloter;
+        function down(from, point=-1) {
+            const isBlack = User.team.id === BoardConstants.BLACK.id;
+            const pos = +from + +(isBlack&&((from<BoardConstants.MAP.blackend)?blackEndShift:blackStartShift)) + +point;
+            
+            //validating
+            const isover = pos < 0;
+
+            const index = isover?User.team.over:isBlack?(pos+12)%24:pos;
+            
+            return {pos, isover, index};
+        }
+        const {pos, isover, index} = down(this.index);
+        return isover?this.Sloter.emptyslot:this.Sloter[index];
     }
 }
 export class DropSlot {
@@ -113,5 +132,8 @@ export class DropSlot {
 
     permPushChecker() {
         this.count++;
+    }
+    ismy() {
+        return false;
     }
 }

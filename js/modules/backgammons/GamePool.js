@@ -135,6 +135,10 @@ export function InitGame(GameInitData, {userId, username}, ws) {
                            || gp.eventHandlers.ustep(step, newstate)
                     GameCanvas.createDices(newstate.Dices[0], newstate.Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1].name);
         });
+    WSEventPool.on('end', ({winner})=>{
+        alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
+        window.location.reload();
+    })
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
     //     if(code !== ncode) step.map(({from,to})=>{
     //             gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));

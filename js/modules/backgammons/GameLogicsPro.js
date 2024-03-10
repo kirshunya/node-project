@@ -25,7 +25,7 @@ class Board {
         this.Drops = [
             new DropSlot(EMPTY.id), new DropSlot(WHITE.over), new DropSlot(BLACK.over)
         ];
-
+        let emptyslot
         this.Slots0 = new Proxy({}, {
             /**
              * 
@@ -36,11 +36,14 @@ class Board {
              */
             get:(_t, SlotIndex, _proxy) => {
                 if(SlotIndex === 'User') return User;
+                if(SlotIndex === 'emptyslot') return emptyslot;
                 if(SlotIndex === WHITE.over) return this.Drops[WHITE.id];
                 if(SlotIndex === BLACK.over) return this.Drops[BLACK.id];
                 return new Slot(self.Slots[SlotIndex], SlotIndex, _proxy)
             }
         });
+        // 0 -> MAP.firstSlotIndex // TODO: change 0 index to unaviable index =D
+        emptyslot = new Slot(new slotinfo(CHECKERS.empty, EMPTY.id), 0, this.Slots0);
     }
     /**
      * 
@@ -49,6 +52,7 @@ class Board {
      * @returns {{}}
      */
     UserMovesFrom(GameState, fromIndex) {
+        const Sloter = this.Slots0;
         const {User} = this;
         const {PTS, ActivePlayer, CurrentStepCash} = GameState;
         const FromSlot = this.Slots0[fromIndex];
@@ -99,7 +103,7 @@ class Board {
                 };
                 if(curSlot.ismy()||curSlot.isempty()) {
                     const curSpended = [...spendedPoints, point];
-                    if(1) {/* if 6 пешек одного цвета подряд и противник дальше не зашёл */}
+                    if((!OpponentIsFarther(curSlot.index))&&sixchecker(curSlot, FromSlot)) continue;
                     AccMoves.push(curSlot.index, curSpended);
 
                     const nextPTS = [...PTS]; nextPTS.splice(PTS.indexOf(point), 1);
@@ -111,8 +115,70 @@ class Board {
         }
         StepByStep(PTS, FromSlot, []);
 
-        
-        function sixchecker(to, from) {
+        /**
+         * 
+         * @param {Slot} toSlot 
+         * @param {Slot} fromSlot 
+         * @returns {boolean} if 6 sequenced checkers
+         */
+        function sixchecker(toSlot, fromSlot) {//проверять передние клетки
+            // const sum = (acc, bool)=>acc+(+bool);
+            let curSlot = toSlot;
+            let counter = 1;
+            for(const _ of Array(5).keys()) {
+                curSlot = curSlot.down();
+                if(curSlot.ismy()) counter++
+                else break;
+            }
+            curSlot = toSlot;
+            for(const _ of Array(5).keys()) {
+                curSlot = curSlot.next();
+                if(curSlot.ismy()) counter++
+                else break;
+            }
+            return counter>=6;
+        }
+
+        /**
+         * 
+         * @param {int} slotIndex 
+         * @returns {boolean}
+         */
+        function OpponentIsFarther(slotIndex) {
+            /** @type {int} */
+            const CurrentPlayerTeam = ActivePlayer.team.id;
+            /** @type {int} */
+            const OpponentPlayerTeam = CurrentPlayerTeam===WHITE.id?BLACK.id:WHITE.id;
+
+            /** @type {boolean} */
+            const isBlack = OpponentPlayerTeam === BoardConstants.BLACK.id;
+
+            const blackEndShift = 12
+            const blackStartShift = -12
+            /**
+             * @param {int} from 
+             * @param {int} point 
+             */
+            function up(from, point) {//TODO: унифицировать функцию в BoardConstants
+                const pos = +from + +(isBlack&&((from<BoardConstants.MAP.blackend)?blackEndShift:blackStartShift)) + point;
+                
+                //validating
+                const isover = pos > BoardConstants.MAP.lastPostionNumber;
+
+                const index = isover?'*over':isBlack?(pos+12)%24:pos;
+                
+                return {pos, isover, index};
+            }
+            let farther = false;
+            let _index_ = slotIndex;
+            while(_index_ < 36) {
+                const {pos, isover, index} = up(_index_, +1);
+                if(isover) return false;
+                /** @type {Slot} */
+                const pp = Sloter[index];
+                if(pp.refToArr.Colour === OpponentPlayerTeam) return true;
+                _index_ = index;
+            }
             return false;
         }
         CurrentStepCash.MovesCash = AccMoves.optimize()
@@ -187,9 +253,13 @@ class GameState {
         })
         return renewalPTS;
     }
+    /**
+     * @returns {boolean}
+     */
     get headed() {
+        const headSlotIndex = this.ActivePlayer.team.id===WHITE.id?0:12;
         return this.CurrentStepCash.MovesStack.reduce(
-            ({from})=>from===this.ActivePlayer.team.id===WHITE.id?0:12)//TODO rename 0 and 12
+            ({from})=>from===headSlotIndex)//TODO rename 0 and 12
     }
     constructor(GameStateInits) {}
 
