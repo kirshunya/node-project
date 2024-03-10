@@ -60,6 +60,7 @@ class TGame extends SharedRoom0 {
     constructor(GameID) {
         super(GameID);
         this.Slots = adv0_range(0, 24, { 17:[15,1], 5:[15,2], null:()=>[0,0] });
+        this.Drops = {};
         this.info = {
             ActiveTeam: CONSTANTS.WHITEID,
             Dices: [1,1]
@@ -70,7 +71,7 @@ class TGame extends SharedRoom0 {
         super.connect(user, ctx, ws);
         ctx.event('backgammons::connection::self', {
                     slots: this.Slots, 
-                    dropped: [],
+                    dropped: this.Drops,
                     state: this.info, 
                     colour: 0,
                     players:this.Players,
@@ -148,6 +149,15 @@ class TGame extends SharedRoom0 {
         }
     }
     slot(index) {
+        if(index === 'blackover' || index === 'whiteover') {
+            const Drop = this.Drops;
+            return {
+                add(ColourID) {
+                    Drop[index] = 1 + (Drop[index]?Drop[index]:0);
+                },
+                take() {console.log('error: tried to access to Drop.take()')}
+            }
+        }
         const Slot = this.Slots[index];
         const [Count, Colour] = Slot;
         return {

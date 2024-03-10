@@ -1,4 +1,4 @@
-// import { black, white } from "./Utilities.js";
+import { $myeval } from "./Utilities.js";
 import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './BoardConstants.js';
 import { BoardCanvas } from './CanvasRender.js'
 
@@ -42,6 +42,12 @@ class Board {
             }
         });
     }
+    /**
+     * 
+     * @param {GameState} GameState 
+     * @param {int} fromIndex 
+     * @returns {{}}
+     */
     UserMovesFrom(GameState, fromIndex) {
         const {User} = this;
         const {PTS, ActivePlayer, CurrentStepCash} = GameState;
@@ -49,7 +55,8 @@ class Board {
 
         if(ActivePlayer.team.id !== User.team.id) return;
         if(!FromSlot.ismy()) return;
-        if(fromIndex===0&&GameState.headed) return;
+        const TeamFirstSlot = ActivePlayer.team.id===WHITE.id?0:12;
+        if(fromIndex===TeamFirstSlot&&GameState.headed) return;
 
         const AccMoves = {
             moves:{},
@@ -121,7 +128,22 @@ class Board {
      */
     UserMove(GameState, {from, to}) {
         const {CurrentStepCash} = GameState;
-        CurrentStepCash.MovesStack.push({from, to, points:CurrentStepCash.MovesCash[to]});
+        if(to === WHITE.over || to === BLACK.over){
+            const sum = (acc, num)=>acc+num;
+            const points = CurrentStepCash.MovesCash[to].length===1
+                                ? CurrentStepCash.MovesCash[to][0]
+                                : [[1000],...CurrentStepCash.MovesCash[to]].reduce(
+                                        /**
+                                         * 
+                                         * @param {int} acc 
+                                         * @param {int[]} points
+                                         * @returns {int}
+                                         */
+                                        function(acc, points) {
+                                            return acc.reduce(sum) < points.reduce(sum) ? acc : points
+                                        });
+            CurrentStepCash.MovesStack.push({from, to, points});
+        } else CurrentStepCash.MovesStack.push({from, to, points:CurrentStepCash.MovesCash[to]});
         this.Slots0[from].permMoveTo(to);
     }
     UserStepComplete() {
@@ -195,7 +217,7 @@ class GameState {
 export class GameProvider {
     /**
      * 
-     * @param {{User, Slots, sendstep:Function}} BoardInits 
+     * @param {{User:{userId,username}, Slots:int[], sendstep:Function, Drops:[Number, Number]}} BoardInits 
      * @param {*} GameStateInits 
      */
     constructor(BoardInits, GameStateInits) {
@@ -203,10 +225,10 @@ export class GameProvider {
         this.Board = new Board(BoardInits);
         this.GameState = new GameState(GameStateInits);
         this.GameCanvas = new BoardCanvas(
-            BoardInits.Slots, [CHECKERS.empty, CHECKERS.empty], {
+            BoardInits.Slots, BoardInits.Drops, {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
-                this.Board.UserMove(this.GameState, {from:+from, to:+to})
+                this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
                 if(this.GameState.PTS.length===0)
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
             }

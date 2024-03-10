@@ -85,7 +85,7 @@ class Slot {
      * @returns {Slot}
      */
     next(point) {
-        const blackEndShift = 24
+        const blackEndShift = 12
         const blackStartShift = -12
         const {User} = this.Sloter
         function up(from, point) {

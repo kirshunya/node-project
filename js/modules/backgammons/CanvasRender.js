@@ -1,4 +1,4 @@
-import { range } from "./Utilities.js";
+import { range, $myeval } from "./Utilities.js";
 import { BoardConstants, refToArr } from "./BoardConstants.js";
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
@@ -223,8 +223,8 @@ export class BoardCanvas {
     }
     
     posXFromIndex(index) {
-        if(typeof index === 'string') {
-            return BoardWidth/2;
+        if(typeof $myeval(index) === 'string') {
+            return BoardWidth/2*scaleFactor - ((index===BLACK.over)?66:0);
         }
         return posX(index,) * scaleFactor;
         if (index === WHITE.over) return 272.5 * scaleFactor + 34.3 * 6 * scaleFactor;
@@ -235,8 +235,8 @@ export class BoardCanvas {
         if (index >= 18 && index < 24) return 272.5 * scaleFactor + 34.3 * (index - 18) * scaleFactor;
     }
     posYFromIndex(index, checkerIndex, indentTop, indentDown) {
-        if(typeof index === 'string') {
-            return BoardHeight/2;
+        if(typeof $myeval(index) === 'string') {
+            return BoardHeight/2*scaleFactor + checkerIndex*33;
         }
         return posY(index, checkerIndex) * scaleFactor;
         if (index === BLACK.over || index >= 0 && index < 12) return 24 * scaleFactor + 10 * checkerIndex * scaleFactor + indentTop;
@@ -246,8 +246,8 @@ export class BoardCanvas {
         for (let ghost of this.enabledGhosts) this.canvas.remove(ghost.img);
         let availableKeys = Object.keys(this.gc.UserMovesFrom(fromSlot));
         for (let key of availableKeys) {
-            if (key === 'whiteOver' || key === 'blackOver') {
-                let team = key === 'whiteOver' ? 0 : 1;
+            if (key === WHITE.over || key === BLACK.over) {
+                let team = key === WHITE.over ? 0 : 1;
                 this.createGhost(key, this.dropped[team].count(), fromSlot)
                 continue;
             }

@@ -92,7 +92,9 @@ export function InitGame(GameInitData, {userId, username}, ws) {
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
 
-    const gp = new GameProvider({ User, Slots:slots, sendstep });
+    const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
+            .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
+    const gp = new GameProvider({ User, Slots:slots, sendstep, Drops });
     const { GameCanvas } = gp;
     // const gm = new GameModel(slots, dropped, sendstep);
     // const {GameController} = GameControllerCtxWithGmEntries(gm);
