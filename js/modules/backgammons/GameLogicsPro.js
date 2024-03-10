@@ -64,7 +64,8 @@ class Board {
         if(ActivePlayer.team.id !== User.team.id) return {};
         if(!FromSlot.ismy()) return {};
         const TeamFirstSlot = ActivePlayer.team.id===WHITE.id?0:12;
-        if(fromIndex===TeamFirstSlot&&GameState.headed||fstepapplied) return {};
+        if(!fstepapplied) 
+            if(fromIndex===TeamFirstSlot&&GameState.headed) return {};
 
         const AccMoves = {
             moves:{},
