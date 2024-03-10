@@ -36,11 +36,13 @@ const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
 const req = msg=>ws.send(JSON.stringify(msg));
 const send = req;
 ws.onopen = () => {
-    const localUser = JSON.parse(localStorage.getItem("user"));
+    // const localUser = JSON.parse(localStorage.getItem("user"));
     req({
         clientId: createClientId(),
-        username: localUser.username,
-        userId: localUser.userId,
+        // username: localUser.username,
+        // userId: localUser.userId,
+        username: 'debug',
+        userId: 0,
         method: "backgammons/auth",
     });
     req({
