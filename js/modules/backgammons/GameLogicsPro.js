@@ -8,6 +8,15 @@ const SlotsIterator = (slots, CB)=>(
                                 [...Array(24).keys()].map(index=>CB(slots[index]))
                             );
 const { WHITE, BLACK, EMPTY, CHECKERS, MAP } = BoardConstants;
+// for jsDoc
+class TCRColour {
+    /** @type {int} */
+    id
+    /** @type {string} */
+    name
+    /** @type {string} */
+    over
+}
 class Board {
     FartherOpponentCheckerPos
     Slots
@@ -60,6 +69,7 @@ class Board {
         const headSlotCheckersCount = this.Slots0[headSlotIndex].refToArr.Count;
         const [f, s] = Dices;
         const fstepapplied = (f===s&&(f===3||f===4||f==6))&&(headSlotCheckersCount===14);
+        const isCanToOver = _isCanToOver();
 
         if(ActivePlayer.team.id !== User.team.id) return {};
         if(!FromSlot.ismy()) return {};
@@ -120,24 +130,39 @@ class Board {
         }
         StepByStep(PTS, FromSlot, []);
 
+        function _isCanToOver() {
+            const isBlack = ActivePlayer.team.id === BLACK.id;
+            const from = isBlack?MAP.blackstart:MAP.whitestart;
+            const to = isBlack?MAP.blackend:MAP.whiteend;
+
+            let outerhouse = false;
+            for(let index = from; index < to; ++index) 
+                outerhouse |= Sloter[index].ismy();
+            
+            return !outerhouse;
+        }
+
         /**
-         * 
+         * @TODO upd algol with excluding of slot if u stepFrom
          * @param {Slot} toSlot 
          * @param {Slot} fromSlot 
          * @returns {boolean} if 6 sequenced checkers
          */
         function sixchecker(toSlot, fromSlot) {//проверять передние клетки
+            //TODO: upd algol with excluding of slot if u stepFrom
             // const sum = (acc, bool)=>acc+(+bool);
-            let curSlot = toSlot;
             let counter = 1;
+            const curSlot = toSlot;
             for(const _ of Array(5).keys()) {
                 curSlot = curSlot.down();
+                if(curSlot.index == fromSlot.index && curSlot.refToArr.Count-1) break;
                 if(curSlot.ismy()) counter++
                 else break;
             }
             curSlot = toSlot;
             for(const _ of Array(5).keys()) {
                 curSlot = curSlot.next();
+                if(curSlot.index == fromSlot.index && curSlot.refToArr.Count-1) break;
                 if(curSlot.ismy()) counter++
                 else break;
             }
@@ -145,7 +170,6 @@ class Board {
         }
 
         /**
-         * 
          * @param {int} slotIndex 
          * @returns {boolean}
          */
@@ -174,7 +198,6 @@ class Board {
                 
                 return {pos, isover, index};
             }
-            let farther = false;
             let _index_ = slotIndex;
             while(_index_ < 36) {
                 const {pos, isover, index} = up(_index_, +1);
@@ -235,8 +258,15 @@ class Board {
 }
 
 class GameState {
-    Dices
+    /**
+     * @type {{userId:int, username:string, team:TCRColour}}
+     */
     ActivePlayer
+    /** @type {[Number, Number]} */
+    Dices
+    /**
+     * @type {{userId:int, username:string, team:TCRColour}[]}
+     */
     players
 
     CurrentStepCash = {
@@ -282,6 +312,10 @@ class GameState {
         console.log(this.players);
         this.state(state);
     }
+    /**
+     * 
+     * @param {{ActiveTeam:int, Dices:[Number, Number]}} param0
+     */
     state({ActiveTeam, Dices}) {
         this.CurrentStepCash = {
             MovesStack: [],
@@ -316,7 +350,7 @@ export class GameProvider {
         });
             // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
             //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
-
+        /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
         this.eventHandlers = {
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players);

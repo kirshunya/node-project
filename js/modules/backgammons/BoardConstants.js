@@ -16,7 +16,9 @@ export const BoardConstants = {
     },
     MAP: {
         whiteend: 24,
+        whitestart: 0,
         blackend: 12,
+        blackstart: 11,
         lastPostionNumber: 23
     },
     CHECKERS: {
