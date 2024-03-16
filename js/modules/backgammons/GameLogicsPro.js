@@ -1,4 +1,4 @@
-import { $myeval } from "./Utilities.js";
+import { $myeval, EventProvider } from "./Utilities.js";
 import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './BoardConstants.js';
 import { BoardCanvas } from './CanvasRender.js'
 
@@ -30,6 +30,9 @@ class Board {
         const {User} = BoardInits;
         this.User = User;//need field @team -> BoardConstant[WHITE||BLACK];
         this.Slots = SlotsIterator(BoardInits.Slots, data=>data);
+        this.eventProviders = {
+            showPTS: new EventProvider()
+        }
 
         this.Drops = [
             new DropSlot(EMPTY.id), new DropSlot(WHITE.over), new DropSlot(BLACK.over)
@@ -78,6 +81,7 @@ class Board {
             if(fromIndex===TeamFirstSlot&&GameState.headed) return {};
 
         const AccMoves = {
+            fromIndex,
             moves:{},
             /**
              * 
@@ -113,7 +117,7 @@ class Board {
             for(const point of new Set(PTS)) {
                 const curSlot = FromSlot.next(point);
                 if(curSlot?.isover) {
-                    AccMoves.push(curSlot.index, [...spendedPoints, point]); 
+                    isCanToOver&&AccMoves.push(curSlot.index, [...spendedPoints, point]); 
                     continue;
                 };
                 if(curSlot.ismy()||curSlot.isempty()) {
@@ -152,7 +156,7 @@ class Board {
             //TODO: upd algol with excluding of slot if u stepFrom
             // const sum = (acc, bool)=>acc+(+bool);
             let counter = 1;
-            const curSlot = toSlot;
+            let curSlot = toSlot;
             for(const _ of Array(5).keys()) {
                 curSlot = curSlot.down();
                 if(curSlot.index == fromSlot.index && curSlot.refToArr.Count-1) break;
@@ -209,8 +213,8 @@ class Board {
             }
             return false;
         }
-        CurrentStepCash.MovesCash = AccMoves.optimize()
-        return CurrentStepCash.MovesCash;
+        CurrentStepCash.MovesCash = AccMoves
+        return AccMoves.optimize();
     }
     CheckersWhichCanMove(GameState) {
         return [...Array(24).keys()]
@@ -224,14 +228,20 @@ class Board {
      * 
      * @param {GameState} GameState 
      * @param {{from:int, to:int}} param1 
+     * @param {int} variantIndex 
      */
-    UserMove(GameState, {from, to}) {
+    UserMove(GameState, {from, to}, variantIndex) {
         const {CurrentStepCash} = GameState;
+        const MovesCash = CurrentStepCash.MovesCash.fromIndex === from
+                                                ? CurrentStepCash.MovesCash.moves
+                                                : this.UserMovesFrom(GameState, from);
         if(to === WHITE.over || to === BLACK.over){
             const sum = (acc, num)=>acc+num;
-            const points = CurrentStepCash.MovesCash[to].length===1
-                                ? CurrentStepCash.MovesCash[to][0]
-                                : [[1000],...CurrentStepCash.MovesCash[to]].reduce(
+            const points = MovesCash[to].length===1
+                                ? MovesCash[to][0]
+                                : variantIndex
+                                    ? map[to][variantIndex]
+                                    : [[1000],...MovesCash[to]].reduce(
                                         /**
                                          * 
                                          * @param {int} acc 
@@ -242,8 +252,9 @@ class Board {
                                             return acc.reduce(sum) < points.reduce(sum) ? acc : points
                                         });
             CurrentStepCash.MovesStack.push({from, to, points});
-        } else CurrentStepCash.MovesStack.push({from, to, points:CurrentStepCash.MovesCash[to]});
+        } else CurrentStepCash.MovesStack.push({from, to, points:MovesCash[to]});
         this.Slots0[from].permMoveTo(to);
+        this.eventProviders.showPTS.send(GameState.PTS);
     }
     UserStepComplete() {
 
@@ -304,25 +315,26 @@ class GameState {
     }
     constructor(GameStateInits) {}
 
-    start(state, players){
+    start(state, players, canvas){
         this.GameState = BoardConstants.GAMESTATE.GameStarted;
         this.players = [{},...players].reduce((acc, player)=>
             (acc[player.team] = (player.team = [WHITE, BLACK][player.team-1], player), acc)
         );
         console.log(this.players);
-        this.state(state);
+        this.state(state, canvas);
     }
     /**
      * 
      * @param {{ActiveTeam:int, Dices:[Number, Number]}} param0
      */
-    state({ActiveTeam, Dices}) {
+    state({ActiveTeam, Dices}, canvas) {
         this.CurrentStepCash = {
             MovesStack: [],
             MovesCash: {}
         }
         this.ActivePlayer = this.players[ActiveTeam];
         this.Dices = Dices;
+        canvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].id);
     }
     finish(WinnerTeam) {
 
@@ -348,20 +360,21 @@ export class GameProvider {
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
             }
         });
-            // range(0,24).map(x=>x!==0?x!==12?[1,1]:[15,2]:[15,1])
-            //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
+        
+        this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
+
         /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
         this.eventHandlers = {
             start(GameStateData, players) {
-                self.GameState.start(GameStateData, players);
+                self.GameState.start(GameStateData, players, self.GameCanvas);
             },
             step(Step, newGameStateData) {
                 self.Board.PermStep(Step, self.GameState);
                 self.GameCanvas.step(Step);
-                self.GameState.state(newGameStateData);
+                self.GameState.state(newGameStateData, self.GameCanvas);
             },
             ustep(Step, newGameStateData) {
-                self.GameState.state(newGameStateData);
+                self.GameState.state(newGameStateData, self.GameCanvas);
             },
             end() {
 

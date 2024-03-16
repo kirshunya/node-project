@@ -1,20 +1,51 @@
-// const {sleep, range, getRandomInt} = import('../js/modules/backgammons/Utilities.mjs')
-// import {sleep, range, getRandomInt} from '../js/modules/backgammons/Utilities.mjs';
-// const BoardContants = require('./../js/modules/backgammons/');
+//some utilities
+const { performance } = require('perf_hooks');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make iterator with Array methods?
 const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
-const CONSTANTS = {
-    WHITEID: 1,
-    BLACKID: 2,
-    RoomStates:{Waiting:0, Started:1},
-}
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
+const Timer = class {
+    /**
+     * do some on calc 
+     * @param {()=>{}} oncomplete 
+     * @param {()=>{}} onreject handle some if sended into .cancel(...) method and if reurns some, return this to cancel
+     */
+    constructor(times, oncomplete, onreject=(...args)=>{}) {
+        this.reject = false;
+        this.waiting = false;
+        this.waited = null;
+        this.onreject = onreject;
+        setTimeout(()=>onTimeout.call(this), times);
+        function onTimeout() {
+            if(this.reject) return;
+            if(this.waiting) this.waited = oncomplete;
+            else oncomplete()
+        }
+    }
+    cancel(...args) {
+        this.reject = false;
+        return this.onreject(...args);
+    }
+    await() {
+        this.waiting = true;
+    }
+    resume() {
+        this.waiting = true;
+        if(this.reject) return;
+        this.waited?.();
+    }
+}
+
+const CONSTANTS = {
+    WHITEID: 1,
+    BLACKID: 2,
+    RoomStates:{Waiting:0, Started:1},
+}
 var GAMESCOUNT = 0;
 const LobbyListeners = {};
 const Lobby = {
@@ -56,7 +87,10 @@ class SharedRoom0 {
     }
 }
 class TGame extends SharedRoom0 {
+    /** @type {{userId:int, username:string, team:int}[]} */
     Players = [];
+    /** @type {Timer} */
+    curTimer = new Timer(0, ()=>{});
     constructor(GameID) {
         super(GameID);
         this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
@@ -65,6 +99,7 @@ class TGame extends SharedRoom0 {
             ActiveTeam: CONSTANTS.WHITEID,
             Dices: [1,1]
         }
+        this.times = [0,0];
     }
     connect(user, ctx, ws) {
         // const __u = {user.}
@@ -80,7 +115,8 @@ class TGame extends SharedRoom0 {
                     dominoRoomId:this.GameID[0],
                     tableId:this.GameID[1],
                     GameState:this.RoomState,
-                    debug:Object.keys(this.Connections)
+                    debug:Object.keys(this.Connections),
+                    times: this.times
         });
         let rec = this.Players.filter(({userId})=>userId===user.userId)[0];
         if(rec) {
@@ -116,7 +152,8 @@ class TGame extends SharedRoom0 {
      */
     stepIfValid(step, code) {
         const {ActiveTeam, Dices} = this.info;
-        const TempSlots = adv0_range(0, 24, {null:()=>[0,0]});
+        // const TempSlots = adv0_range(0, 24, {null:()=>[0,0]});
+        this.curTimer.await();//time to check is step success 
         // const Skin = new Proxy(this.Slots, {
         //     get:(Slots, key)=>{
         //         const [colour, count] = Slots[key];
@@ -134,22 +171,38 @@ class TGame extends SharedRoom0 {
             this.slot(to).add(ActiveTeam);
             // typeof to === 'string' && to = 
         });
+        this.curTimer.cancel();//if succes step
+        this.curTimer.resume();
         const prevstate = this.info;
-        this.event('step', {step, prevstate, newstate: this.nextState(), code});
+        this.event('step', {step, prevstate, newstate: this.nextState(), code});//if success step
         if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
-            this.event('end', {winner: ActiveTeam});
-            GAMESCOUNT++;
+            this.endGame(ActiveTeam, 'Players dropped all checkers', 'win')
         }
         return {result:'success'};
     }
+    endGame(WinnerTeam, msg, code) {
+        if(code === 'timer') return; //debig
+        this.event('end', {winner: WinnerTeam, msg, code});
+        GAMESCOUNT++;
+    }
     nextState() {
         const {ActiveTeam} = this.info;
-        const nextTeam = {
+        const nextTeamDict = {
             [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
             [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
         }
+        const nextTeam = nextTeamDict[ActiveTeam];
+        const timesIndex = {
+            [CONSTANTS.WHITEID]: 0,
+            [CONSTANTS.BLACKID]: 1
+        }
+        this.times[timesIndex[ActiveTeam]] = 0
+        this.times[timesIndex[nextTeam]] = performance.now();
+        this.curTimer.cancel();
+        this.curTimer = new Timer(60*1000, ()=>
+                this.endGame(ActiveTeam/* in context this is OpponentTeam */, 'Time end', 'timer'));
         return this.info = {
-            ActiveTeam: nextTeam[ActiveTeam],
+            ActiveTeam: nextTeam,
             Dices: randdice()
         }
     }

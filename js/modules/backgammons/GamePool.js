@@ -1,4 +1,4 @@
-import { ondom, getRandomInt } from './Utilities.js';
+import { ondom, getRandomInt, EventProvider } from './Utilities.js';
 import { WSEventPool } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
@@ -96,6 +96,7 @@ export function InitGame(GameInitData, {userId, username}, ws) {
             .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
     const gp = new GameProvider({ User, Slots:slots, sendstep, Drops });
     const { GameCanvas } = gp;
+    let TimersByTeam, activetimerind;
     // const gm = new GameModel(slots, dropped, sendstep);
     // const {GameController} = GameControllerCtxWithGmEntries(gm);
     // const gc = new GameController({id:userId, username});
@@ -109,11 +110,11 @@ export function InitGame(GameInitData, {userId, username}, ws) {
     //             //             .map(([Count, Colour])=>({Count, Colour:Colour!==1?Colour!==2?null:'white':'black'})),
     //             [0, 0], gc);
 
-    WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices))
-    if(GameInitData.GameState === 1) GameStart(GameInitData.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices)
+    WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices, [0, 0]))
+    if(GameInitData.GameState === 1) GameStart(GameInitData.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices, GameInitData.times)
     // if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
-    if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices);//debug----TODO
-    function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices) {
+    if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices, GameInitData.times);//debug----TODO
+    function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times) {
         User.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
         gp.eventHandlers.start({ActiveTeam, Dices}, [firstPlayer, secondPlayer]);
         // gc.User = secondPlayer;
@@ -122,18 +123,17 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         //         {id:secondPlayer.userId, pteam:secondPlayer.team, team:secondPlayer.team}
         //     ], Dices, ActiveTeam);
         
-        GameCanvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].name);
+        
         const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
-        document.getElementById('TopPan')
-                .getElementsByClassName('Nickname')[0].innerHTML = whiteplayer.username;
-        document.getElementById('BottomPan')
-                .getElementsByClassName('Nickname')[0].innerHTML = blackplayer.username;
+        TimersByTeam = InitUI(whiteplayer, blackplayer, times);
+        startTimer(ActiveTeam)
     }
     WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
-            User.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];
+            User.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+            setActiveTimer(newstate.ActiveTeam);
             code !== ncode && gp.eventHandlers.step(step, newstate)
                            || gp.eventHandlers.ustep(step, newstate)
-                    GameCanvas.createDices(newstate.Dices[0], newstate.Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1].name);
+                    GameCanvas.createDices(newstate.Dices[0], newstate.Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1].id);
         });
     WSEventPool.on('end', ({winner})=>{
         alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
@@ -143,6 +143,44 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
     })
+    function InitUI(user, opponent, initials) {
+        class Timer {
+            constructor(Element, values) {
+                const TLabel = Element.getElementsByClassName('timer')[0];
+                let val = 0;
+                this.label = (newval=undefined)=>{
+                    if(typeof newval === 'number') val = newval;
+                    function timer() {
+                        const seconds = Math.floor((performance.now()-val)/1000);
+                        const minuts = Math.floor(seconds/60);
+                        const seconds60 = seconds%60;
+                        return `${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
+                    }
+                    TLabel.innerHTML = val===0?'1:00':timer();
+                }
+            }
+        }
+        document.getElementById('TopPan')
+                .getElementsByClassName('Nickname')[0].innerHTML = user.username;
+        document.getElementById('BottomPan')
+                .getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+        return [new Timer(document.getElementById('TopPan')), new Timer(document.getElementById('BottomPan'))]
+    }
+    function startTimer(ActiveTeam) {
+        setActiveTimer(ActiveTeam);
+        setInterval(()=>TimersByTeam[activetimerind].label(), 250);
+    }
+    function setActiveTimer(ActiveTeam) {
+        const TimerIndByTeam = {
+            [BoardConstants.WHITE.id]: 0,
+            [BoardConstants.BLACK.id]: 1
+        };
+        const prevtimer = activetimerind
+        activetimerind = TimerIndByTeam[ActiveTeam];
+        // TimerByTeam[prevtimer].label(0);
+        TimersByTeam[activetimerind].label(performance.now());
+        return activetimerind;
+    }
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
     //     if(code !== ncode) step.map(({from,to})=>{
     //             gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));

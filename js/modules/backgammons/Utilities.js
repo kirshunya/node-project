@@ -37,7 +37,15 @@ export const FCPromise = ()=>{
     const [promise, resolve, reject] = OEPromise();
     return Object.assign(promise, {promise, resolve, reject});
 }
-
+export class EventProvider {
+    constructor() {
+        const EventListeners = []
+        const subsrcibe = (CB)=>EventListeners.push(CB);
+        subsrcibe.subsrcibe = subsrcibe
+        subsrcibe.send = (...args)=>EventListeners.map(CB=>CB?.(...args));
+        return subsrcibe;
+    }
+}
 export class JustEnoughEvents {
     EventListeners = {}
     NamedPromises = []

@@ -30,6 +30,12 @@ export const BoardConstants = {
         GameStarted:1
     }
 }
+// export const GraphicsContants = {
+//     whitecheckerpicurl: `img/blackcell4.png`, 
+//     blackcheckerpicurl: `img/whitecell4.png`,
+//     ghostcheckerpicurl: `img/checker-white.png`, 
+//     gameboardpic: `img/bcbg.png`
+// }
 export class refToArr {
     ref
     constructor(ref) { this.ref = ref; }
@@ -46,7 +52,20 @@ export class refToArr {
         return this.ref[0] = value;
     }
 }
+/**
+ * @class some version of *refToArr*
+ */
 export class slotinfo {
+    /**@type {int} */
+    Count
+    /**@type {int} */
+    Colour
+    /**
+     * Constructor of arrayed Data of SlotInfo for GameLogicsPro.js
+     * @param {int} Colour 
+     * @param {int} Colour
+     * @returns {[Number, Number]}
+     */
     constructor(Count, Colour) {
         return [Count, Colour];
     }

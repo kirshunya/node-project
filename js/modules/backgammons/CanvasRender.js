@@ -1,11 +1,20 @@
-import { range, $myeval } from "./Utilities.js";
-import { BoardConstants, refToArr } from "./BoardConstants.js";
+import { range, $myeval, ondom, sleep, black } from "./Utilities.js";
+import { BoardConstants, refToArr, slotinfo } from "./BoardConstants.js";
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
 var scaleFactor = 1.3;
 var indent = 14;
 
 class Checker {
+    /**@type {fabricImage} */ 
+    img
+    /**@type {int} */ 
+    slot
+    /**
+     * 
+     * @param {fabricImage} img 
+     * @param {int} slot 
+     */
     constructor(img, slot) {
         this.img = img;
         this.slot = slot;
@@ -13,8 +22,10 @@ class Checker {
 }
 
 class Slot {
+    /** @type {Checker[]} */
     checkers = [];
 
+    /** @param {Checker} checker  */
     add(checker) {
         this.checkers.push(checker);
     }
@@ -55,25 +66,25 @@ const $PageSnapshotData = {
     Graphics: {
         // whitecheckerpicurl: `img/checker-white.png`, 
         // blackcheckerpicurl: `img/checker-black.png`,
-        whitecheckerpicurl: `img/blackcell4.png`, 
-        blackcheckerpicurl: `img/whitecell4.png`,
-        ghostcheckerpicurl: `img/checker-white.png`, 
-        gameboardpic: `img/bcbg.png`
+        whitecheckerpicurl: `img/backgammons/blackcell4.png`, 
+        blackcheckerpicurl: `img/backgammons/whitecell4.png`,
+        ghostcheckerpicurl: `img/backgammons/ghost-checker.png`, 
+        gameboardpic: `img/backgammons/bcbg.png`
     }
 }
 //Выделить в отдельный класс позиционирования и масштабирования
     const [initWidth, initHeight] = [360, 480];
     const BoardWidth = 1600;
-    const BoardHeight = 1850;
-    const BordersByX = [43,100,40];
-    const BordersByY = [56,0,-112];
+    const BoardHeight = 1900;
+    const BordersByX = [43,90,40];
+    const BordersByY = [56,0,56];
     const slotWidth = (BoardWidth - BordersByX.reduce((acc,n)=>acc+n))/12;
     const slotHeight = (BoardHeight - BordersByY.reduce((acc,n)=>acc+n))/2;
     const BoardSidesSize = [712, 712];
 
-    const slotMargin = -10;
+    const slotMargin = 0;
     const checkerSize = slotWidth - slotMargin*2;
-    let StaticImg 
+    let StaticImg = genStaticImgClass(checkerSize/66)
 
     const stepY = checkerSize / 2.5;
     const TopY = BordersByY[0];
@@ -88,10 +99,464 @@ const $PageSnapshotData = {
     const posX = (slotIndex) => __posX(slotIndex < 12 ? 11 - slotIndex : slotIndex - 12);
     const posY = (slotIndex, CheckerIndex) => (slotIndex<12)
                                                     ? TopY  +  stepY*CheckerIndex
-                                                    : BottomY  -  stepY*CheckerIndex;
+                                                    : BottomY  -  stepY*CheckerIndex - checkerSize;
+
+const BoardSizesInfo = (()=>{
+    const BoardParts = [43, 712, 100, 712, 43];
+    
+    return {
+    }
+})()
 const {whitecheckerpicurl, blackcheckerpicurl, 
     ghostcheckerpicurl, gameboardpic} = $PageSnapshotData.Graphics
-export class BoardCanvas {
+const CHECKERS_TEXTURES = [ghostcheckerpicurl, whitecheckerpicurl, blackcheckerpicurl]
+/**
+ * for jsDoc
+ */
+class fabricImage {
+    //properties
+    width
+    height
+
+    //other
+    /** @type {[]} */
+    filters
+    /** applyFilters */
+    applyFilters() {}
+    /**
+     * set Z
+     * @param {int} Z 
+     * @returns {fabricImage} this
+     */
+    moveTo(Z){}
+    /**
+     * accept Coords Changes
+     * @param {boolean} skipCornesopt "skip calculation of oCoords."
+     * @returns {fabricImage} this
+     */
+    setCoords(skipCornesopt){}
+}
+export var board = {};
+export var canva = {};
+export var drop = {}
+class CanvasFunctions {
+    initWidth = initWidth
+    /**
+     * @param {string} CanvasName 
+     */
+    constructor(CanvasName) {
+        this.canvas = new fabric.Canvas(CanvasName, {
+                preserveObjectStacking: true,
+                selection : false,
+                controlsAboveOverlay:true,
+                centeredScaling: true,
+                allowTouchScrolling: true // скроллинг страницы касанием по канвасу
+            });
+    }
+    /** @param {string} imgSrc @returns {Promise.<fabricImage>} */
+    async setbackground(imgSrc) {
+        const callRender = this.canvas.renderAll.bind(this.canvas);
+        return new Promise(resolve=>
+                fabric.Image.fromURL(imgSrc, 
+                        bgImg=>(this.canvas.setBackgroundImage(bgImg, callRender, {}), resolve(bgImg))
+        ));
+    }
+    enterContentToViewBox(newWidth, newHeight=undefined, realWidth = BoardWidth, realHeight=BoardHeight) {
+        const {canvas} = this;
+        if(!newHeight) 
+            newHeight = newWidth/realWidth*realHeight
+        
+
+        canvas.setWidth(newWidth);
+        canvas.setHeight(newHeight);
+        canvas.setZoom(newWidth/realWidth);
+    }
+    /**
+     * 
+     * @param {string} texture 
+     * @param {{left, top}} additional 
+     * @returns {Promise.<fabricImage>}
+     */
+    installImg(texture, additional) {//TODO: rebase
+        const self = this;
+        return new Promise(resolve=>fabric.Image.fromURL(texture, function (rawImg) {
+                console.log(additional)
+                const img = rawImg.set(new StaticImg(additional));
+                self.canvas.add(img)
+                resolve(img);
+            }));
+    }
+}
+class TopDropLunk extends CanvasFunctions {
+    _count = 0
+    _effects = []
+    _effectsRejects = []
+    pic = ghostcheckerpicurl
+    constructor(Prefix, count=0) {
+        super(`${Prefix}DropLunk`);
+        const dropcanvas = this.canvas;
+        const DropLunkContainer = document.getElementById(`${Prefix}Pan`).getElementsByClassName('line')[0];
+        const DropLunkCC = document.getElementById(`${Prefix}Pan`).getElementsByClassName('DropLunk')[0]
+        const resize = ()=>{
+            dropcanvas.setWidth(DropLunkCC.width = DropLunkContainer.clientWidth);
+            dropcanvas.setHeight(DropLunkCC.height = DropLunkContainer.clientHeight);
+            dropcanvas.setZoom((DropLunkContainer.clientHeight)/66/2)
+        }
+        window.addEventListener('resize', resize);
+        ondom.then(resize);
+
+        const pic = this.pic = {Top:whitecheckerpicurl, Bottom:blackcheckerpicurl}[Prefix];//TODO
+        ondom.then(()=>{
+            Promise.all([...Array(count).keys()].map((i)=>this.installImg(pic, {left:20+i*50, top:3})))
+                   .then(arr=>arr.map((img, i)=>img.moveTo(i).setCoords()));
+        this._count = count;
+            // this.installImg(whitecheckerpicurl, {left: 250, top: 3}).then(img=>img.moveTo(3)).then(img=>img.setCoords())
+            // this.installImg(whitecheckerpicurl, {left: 310, top: 3}).then(img=>img.moveTo(2)).then(img=>img.setCoords())
+            // this.installImg(ghostcheckerpicurl, {left: 380, top: 3}).then(img=>img.moveTo(1)).then(img=>img.setCoords())
+        })
+    }
+    count() {
+        return this._count
+    }
+    /**
+     * 
+     * @param {[int[]]|[[Number], [Number]]} points 
+     * @returns {Promise.<Number>}
+     */
+    accept(points) {
+        return new Promise((resolve, reject)=>{
+            const resolver = val=>()=>resolve(val)
+            const Rect = new fabric.Rect({
+                width:this.canvas.getWidth()/this.canvas.getZoom(),
+                height:this.canvas.getHeight()/this.canvas.getZoom(),
+                fill: 'rgba(225,225,100,.53)',
+            });
+            this.canvas.add(Rect); this._effects.push(Rect);
+            // if(typeof points)
+            if(points.length - 1) {
+                const [firstVariant, secondVariant] = points
+                this.createDice(firstVariant[0], 0).then(resolver(0), reject)
+                this.createDice(secondVariant[0], 1).then(resolver(1), reject)
+            } else {
+                this.createDice(points[0][0], 0).then(resolver(-1), reject)
+                Rect.on('mousedown', resolver(-1));
+            }
+        })
+
+    }
+    append() {
+        const index = this._count++;
+        return this.installImg(this.pic, {left:20+index*45, top:3})
+                .then(img=>img.moveTo(index).setCoords());
+    }
+    createDice(diceNumber, shiftType=0) {
+        return this.installImg(`/img/backgammons/dices${diceNumber}.png`, {
+            left: shiftType===0 ?this.canvas.getWidth()
+                                :this.canvas.getWidth()+this.canvas.getHeight()*3,
+            top: 2, scaleX:128/328, scaleY:128/328,
+            hoverCursor: 'pointer',
+        }).then(dice=>{
+            this._effects.push(dice);
+            this.canvas.bringToFront(dice);
+            return new Promise((resolve, reject)=>{
+                this._effectsRejects.push(reject);
+                dice.on("mousedown", ()=>resolve());
+            });
+        });
+    }
+    clear() {
+        const {_effects, _effectsRejects} = this;
+        this._effects = []
+        this._effectsRejects = [];
+        _effects.map(effect=>this.canvas.remove(effect));
+        _effectsRejects.map(rej=>rej());
+    }
+}
+/*
+ * FRONT::DROPS::Accept([Dices])
+ * We can drop with 2 dice(but spend only on of *), but if we chose first dice:
+ * * first n second dice cant be used to moving by other checkers -- all good
+ * * second dice cant be used to moving other checkers, but first can be used to this -- what should to do?
+ * * second dice as first can be used to moving other checkers -- all good
+ */
+
+export class BoardCanvas extends CanvasFunctions {
+    /** @type {Slot[]} */
+    slots = []
+    /** @type {Checker[]} */
+    enabledGhosts = []
+    /** @type {TopDropLunk[]} */
+    drops
+    /** @type {{UserMovesFrom, move}} */
+    gc
+    /**
+     * 
+     * @param {[Number, Number][]} GSlots 
+     * @param {[Number, Number]} GDropped 
+     * @param {{UserMovesFrom:Function, move:Function}} param2 
+     */
+    constructor(GSlots, GDropped, {UserMovesFrom, move}) {
+        super('canvas');
+        const canvas = canva = this.canvas;
+        board = this;
+        console.log(`[BoardCanvas]: vars inited`)
+        const self = this;
+        this.gc = {UserMovesFrom, move};
+
+        super.setbackground(gameboardpic);
+
+        this.drops = drop = {
+            [WHITE.over]: new TopDropLunk('Top', GDropped[0]),
+            [BLACK.over]: new TopDropLunk('Bottom', GDropped[1])
+        };
+        // [...Array(24).keys()].map(i=>this.createChecker(1, i, 0));
+        // this.createChecker(1, 0, 0);
+        // this.createChecker(1, 1, 2);
+        
+        const PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
+                const slot = new refToArr(slotinfo);
+                const SlotLet = self.slots[slotIndex] = new Slot();
+                return range(0,slot.Count)
+                        .map(checkerIndex=>self.createChecker(slot.Colour, slotIndex, checkerIndex).then(
+                            ([CheckerObj, slotIndex, checkerIndex])=>{
+                                SlotLet.checkers[checkerIndex]=CheckerObj
+                                return [CheckerObj, slotIndex, checkerIndex];
+                            }));
+            }).flat(1)).then(ValidatingCheckersLayouting);
+        // const PromiseOfCreatingDroppedPictures = Promise.all(GDropped.map((Count, teamLeft)=>{
+        //         const droppedPic = teamLeft===0?whitecheckerpicurl:blackcheckerpicurl;
+        //         const droppedTeam = teamLeft===0? WHITE.over : BLACK.over;
+        //         return range(0, Count)
+        //                 .map(checkerIndex=>self.createImg(droppedPic, droppedTeam, checkerIndex))
+        //     }).flat(1)).then(ValidatingCheckersLayouting);
+        /**
+         * 
+         * @param {[Checker, Number, Number][]} arr 
+         * @returns {[Checker, Number, Number][]}
+         */
+        function ValidatingCheckersLayouting (arr) {
+            return (arr.map(([CheckerObj, slotIndex, checkerIndex])=>{
+                /** @type {fabricImage} */
+                const CheckerIMG = CheckerObj.img;
+                CheckerIMG.moveTo(checkerIndex);
+                CheckerIMG.set("top", posY(slotIndex, checkerIndex, 0, 0));
+                CheckerIMG.setCoords();
+            }), arr)
+        }
+
+        // function CanvasValidate() {
+        //     const width = containerOfBoard.clientWidth;
+        //     // const width = window.innerWidth;
+        //     if(width < 950) self.GetCanvasAtResoution(width);
+        //     else if (width < 1207) self.GetCanvasAtResoution(width - 372);
+        //     else if (width) {
+        //         const w = width - 506;
+        //         const h = document.body.clientHeight - 90 - 37;
+        //         self.GetCanvasAtResoution(w > h ? h : w);
+        //     }
+        // }
+        const containerOfBoard = ondom.then(()=>document.getElementsByClassName('domino-game-page__body-wrapper')[0])
+        const CanvasValidate = async()=>{
+            const width = (await containerOfBoard).clientWidth;
+            const pageheight = document.body.clientHeight - 90 - 37;
+            const newWidth = width<950?width:width<1207?width-372:maybeHeight(width)>pageheight?widthIfHeight(pageheight):width;
+            function maybeHeight(width) {
+                return width/BoardWidth*BoardHeight
+            }
+            function widthIfHeight(height) {
+                return height/BoardHeight*BoardWidth
+            }
+            return this.enterContentToViewBox(newWidth)
+        }
+        window.addEventListener('resize', ()=>(CanvasValidate(),CanvasValidate()));
+        window.addEventListener('load', ()=>(CanvasValidate(),CanvasValidate()));
+        CanvasValidate(); CanvasValidate();
+    }
+    /** @type {{diceNumber:int, img:fabricImage, remove:Function}} */
+    _dices = []
+    /**
+     * @param {int} firstDice 
+     * @param {int} secondDice 
+     * @param {*} ActiveTeam 
+     */
+    createDices(firstDice, secondDice, ActiveTeam) {
+        const _dices = this._dices
+        _dices.map(Dice => Dice.remove());
+        this._dices = [];
+        const self = this;
+        const scale = 166/328;
+        const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
+        const dicesize = scale*328; const space = 20;
+        const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
+
+        class Dice {
+            spended = false;
+            removed = false;
+            constructor(diceNumber, left) {
+                this.diceNumber = diceNumber;
+                self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice':'dices'}${diceNumber}.png`, {
+                    left, top: BoardHeight/2, scaleX:scale, scaleY:scale,
+                    hoverCursor: 'pointer',
+                }).then(dice=>{
+                    this.img = dice;
+                    self.canvas.bringToFront(dice);
+                });
+            }
+            spend() {
+                if(this.spended || this.removed) return;
+                const Dice = this;
+                this.spended = true;
+                this.img.filters.push(new fabric.Image.filters.Sepia(),
+                                      new fabric.Image.filters.Brightness({ brightness: 57 }))
+                this.img.applyFilters();
+                self.canvas.renderAll();
+                sleep(375).then(removeif)
+                function removeif() { if(Dice.removed) self.canvas.remove(Dice.img); }
+            }
+            remove() {
+                this.removed = true;
+                self.canvas.remove(this.img);
+            }
+        }
+
+        if(firstDice!==secondDice) {
+            const firstDicePos = sideleft - (dicesize + space/2) + currentSideSize/2;
+            this._dices.push(new Dice(firstDice, firstDicePos), new Dice(secondDice, firstDicePos+space+dicesize))
+        } else {
+            const firstDicePos = sideleft - 2*(dicesize + space/2) + currentSideSize/2;
+            this._dices.push(new Dice(firstDice, firstDicePos),
+                             new Dice(firstDice, firstDicePos+space+dicesize),
+                             new Dice(secondDice, firstDicePos+2*(space+dicesize)), 
+                             new Dice(secondDice, firstDicePos+3*(space+dicesize)))
+        }
+    }
+    setPTS(pts) {
+        const _dices = this._dices;
+        if(pts.length === 1 && _dices.length === 2)
+            _dices.map(Dice=>Dice.diceNumber===pts[0]&&Dice.spend());
+        else if(pts.length === 2 && _dices.length === 2)
+            _dices.map(Dice=>Dice.spend());
+        else
+            _dices.map((Dice, i)=>i<=(4-pts.length)&&Dice.spend());
+    }
+    /**
+     * 
+     * @param {int} diceNumber 
+     * @param {*} ActiveTeam 
+     * @param {int} shift 
+     * @returns 
+     */
+    createDice(diceNumber, ActiveTeam, shift=0) {
+        
+    }
+    updatePTS
+    /**
+     * @param {int} Colour 1,2 -- colour, 0 -- ghost
+     * @param {int} slotIndex 
+     * @param {int} checkerIndex 
+     * @returns {Promise.<[Checker, Number, Number]>}
+     */
+    createChecker(Colour, slotIndex, checkerIndex) {
+        const self = this;
+        return this.installImg(CHECKERS_TEXTURES[Colour], {
+                left: posX(slotIndex),
+                top: posY(slotIndex, checkerIndex)
+            }).then(img=>{
+                const checkerFromImg = new Checker(img, slotIndex);
+                Colour&&img.on('mousedown', () => {
+                    // if (slotIndex !== WHITE.over && slotIndex !== BLACK.over)
+                        self.showGhostsCheckersOfAccesibleSlots(checkerFromImg.slot);
+                });
+
+                return ([checkerFromImg, slotIndex, checkerIndex]);
+            })
+    }
+    /**
+     * Расстваляет по полю призраки пешек куда человек сможет сделать ход с выбранной пешки
+     * @requires this.gc.UserMovesFrom(fromIndex) to get list of accesible slots
+     * @requires FRONT::DROPS::Accept([Dices]) to accept drops over
+     * @requires this.clearGhosts() on click to ghost we hide other ghost because User *commanded* to Move
+     * @requires this.gc.move(fromIndex,toIndex) on click to ghost
+     * @requires this.moveChecker(fromIndex,toIndex) on click to ghost
+     * @param {int} fromIndex 
+     */
+    showGhostsCheckersOfAccesibleSlots(fromIndex) {
+        const self = this;
+        // for (let ghost of this.enabledGhosts) this.canvas.remove(ghost.img);
+        this.clearGhosts();
+        /** @type {Array.<[string, (int[]|[Number, Number])]>} */
+        const availableKeys = Object.entries(this.gc.UserMovesFrom(fromIndex));
+        for (const [key, points] of availableKeys) {
+            if (key === WHITE.over || key === BLACK.over) {
+                // TODO: DropRegion
+                this.drops[key].accept(points).then(()=>move(key), ()=>{});
+                // let team = key === WHITE.over ? 0 : 1;
+                // this.createGhost(key, this.dropped[team].count(), fromIndex)
+                continue;
+            }
+            // this.createGhost(key, this.slots[key].count(), fromIndex);
+            this.createChecker(0, key, this.slots[key].count()).then(
+                ([CheckerObj, slotIndex, checkerIndex])=>{
+                    CheckerObj.img.on('added', () => CheckerObj.img.moveTo(checkerIndex));
+                    CheckerObj.img.on('mousedown', ()=>move(slotIndex));
+                    self.canvas.bringToFront(CheckerObj.img);
+                    self.enabledGhosts.push(CheckerObj);
+                }
+            );
+        }
+        function move(slotIndex) {
+            self.gc.move(fromIndex, slotIndex);
+            self.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
+            self.clearGhosts();
+        }
+    }
+    clearGhosts() {
+        this.drops[WHITE.over].clear()
+        this.drops[BLACK.over].clear()
+        return this.enabledGhosts.map(ghost=>this.canvas.remove(ghost.img));
+    }
+    /**
+     * 
+     * @param {int} from 
+     * @param {int} to 
+     */
+    moveChecker(from, to) {
+        const {canvas} = this;
+        let isOver = to === WHITE.over || to === BLACK.over;
+        const checker = (from === WHITE.over || from === BLACK.over)
+                                        ? alert('moveChecker from Over?? in CanvasRender.js')
+                                        : this.slots[from].getRemoveLast()
+        
+        if(isOver) {
+            const drop = this.drops[to];
+            const Direction = {[WHITE.over]:-checkerSize, [BLACK.over]:BoardHeight+checkerSize}[to]
+            checker.img.animate('left', checker.img.left, {
+                duration: 400,
+                onChange: canvas.renderAll.bind(canvas)
+            })
+            checker.img.animate('top', Direction, {
+                duration: 400,
+                onChange: canvas.renderAll.bind(canvas)
+            })
+            sleep(400).then(()=>drop.append())
+            // drop.append();
+        } else {
+            const checkerIndex = this.slots[to].count();
+            checker.img.animate('left', posX(to), {
+                duration: 400,
+                onChange: canvas.renderAll.bind(canvas)
+            })
+            checker.img.animate('top', posY(to, checkerIndex, indent, -indent), {
+                duration: 400,
+                onChange: canvas.renderAll.bind(canvas)
+            })
+            checker.slot = to;
+            canvas.bringToFront(checker.img)
+            this.slots[to].add(checker);
+        }
+    }
+}
+export class _BoardCanvas {
     dropped = [new Slot(), new Slot()]
     slots = []
     enabledGhosts = []
@@ -143,7 +608,9 @@ export class BoardCanvas {
                     return range(0, Count)
                             .map(checkerIndex=>self.createImg(droppedPic, droppedTeam, checkerIndex))
                 }).flat(1));
-            const ValidatingCheckersLayouting = arr=>arr.map(([CheckerIMG, slotIndex, checkerIndex])=>{
+            const ValidatingCheckersLayouting = arr=>arr.map(([CheckerObj, slotIndex, checkerIndex])=>{
+                    /** @type {fabricImage} */
+                    const CheckerIMG = CheckerObj.img;
                     CheckerIMG.moveTo(checkerIndex);
                     CheckerIMG.set("top", self.posYFromIndex(slotIndex, checkerIndex, 0, 0));
                     CheckerIMG.setCoords();

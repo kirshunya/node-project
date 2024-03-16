@@ -24,9 +24,13 @@
     <link rel="stylesheet" href="style/domino/domino-table-page.css" />
     <link rel="stylesheet" href="style/choose-mode-menu.css" />
 
-    <link
+    <!-- <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    /> -->
+    <link
+      rel="stylesheet"
+      href="./js/swiper-bundle.min.css"
     />
   <body>
     <main>
@@ -192,7 +196,7 @@
                 height: 100%;
                 padding: 0.65em;
               }
-              .line > *::after {
+              .line > .dp::after {
                 content: ' ';
                 width: 100%;
                 height: 100%;
@@ -249,16 +253,26 @@
                                 background-size: 57%;"></div>
                     <div style="background-image: url('img/dice.png');"></div>
                   </div>
-                  <div class="line">
-                    <div style="flex-grow: 1;"></div>
-                    <div style="flex-grow: 3;"></div>
+                  <div class="line" style="position: relative;">
+                    <div style="flex-grow: 1;" class="dp"></div>
+                    <div style="flex-grow: 3;" class="dp"></div>
+                    <div style="
+                      position: absolute;
+                      top:0;
+                      bottom: 0;
+                      margin: 0;
+                      padding: 0;
+                    " class="DropLunk">
+                      <canvas id="TopDropLunk"></canvas>
+                    </div>
                   </div>
                 </div>
               </div>
               <canvas id="canvas"></canvas>
               <script>console.clear()</script>
-              <script src="https://cdn.jsdelivr.net/npm/fabric"></script>
-              <!-- <script src="js/Utilities.js"></script> -->
+              <!-- <script src="https://cdn.jsdelivr.net/npm/fabric"></script> -->
+              <!-- <script src="js/Utilities.js"></script> -->>
+              <script src="./js/fabric"></script>
               <script src="js/modules/backgammons/EntryPoint.js" type="module" defer></script>
               <div id="BottomPan" class="TopLink">
                 <div class="pcontrs">
@@ -266,9 +280,18 @@
                     <div style="background-image: url('img/icons8-smile-chat-100.png');"></div>
                     <div style="background-image: url('img/chat50.png');"></div>
                   </div>
-                  <div class="line">
-                    <div style="flex-grow: 1;"></div>
-                    <div style="flex-grow: 3;"></div>
+                  <div class="line" style="position: relative;">
+                    <div style="flex-grow: 1;" class="dp"></div>
+                    <div style="flex-grow: 3;" class="dp"></div>
+                    <div style="
+                      position: absolute;
+                      top:0;
+                      bottom: 0;
+                      margin: 0;
+                      padding: 0;
+                    " class="DropLunk">
+                      <canvas id="BottomDropLunk"></canvas>
+                    </div>
                   </div>
                 </div>
                 <div class="ProfCol">
@@ -291,10 +314,11 @@
           
       </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script> -->
+    <script src="./js/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <script src="libs/eventSource/eventsource-polyfill.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fabric"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/fabric"></script> --
     <!-- <script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script> -->
     <!-- <script src="js/app.js" type="module"></script> -->
   </body>

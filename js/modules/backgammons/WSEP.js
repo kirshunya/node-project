@@ -1,10 +1,39 @@
 import { sleep, range, JustEnoughEvents, OEPromise } from './Utilities.js';
 export const WSEventPool = new JustEnoughEvents();
 
+import { slotinfo } from './BoardConstants.js';
 import * as BackgammonMenu from "./LobbyPool.js";
 import * as BackgammonGameTable from "./GamePool.js";
+//TODO: продумать мессаджинг
+export const WSEvents = {
+    self: {
+        connectionToRoom: 'backgammons::connection::self'
+    },
+    lobby: {
+        init: 'backgammons::lobbyInit',
+        newConnectionToRoom: 'backgammons::lobby::connectionToRoom',
+    },
+    room: {
 
-const EventsRoutes = ({
+    }
+}
+class RoomCashData {
+    /** @type {Array.<slotinfo>} */
+    slots
+    /** @type {[Number, Number]} */
+    drops
+    /** @type {{ActiveTeam:int, Dices:[Number, Number]}} */
+    state
+}
+export const ConnectionStables = {
+    Room: new class { // this vals will be filled always when called WSEvents.self.conectionToRoom
+        /** @type {[Number, Number]} */
+        id = [-1,-1]
+        /**@type {RoomCashData} */
+        roomCashedData = null
+    }
+}
+/*lotoserviced*/const EventsRoutes = ({
     ["backgammons::connection::self"](msg) {
         const {dominoRoomId, tableId, colour, players } = msg;
         window.location.hash = `backgammon-room-table/${dominoRoomId}/${tableId}`;
