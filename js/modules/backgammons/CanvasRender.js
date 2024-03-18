@@ -392,30 +392,31 @@ export class BoardCanvas extends CanvasFunctions {
         class Dice {
             spended = false;
             removed = false;
+            imgpromise
             constructor(diceNumber, left) {
                 this.diceNumber = diceNumber;
-                self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice':'dices'}${diceNumber}.png`, {
+                this.imgpromise = self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice':'dices'}${diceNumber}.png`, {
                     left, top: BoardHeight/2, scaleX:scale, scaleY:scale,
                     hoverCursor: 'pointer',
                 }).then(dice=>{
                     this.img = dice;
                     self.canvas.bringToFront(dice);
+                    return dice;
                 });
             }
             spend() {
                 if(this.spended || this.removed) return;
                 const Dice = this;
                 this.spended = true;
-                this.img.filters.push(new fabric.Image.filters.Sepia(),
-                                      new fabric.Image.filters.Brightness({ brightness: 57 }))
+                this.img.filters.push(new fabric.Image.filters.Brightness({ brightness: 200 }))
                 this.img.applyFilters();
                 self.canvas.renderAll();
-                sleep(375).then(removeif)
+                sleep(375).then(removeif)//не знаю удалятся ли картинки пока канвас придумает им фильтры
                 function removeif() { if(Dice.removed) self.canvas.remove(Dice.img); }
             }
-            remove() {
+            async remove() {
                 this.removed = true;
-                self.canvas.remove(this.img);
+                this.imgpromise.then(img=>self.canvas.remove(img));
             }
         }
 
@@ -437,7 +438,7 @@ export class BoardCanvas extends CanvasFunctions {
         else if(pts.length === 2 && _dices.length === 2)
             _dices.map(Dice=>Dice.spend());
         else
-            _dices.map((Dice, i)=>i<=(4-pts.length)&&Dice.spend());
+            _dices.map((Dice, i)=>i<(4-pts.length)&&Dice.spend());
     }
     /**
      * 
