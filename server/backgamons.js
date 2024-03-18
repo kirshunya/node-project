@@ -217,18 +217,29 @@ class TGame extends SharedRoom0 {
             }
         }
         const Slot = this.Slots[index];
-        const [Count, Colour] = Slot;
+        const refToArr = new (class {
+            ref
+            constructor(ref) { this.ref = ref; }
+            get Colour() {
+                return this.ref[1]
+            }
+            set Colour(value) {
+                return this.ref[1] = value;
+            }
+            get Count() {
+                return this.ref[0]
+            }
+            set Count(value) {
+                return this.ref[0] = value;
+            }
+        })(Slot)
         return {
             add(ColourID) {
-                if(Count===0) 
-                    Slot[1] = ColourID;
-                Slot[0]++;
+                if(refToArr.Count++===0)
+                    refToArr.Colour = ColourID;
             },
             take(ColourID) {
-                Slot[0]-=1;
-                if(Count===0) 
-                    Slot[1] = 0;
-                return ColourID
+                refToArr.Colour = (--refToArr.Count===0)?0:ColourID;
             }
         }
     }
@@ -300,6 +311,7 @@ const WSPipelineCommands = {
 }
 
 var fs = require('fs');
+const { refToArr } = require('../js/modules/backgammons/BoardConstants');
 module.exports = function(ws, req) {
     // fs.writeFile('/test.log', 'connection', console.log.bind(console));
     console.log('new Connection')
