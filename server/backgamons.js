@@ -220,14 +220,15 @@ class TGame extends SharedRoom0 {
         const [Count, Colour] = Slot;
         return {
             add(ColourID) {
-                if(Colour===0) 
+                if(Count===0) 
                     Slot[1] = ColourID;
                 Slot[0]++;
             },
             take(ColourID) {
-                Slot[0]--;
-                if(Colour===0) 
+                Slot[0]-=1;
+                if(Count===0) 
                     Slot[1] = 0;
+                return ColourID
             }
         }
     }

@@ -18,8 +18,10 @@ export const BoardConstants = {
         whiteend: 24,
         whitestart: 0,
         blackend: 12,
-        blackstart: 11,
-        lastPostionNumber: 23
+        blackstart: 12,
+        lastPostionNumber: 23,
+        blackLastIndexNumber: 11,
+        whiteLastIndexNumber: 23
     },
     CHECKERS: {
         first: 1,

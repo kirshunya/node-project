@@ -47,6 +47,9 @@ class Board {
              * @returns {Slot}
              */
             get:(_t, SlotIndex, _proxy) => {
+                // if(slotIndex === 'iterate') return (from, to, CB, team) => {
+                //     for()
+                // }
                 if(SlotIndex === 'User') return User;
                 if(SlotIndex === 'emptyslot') return emptyslot;
                 if(SlotIndex === WHITE.over) return this.Drops[WHITE.id];
@@ -73,6 +76,7 @@ class Board {
         const [f, s] = Dices;
         const fstepapplied = (f===s&&(f===3||f===4||f==6))&&(headSlotCheckersCount===14);
         const isCanToOver = _isCanToOver();
+        const CashOfOiFBySlot = {}
 
         if(ActivePlayer.team.id !== User.team.id) return {};
         if(!FromSlot.ismy()) return {};
@@ -137,11 +141,19 @@ class Board {
         function _isCanToOver() {
             const isBlack = ActivePlayer.team.id === BLACK.id;
             const from = isBlack?MAP.blackstart:MAP.whitestart;
-            const to = isBlack?MAP.blackend:MAP.whiteend;
+            const to = isBlack?MAP.blackLastIndexNumber:MAP.whiteLastIndexNumber;
 
             let outerhouse = false;
-            for(let index = from; index < to; ++index) 
-                outerhouse |= Sloter[index].ismy();
+            // for beauty should use Slot.next(1) from Sloter[0] to Sloter[17] 
+            // but we can think this is optimized variant
+            if(isBlack) {
+                for(let index = from; index < 23 && !outerhouse; ++index) 
+                    outerhouse |= Sloter[index].ismy();
+                for(let index = 0; index < 6 && !outerhouse; ++index) 
+                    outerhouse |= Sloter[index].ismy();
+            } else for(let index = from; index < to && !outerhouse; ++index) 
+                    outerhouse |= Sloter[index].ismy();
+            
             
             return !outerhouse;
         }
@@ -159,14 +171,14 @@ class Board {
             let curSlot = toSlot;
             for(const _ of Array(5).keys()) {
                 curSlot = curSlot.down();
-                if(curSlot.index == fromSlot.index && curSlot.refToArr.Count-1) break;
+                if(curSlot.index == fromSlot.index && !(curSlot.refToArr.Count-1)) break;
                 if(curSlot.ismy()) counter++
                 else break;
             }
             curSlot = toSlot;
             for(const _ of Array(5).keys()) {
                 curSlot = curSlot.next();
-                if(curSlot.index == fromSlot.index && curSlot.refToArr.Count-1) break;
+                if(curSlot.index == fromSlot.index && !(curSlot.refToArr.Count-1)) break;
                 if(curSlot.ismy()) counter++
                 else break;
             }
@@ -178,6 +190,7 @@ class Board {
          * @returns {boolean}
          */
         function OpponentIsFarther(slotIndex) {
+            if(CashOfOiFBySlot[slotIndex]) return CashOfOiFBySlot[CashOfOiFBySlot];
             /** @type {int} */
             const CurrentPlayerTeam = ActivePlayer.team.id;
             /** @type {int} */
