@@ -311,7 +311,6 @@ const WSPipelineCommands = {
 }
 
 var fs = require('fs');
-const { refToArr } = require('../js/modules/backgammons/BoardConstants');
 module.exports = function(ws, req) {
     // fs.writeFile('/test.log', 'connection', console.log.bind(console));
     console.log('new Connection')
