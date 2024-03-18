@@ -433,7 +433,7 @@ export class BoardCanvas extends CanvasFunctions {
     setPTS(pts) {
         const _dices = this._dices;
         if(pts.length === 1 && _dices.length === 2)
-            _dices.map(Dice=>Dice.diceNumber===pts[0]&&Dice.spend());
+            _dices.map(Dice=>Dice.diceNumber!==pts[0]&&Dice.spend());
         else if(pts.length === 2 && _dices.length === 2)
             _dices.map(Dice=>Dice.spend());
         else
