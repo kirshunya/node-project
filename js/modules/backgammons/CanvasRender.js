@@ -4,7 +4,7 @@ const { WHITE, BLACK, EMPTY } = BoardConstants;
 
 var scaleFactor = 1.3;
 var indent = 14;
-
+fabric.isWebglSupported(fabric.textureSize);
 class Checker {
     /**@type {fabricImage} */ 
     img
@@ -303,6 +303,45 @@ export class BoardCanvas extends CanvasFunctions {
         const self = this;
         this.gc = {UserMovesFrom, move};
 
+        // slot = {
+        //     Checker -> Slot{}
+        //     Checker.onclick -> [Checker.Slot] -> Slot.onclick
+        //     Checker.moving -> [Checker.Slot] -> Slot.movings { moving if is head of slot, moving if is User.team === Slot.Colour, moving if is Your step, moving if is can step}
+        //     Slots.moveChecker -> Slot.moveToSlot(Slot)
+        //     Slot -> CanvasCallBacks
+        //      {* SelectionJumper : State of FromImage, Jumps to ToImage and clear FromImage*}
+        // }
+        this.selectionChecker.canvasRenderAll = ()=>canvas.renderAll();
+        this.shared = {
+            /**
+             * moves pic
+             * @param {fabricImage} subject 
+             * @param {int} toX 
+             * @param {int} toY 
+             * @returns {Promise.<void>} resolves after duration
+             */
+            movesubject: (subject, toX=undefined, toY=undefined, duration=400)=>{
+                subject.animate('left', toX, {
+                    duration, onChange: canvas.renderAll.bind(canvas)
+                })
+                subject.animate('top', toY, {
+                    duration, onChange: canvas.renderAll.bind(canvas)
+                })
+                return sleep(duration);
+            },
+            /**
+             * 
+             * @param {[Number, Number][]} positions 
+             * @returns 
+             */
+            resetghosts: (positions)=>{},
+            /**
+             * work with lightning
+             * @param {*} dyns 
+             */
+            resetDynamics: (dyns) => {}
+        }
+
         super.setbackground(gameboardpic);
 
         this.drops = drop = {
@@ -408,7 +447,11 @@ export class BoardCanvas extends CanvasFunctions {
                 if(this.spended || this.removed) return;
                 const Dice = this;
                 this.spended = true;
-                this.img.filters.push(new fabric.Image.filters.Brightness({ brightness: 200 }))
+                this.img.filters.push(new fabric.Image.filters.BlendColor({
+                                                color: 'yellow', 
+                                                alpha: 0.5, 
+                                                mode:'tint'
+                                            }))
                 this.img.applyFilters();
                 self.canvas.renderAll();
                 sleep(375).then(removeif)//не знаю удалятся ли картинки пока канвас придумает им фильтры
@@ -440,17 +483,32 @@ export class BoardCanvas extends CanvasFunctions {
         else
             _dices.map((Dice, i)=>i<(4-pts.length)&&Dice.spend());
     }
-    /**
-     * 
-     * @param {int} diceNumber 
-     * @param {*} ActiveTeam 
-     * @param {int} shift 
-     * @returns 
-     */
-    createDice(diceNumber, ActiveTeam, shift=0) {
+    selectionChecker = {
+        Checker:null,
+        canvasRenderAll:()=>{},
+        set(Checker, awa) {
+            this.reset();
+            this.Checker = Checker;
+            this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
+                            color: awa?'yellow':'red', 
+                            alpha: 0.5, 
+                            mode:'tint'
+                        }))
+            this.Checker.img.applyFilters();
+            this.canvasRenderAll();
+        },
+        reset() {
+            if(!this.Checker) return;
+            this.Checker.img.filters.length = 0;
+            this.Checker.img.applyFilters();
+            this.canvasRenderAll();
+            this.Checker = null;
+        }
+    }
+    actualCheckers = {
+        Checkers: []
         
     }
-    updatePTS
     /**
      * @param {int} Colour 1,2 -- colour, 0 -- ghost
      * @param {int} slotIndex 
@@ -466,7 +524,9 @@ export class BoardCanvas extends CanvasFunctions {
                 const checkerFromImg = new Checker(img, slotIndex);
                 Colour&&img.on('mousedown', () => {
                     // if (slotIndex !== WHITE.over && slotIndex !== BLACK.over)
-                        self.showGhostsCheckersOfAccesibleSlots(checkerFromImg.slot);
+                    const awa = self.showGhostsCheckersOfAccesibleSlots(checkerFromImg.slot);
+                    if(Colour&&!img.filters.length) 
+                        self.selectionChecker.set(checkerFromImg, awa.length);
                 });
 
                 return ([checkerFromImg, slotIndex, checkerIndex]);
@@ -481,7 +541,7 @@ export class BoardCanvas extends CanvasFunctions {
      * @requires this.moveChecker(fromIndex,toIndex) on click to ghost
      * @param {int} fromIndex 
      */
-    showGhostsCheckersOfAccesibleSlots(fromIndex) {
+    showGhostsCheckersOfAccesibleSlots(fromIndex, onmove) {
         const self = this;
         // for (let ghost of this.enabledGhosts) this.canvas.remove(ghost.img);
         this.clearGhosts();
@@ -509,9 +569,12 @@ export class BoardCanvas extends CanvasFunctions {
             self.gc.move(fromIndex, slotIndex);
             self.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
             self.clearGhosts();
+            onmove?.();
         }
+        return availableKeys;
     }
     clearGhosts() {
+        this.selectionChecker.reset()
         this.drops[WHITE.over].clear()
         this.drops[BLACK.over].clear()
         return this.enabledGhosts.map(ghost=>this.canvas.remove(ghost.img));
