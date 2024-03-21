@@ -181,7 +181,7 @@ class TGame extends SharedRoom0 {
         return {result:'success'};
     }
     endGame(WinnerTeam, msg, code) {
-        if(code === 'timer') return; //debig
+        // if(code === 'timer') return; //debig
         this.event('end', {winner: WinnerTeam, msg, code});
         GAMESCOUNT++;
     }
