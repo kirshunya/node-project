@@ -141,7 +141,7 @@ class Board {
         function _isCanToOver() {
             const isBlack = ActivePlayer.team.id === BLACK.id;
             const from = isBlack?MAP.blackstart:MAP.whitestart;
-            const to = isBlack?MAP.blackLastIndexNumber:MAP.whiteLastIndexNumber;
+            const to = isBlack?MAP.blackLastIndexNumber:MAP.whiteLastIndexNumber-6;
 
             let outerhouse = false;
             // for beauty should use Slot.next(1) from Sloter[0] to Sloter[17] 
