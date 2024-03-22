@@ -230,6 +230,10 @@ class TopDropLunk extends CanvasFunctions {
                 width:this.canvas.getWidth()/this.canvas.getZoom(),
                 height:this.canvas.getHeight()/this.canvas.getZoom(),
                 fill: 'rgba(225,225,100,.53)',
+                selectable: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                
             });
             this.canvas.add(Rect); this._effects.push(Rect);
             // if(typeof points)
@@ -239,8 +243,8 @@ class TopDropLunk extends CanvasFunctions {
                 this.createDice(secondVariant[0], 1).then(resolver(1), reject)
             } else {
                 this.createDice(points[0][0], 0).then(resolver(-1), reject)
-                Rect.on('mousedown', resolver(-1));
             }
+            Rect.on('mousedown', points.length?resolver(points.reduce((acc,pm)=>acc<pm?acc:pm)):resolver(-1));
         })
 
     }
@@ -272,6 +276,9 @@ class TopDropLunk extends CanvasFunctions {
         _effectsRejects.map(rej=>rej());
     }
 }
+// BoardPresentation -> Canvas
+// BoardEffects -> Canvas
+// BoardLocalsTEMP -> [Board/*Logic*/, Canvas]
 /*
  * FRONT::DROPS::Accept([Dices])
  * We can drop with 2 dice(but spend only on of *), but if we chose first dice:
@@ -408,7 +415,7 @@ export class BoardCanvas extends CanvasFunctions {
             return this.enterContentToViewBox(newWidth)
         }
         window.addEventListener('resize', ()=>(CanvasValidate(),CanvasValidate()));
-        window.addEventListener('load', ()=>(CanvasValidate(),CanvasValidate()));
+        window.addEventListener('load', ()=>sleep(300).then(CanvasValidate(),CanvasValidate()));
         CanvasValidate(); CanvasValidate();
     }
     /** @type {{diceNumber:int, img:fabricImage, remove:Function}} */
@@ -566,7 +573,7 @@ export class BoardCanvas extends CanvasFunctions {
             );
         }
         function move(slotIndex) {
-            self.gc.move(fromIndex, slotIndex);
+            if(!self.gc.move(fromIndex, slotIndex)) alert('some error in checker move command..');
             self.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
             self.clearGhosts();
             onmove?.();
@@ -585,6 +592,7 @@ export class BoardCanvas extends CanvasFunctions {
      * @param {int} to 
      */
     moveChecker(from, to) {
+        this.clearGhosts();
         const {canvas} = this;
         let isOver = to === WHITE.over || to === BLACK.over;
         const checker = (from === WHITE.over || from === BLACK.over)

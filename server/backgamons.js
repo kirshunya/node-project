@@ -1,5 +1,6 @@
 //some utilities
 const { performance } = require('perf_hooks');
+const timestamp = ()=>Date.now();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make iterator with Array methods?
 const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
@@ -47,6 +48,7 @@ const CONSTANTS = {
     RoomStates:{Waiting:0, Started:1},
 }
 var GAMESCOUNT = 0;
+var TimersTurn = 'on';
 const LobbyListeners = {};
 const Lobby = {
     ListenLobby(ctx, ws) {
@@ -93,7 +95,8 @@ class TGame extends SharedRoom0 {
     curTimer = new Timer(0, ()=>{});
     constructor(GameID) {
         super(GameID);
-        this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
+        this.Slots = adv0_range(0, 24, { 18:[15,1], 11:[15,2], null:()=>[0,0] });
+        // this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
         this.Drops = {};
         this.info = {
             ActiveTeam: CONSTANTS.WHITEID,
@@ -104,8 +107,9 @@ class TGame extends SharedRoom0 {
     connect(user, ctx, ws) {
         // const __u = {user.}
         super.connect(user, ctx, ws);
+        console.log('TimersTurn', TimersTurn);
         ctx.event('backgammons::connection::self', {
-            GAMESCOUNT,
+            GAMESCOUNT, TimersTurn:TimersTurn, deb1:'test',
                     slots: this.Slots, 
                     dropped: this.Drops,
                     state: this.info, 
@@ -116,7 +120,7 @@ class TGame extends SharedRoom0 {
                     tableId:this.GameID[1],
                     GameState:this.RoomState,
                     debug:Object.keys(this.Connections),
-                    times: this.times
+                    times: this.times,
         });
         let rec = this.Players.filter(({userId})=>userId===user.userId)[0];
         if(rec) {
@@ -181,7 +185,7 @@ class TGame extends SharedRoom0 {
         return {result:'success'};
     }
     endGame(WinnerTeam, msg, code) {
-        if(code === 'timer') return; //debig
+        if(!TimersTurn&&code === 'timer') return; //debig
         this.event('end', {winner: WinnerTeam, msg, code});
         GAMESCOUNT++;
     }
@@ -197,7 +201,7 @@ class TGame extends SharedRoom0 {
             [CONSTANTS.BLACKID]: 1
         }
         this.times[timesIndex[ActiveTeam]] = 0
-        this.times[timesIndex[nextTeam]] = performance.now();
+        this.times[timesIndex[nextTeam]] = timestamp();
         this.curTimer.cancel();
         this.curTimer = new Timer(60*1000, ()=>
                 this.endGame(ActiveTeam/* in context this is OpponentTeam */, 'Time end', 'timer'));
@@ -308,6 +312,11 @@ const WSPipelineCommands = {
         GAMESCOUNT++;
         ctx.event('restart__', {});
     },
+    TimersTurnSet(ctx, msg) {
+        TimersTurn = msg.TimersTurn
+        console.log('settimers', msg)
+        GamesLobby.getGameByID(ctx.GameID).event('TimersTurn', {TimersTurn});
+    }
 }
 
 var fs = require('fs');

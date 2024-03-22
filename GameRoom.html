@@ -321,5 +321,58 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/fabric"></script> -->
     <!-- <script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script> -->
     <!-- <script src="js/app.js" type="module"></script> -->
+    <div class="debugPan">debug: 
+      <input type="button" id="TimersTurnDebugButton"></input>
+      <!-- <button onclick=""></button> -->
+    </div>
+    <style>
+      .debugPan {
+        position: fixed;
+        top: 0;
+        right: 0;
+        font-size: 1.5rem;
+        background-color: gray;
+      }
+      .debugPan input {
+        font-size: 1.5rem;
+        border-radius: 5pt;
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+      }
+      /* .debugPan button::selection {
+
+      } */
+    </style>
+    <script>
+      window.addEventListener('DOMContentLoaded', ()=>TimersTurnDebugButton.addEventListener('click', settimer))
+      function settimer() {
+        if(!window.TimersTurn) return;
+        window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
+      }
+    </script>
+    <!-- <div class="closer">
+      <div class="playerChosePanel">
+        <style>
+          .closer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            top: 0;
+            left: 0;
+          }
+          .playerChosePanel {
+            position: absolute;
+            width: 250px;
+            min-height: 250px;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+          }
+        </style>
+      </div> -->
+    </div>
   </body>
 </html>

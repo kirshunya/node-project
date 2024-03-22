@@ -28,7 +28,13 @@ function createClientId() {//impNav.createClientId
 WSEventPool.on('backgammons::connection::self', function(GameInitData) {
     // GamePool.ShowGameTable(GameInitData);
     GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
+    window.TimersTurn = GameInitData?.TimersTurn;
+    (async(TimersTurn)=>TimersTurnDebugButton.value = `timers: ${TimersTurn?'on':'off'}`)(GameInitData.TimersTurn)
 });
+WSEventPool.on('TimersTurn', async({TimersTurn})=>{
+    window.TimersTurn = TimersTurn
+    TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
+})
 WSEventPool.on('backgammons::game::init', function() {
     GamePool.ShowGameTable(GameInitData);
 });
@@ -37,6 +43,7 @@ const req = msg=>ws.send(JSON.stringify(msg));
 const send = req;
 ws.onopen = () => {
     // const localUser = JSON.parse(localStorage.getItem("user"));
+    window.ws = ws;
     req({
         clientId: createClientId(),
         // username: localUser.username,
