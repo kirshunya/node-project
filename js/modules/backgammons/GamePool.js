@@ -3,7 +3,7 @@ import { WSEventPool } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
-
+const timestamp = ()=>Date.now();
 var GameInitData = null;
 export function setGameInitData(data) {
     GameInitData = data;
@@ -143,15 +143,15 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
     })
-    function InitUI(user, opponent, initials) {
+    function InitUI(user, opponent, [whiteval, blackval]) {
         class Timer {
-            constructor(Element, values) {
+            constructor(Element, value) {
                 const TLabel = Element.getElementsByClassName('timer')[0];
-                let val = 0;
+                let val = value;
                 this.label = (newval=undefined)=>{
                     if(typeof newval === 'number') val = newval;
                     function timer() {
-                        const seconds = Math.floor((performance.now()-val)/1000);
+                        const seconds = val?Math.floor((timestamp()-val)/1000):0;
                         const minuts = Math.floor(seconds/60);
                         const seconds60 = seconds%60;
                         return `${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
@@ -164,13 +164,16 @@ export function InitGame(GameInitData, {userId, username}, ws) {
                 .getElementsByClassName('Nickname')[0].innerHTML = user.username;
         document.getElementById('BottomPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
-        return [new Timer(document.getElementById('TopPan')), new Timer(document.getElementById('BottomPan'))]
+        return [
+                new Timer(document.getElementById('TopPan'), whiteval), 
+                new Timer(document.getElementById('BottomPan'), blackval)
+            ]
     }
     function startTimer(ActiveTeam) {
-        setActiveTimer(ActiveTeam);
+        setActiveTimer(ActiveTeam, true);
         setInterval(()=>TimersByTeam[activetimerind].label(), 250);
     }
-    function setActiveTimer(ActiveTeam) {
+    function setActiveTimer(ActiveTeam, isinit=false) {
         const TimerIndByTeam = {
             [BoardConstants.WHITE.id]: 0,
             [BoardConstants.BLACK.id]: 1
@@ -178,7 +181,7 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         const prevtimer = activetimerind
         activetimerind = TimerIndByTeam[ActiveTeam];
         // TimerByTeam[prevtimer].label(0);
-        TimersByTeam[activetimerind].label(performance.now());
+        TimersByTeam[activetimerind].label(isinit?undefined:timestamp());
         return activetimerind;
     }
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{

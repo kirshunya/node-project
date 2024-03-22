@@ -108,6 +108,15 @@ class Board {
                 //         if(acc.reduce((s,p)=>s+p) < cur.reduce((s,p)=>s+p)) return acc;
                 //     });
                 // });
+                Object.entries(this.moves).map(([toIndex, ListOfPointsList])=>{
+                    if(ListOfPointsList.length === 1) return;
+                    if(ListOfPointsList[0].length === ListOfPointsList[1].length) return;
+                    return this.moves[toIndex] = [
+                        ListOfPointsList[0].length < ListOfPointsList[1].length
+                                                ? ListOfPointsList[0] 
+                                                : ListOfPointsList[1]
+                                        ];
+                })
                 return this.moves;
             }
         };
@@ -117,9 +126,9 @@ class Board {
          * @param {Slot} FromSlot 
          * @param {int[]} spendedPoints 
          */
-        function StepByStep(PTS, FromSlot, spendedPoints) {
+        function StepByStep(PTS, FromSlot, SlotCursor=FromSlot, spendedPoints=[]) {
             for(const point of new Set(PTS)) {
-                const curSlot = FromSlot.next(point);
+                const curSlot = SlotCursor.next(point);
                 if(curSlot?.isover) {
                     isCanToOver&&AccMoves.push(curSlot.index, [...spendedPoints, point]); 
                     continue;
@@ -132,11 +141,11 @@ class Board {
                     const nextPTS = [...PTS]; nextPTS.splice(PTS.indexOf(point), 1);
                     if(!nextPTS.length) continue;
 
-                    StepByStep(nextPTS, curSlot, curSpended);
+                    StepByStep(nextPTS, FromSlot, curSlot, curSpended);
                 }
             }
         }
-        StepByStep(PTS, FromSlot, []);
+        StepByStep(PTS, FromSlot);
 
         function _isCanToOver() {
             const isBlack = ActivePlayer.team.id === BLACK.id;
@@ -230,7 +239,7 @@ class Board {
         return AccMoves.optimize();
     }
     CheckersWhichCanMove(GameState) {
-        return [...Array(24).keys()]
+        return !![...Array(24).keys()]
                     .map(i=>Object.keys(this.UserMovesFrom(GameState, i)).length)
                     .reduce((acc,k)=>acc+k);
     }
@@ -268,6 +277,7 @@ class Board {
         } else CurrentStepCash.MovesStack.push({from, to, points:MovesCash[to]});
         this.Slots0[from].permMoveTo(to);
         this.eventProviders.showPTS.send(GameState.PTS);
+        return true;
     }
     UserStepComplete() {
 
@@ -368,9 +378,10 @@ export class GameProvider {
             BoardInits.Slots, BoardInits.Drops, {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
-                this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
-                if(this.GameState.PTS.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
+                const ret = this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
+                if(this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
+                return ret;
             }
         });
         
@@ -381,9 +392,13 @@ export class GameProvider {
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
             },
+            /**
+             * @param {{from, to}[]} Step 
+             * @param {{ActiveTeam, Dice}} newGameStateData 
+             */
             step(Step, newGameStateData) {
                 self.Board.PermStep(Step, self.GameState);
-                self.GameCanvas.step(Step);
+                Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
             },
             ustep(Step, newGameStateData) {
