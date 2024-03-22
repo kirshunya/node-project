@@ -147,7 +147,7 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         class Timer {
             constructor(Element, value) {
                 const TLabel = Element.getElementsByClassName('timer')[0];
-                let val = value? timestamp() - value:0;
+                let val = value;
                 this.label = (newval=undefined)=>{
                     if(typeof newval === 'number') val = newval;
                     function timer() {
@@ -170,10 +170,10 @@ export function InitGame(GameInitData, {userId, username}, ws) {
             ]
     }
     function startTimer(ActiveTeam) {
-        setActiveTimer(ActiveTeam);
+        setActiveTimer(ActiveTeam, true);
         setInterval(()=>TimersByTeam[activetimerind].label(), 250);
     }
-    function setActiveTimer(ActiveTeam) {
+    function setActiveTimer(ActiveTeam, isinit=false) {
         const TimerIndByTeam = {
             [BoardConstants.WHITE.id]: 0,
             [BoardConstants.BLACK.id]: 1
@@ -181,7 +181,7 @@ export function InitGame(GameInitData, {userId, username}, ws) {
         const prevtimer = activetimerind
         activetimerind = TimerIndByTeam[ActiveTeam];
         // TimerByTeam[prevtimer].label(0);
-        TimersByTeam[activetimerind].label(performance.now());
+        TimersByTeam[activetimerind].label(isinit?undefined:timestamp());
         return activetimerind;
     }
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
