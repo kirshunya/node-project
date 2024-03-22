@@ -109,7 +109,9 @@ class TGame extends SharedRoom0 {
         super.connect(user, ctx, ws);
         console.log('TimersTurn', TimersTurn);
         ctx.event('backgammons::connection::self', {
-            GAMESCOUNT, TimersTurn:TimersTurn, deb1:'test',
+            GAMESCOUNT, 
+                    ['TimersTurn']:(TimersTurn?'on':'off'),
+                    deb1:'test',
                     slots: this.Slots, 
                     dropped: this.Drops,
                     state: this.info, 

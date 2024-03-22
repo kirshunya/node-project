@@ -346,7 +346,7 @@
     <script>
       window.addEventListener('DOMContentLoaded', ()=>TimersTurnDebugButton.addEventListener('click', settimer))
       function settimer() {
-        if(!window.TimersTurn) return;
+        if(typeof window.TimersTurn !== 'boolean') return;
         window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
       }
     </script>
