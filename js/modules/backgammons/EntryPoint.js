@@ -28,8 +28,8 @@ function createClientId() {//impNav.createClientId
 WSEventPool.on('backgammons::connection::self', function(GameInitData) {
     // GamePool.ShowGameTable(GameInitData);
     GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
-    window.TimersTurn = GameInitData?.TimersTurn;
-    (async(TimersTurn)=>TimersTurnDebugButton.value = `timers: ${TimersTurn?'on':'off'}`)(GameInitData.TimersTurn)
+    window.TimersTurn = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
+    (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
 });
 WSEventPool.on('TimersTurn', async({TimersTurn})=>{
     window.TimersTurn = TimersTurn
