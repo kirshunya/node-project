@@ -88,7 +88,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     /** @type {[Number, Number]} */
     times = [0, 0];
     /** @type {[Number, Number][]} */
-    Slots = adv0_range(0, 24, { 18:[15,1], 11:[15,2], null:()=>[0,0] });
+    Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
     // this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
     /** @type {{whiteover:Number, blackover:Number}} */
     Drops = {
