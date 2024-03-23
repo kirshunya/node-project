@@ -286,8 +286,20 @@ class Board {
     CancelLastMove() {
 
     }
+    /**
+     * 
+     * @param {GameState} GameState 
+     * @param {{from:int, to:int|string}[]} step 
+     */
     PermStep(GameState, step) {
-
+        step.map(({from, to})=>{
+            const FromSlot = this.Slots0[from]
+            const ToSlot = this.Slots0[to]
+            if(ToSlot.refToArr.Count++===0)
+                ToSlot.refToArr.Colour = GameState.ActivePlayer.team.id;
+            if(--FromSlot.refToArr.Count===0)
+                FromSlot.refToArr.Colour = 0;
+        })
     }
 }
 
