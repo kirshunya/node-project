@@ -67,7 +67,7 @@ class SharedRoom0 {
     }
     event(event, obj) {
         const msg = Object.assign(obj, {event, method:'backgammons::event'});
-        console.log(`sending`, msg, Object.values(this.Connections))
+        // console.log(`sending`, msg, Object.values(this.Connections))
         Object.values(this.Connections).map(async(ctx)=>ctx.send(msg));
     }
 }
