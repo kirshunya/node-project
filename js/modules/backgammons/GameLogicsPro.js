@@ -409,7 +409,7 @@ export class GameProvider {
              * @param {{ActiveTeam, Dice}} newGameStateData 
              */
             step(Step, newGameStateData) {
-                self.Board.PermStep(Step, self.GameState);
+                self.Board.PermStep(self.GameState, Step);
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
             },
