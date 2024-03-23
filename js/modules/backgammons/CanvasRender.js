@@ -431,7 +431,7 @@ export class BoardCanvas extends CanvasFunctions {
         _dices.map(Dice => Dice.remove());
         this._dices = [];
         const self = this;
-        const scale = 328/328;
+        const scale = (328/328)*1.2;
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
         const dicesize = scale*328; const space = 10;
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
@@ -443,10 +443,13 @@ export class BoardCanvas extends CanvasFunctions {
             constructor(diceNumber, left) {
                 this.diceNumber = diceNumber;
                 this.imgpromise = self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice_':'bdice_'}${diceNumber}.png`, {
-                    left, top: BoardHeight/2, scaleX:scale, scaleY:scale,
+                    left, top: BoardHeight/2-dicesize/8, scaleX:scale, scaleY:scale,
                     hoverCursor: 'pointer',
                 }).then(dice=>{
                     this.img = dice;
+                    // img.filters.push(fabric.Image.filters.BlackWhite());
+                    // this.img.applyFilters();
+                    // self.canvas.renderAll();
                     self.canvas.bringToFront(dice);
                     return dice;
                 });
