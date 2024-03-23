@@ -60,7 +60,7 @@ class SharedRoom0 {
         const rikey = ctx.rikey = `${user.clientId}-${user.userId}-${getRandomInt(-10,100)}`;
         this.Connections[rikey] = ({user, ctx, ws, send:(...args)=>ctx.send(...args)});
         this.event('backgammons::connection', user, 'add ignoreList and send current user..');//? player:visitor
-        console.log(rikey, this.Connections[rikey]);
+        console.log(rikey, user);
     }
     disconnect(user, ctx, ws) {
         delete this.Connections[ctx.rikey];
