@@ -14,6 +14,9 @@ export const BoardConstants = {
         name: 'EMPTY',
         over: 'EMPTYover'
     },
+    DEBUGGERTEAM: {
+        id: -1,
+    },
     MAP: {
         whiteend: 24,
         whitestart: 0,
@@ -159,4 +162,62 @@ export class DropSlot {
     ismy() {
         return false;
     }
+}
+export class TState {
+    /** @type {int} */
+    ActiveTeam
+    /** @type {[Number, Number]} */
+    Dices
+}
+export class TPlayer {
+    /** @type {int} */
+    userId
+    /** @type {string} */
+    username
+    /** @type {int} */
+    team
+}
+export class TGameStartedData {
+    /** @type {[Number, Number][]} */
+    slots
+    /** @type {TState} */
+    state
+    /** @type {TPlayer[]} */
+    players
+
+    constructor(slots, state, players) {
+        this.slots = slots
+        this.state = state
+        this.players = players
+    }
+}
+export class GameInitData {
+    /** @type {Number, Number} */
+    GameID
+    
+    /** @type {TState} */
+    state
+    /** @type {[Number, Number][]}} */
+    slots
+    /** @type {{whiteover:int, blackover:int}} */
+    dropped
+
+    /** @type {int} */
+    RoomState
+    /** @type {int} */
+    GameState
+    /** @type {TPlayer[]} */
+    players
+    
+    /** @type {[Number, Number]} */
+    times
+
+
+//////// Debugs
+    /** @type {int} */
+    GAMESCOUNT
+    /** @type {any} */
+    debug
+    /** @type {TState} */
+    ['TimersTurn']
 }

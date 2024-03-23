@@ -1,4 +1,4 @@
-const { CONSTANTS, Debug } = require("./Generals");
+const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext } = require("./Generals");
 
 const timestamp = ()=>Date.now();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -50,35 +50,53 @@ class SharedRoom0 {
     constructor(GameID=[-1,-1]) {
         this.GameID = GameID;
     }
+    /**
+     * 
+     * @param {TUser} user 
+     * @param {ConnectionContext} ctx 
+     * @param {WebSocket} ws 
+     */
     connect(user, ctx, ws) {
-        const rikey = ctx.rikey = `${user.clientID}-${user.userId}-${getRandomInt(-10,100)}`;
-        this.Connections[rikey] = ({user, ctx, ws, send:()=>ctx.send});
+        const rikey = ctx.rikey = `${user.clientId}-${user.userId}-${getRandomInt(-10,100)}`;
+        this.Connections[rikey] = ({user, ctx, ws, send:(...args)=>ctx.send(...args)});
         this.event('backgammons::connection', user, 'add ignoreList and send current user..');//? player:visitor
+        console.log(rikey, this.Connections[rikey]);
     }
     disconnect(user, ctx, ws) {
         delete this.Connections[ctx.rikey];
     }
     event(event, obj) {
         const msg = Object.assign(obj, {event, method:'backgammons::event'});
-
+        console.log(`sending`, msg, Object.values(this.Connections))
         Object.values(this.Connections).map(async(ctx)=>ctx.send(msg));
     }
 }
+const Debugger = new TPlayer(2, 'Debby', -1);
 module.exports.TGame = class TGame extends SharedRoom0 {
-    /** @type {{userId:int, username:string, team:int}[]} */
-    Players = [];
+    /** @type {TPlayer[]} */
+    Players = [
+        new TPlayer(0, 'Jimmy', CONSTANTS.BLACKID),
+        new TPlayer(1, 'Missy', CONSTANTS.WHITEID)
+    ];
     /** @type {Timer} */
     curTimer = new Timer(0, ()=>{});
+    /** @type {TState} */
+    info = {
+        ActiveTeam: CONSTANTS.WHITEID,
+        Dices: [1, 1]
+    }
+    /** @type {[Number, Number]} */
+    times = [0, 0];
+    /** @type {[Number, Number][]} */
+    Slots = adv0_range(0, 24, { 18:[15,1], 11:[15,2], null:()=>[0,0] });
+    // this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
+    /** @type {{whiteover:Number, blackover:Number}} */
+    Drops = {
+        whiteover: 0,
+        blackover: 0
+    };
     constructor(GameID) {
         super(GameID);
-        this.Slots = adv0_range(0, 24, { 18:[15,1], 11:[15,2], null:()=>[0,0] });
-        // this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
-        this.Drops = {};
-        this.info = {
-            ActiveTeam: CONSTANTS.WHITEID,
-            Dices: [1,1]
-        }
-        this.times = [0,0];
     }
     connect(user, ctx, ws) {
         // const __u = {user.}
@@ -100,27 +118,26 @@ module.exports.TGame = class TGame extends SharedRoom0 {
 
                     debug:Object.keys(this.Connections),
         });
-        let rec = this.Players.filter(({userId})=>userId===user.userId)[0];
-        if(rec) {
-            user.team = rec.team;
-            return;
-        }
-        if(this.Players.length<2) {
-            this.Players.push(user);
-            // Lobby.event('backgammons::lobby::connectionToRoom', {
-            //     GameID: this.GameID, Players: this.Players.length
-            // });
-            if(this.Players.length===2) {//
-                this.startGame();
-            }
-        }
-    }
-    connectPage() {
-
+        if(this.RoomState === CONSTANTS.RoomStates.Waiting)
+            this.startGame()
+        // let rec = this.Players.filter(({userId})=>userId===user.userId)[0];
+        // if(rec) {
+        //     user.team = rec.team;
+        //     return;
+        // }
+        // if(this.Players.length<2) {
+        //     this.Players.push(user);
+        //     // Lobby.event('backgammons::lobby::connectionToRoom', {
+        //     //     GameID: this.GameID, Players: this.Players.length
+        //     // });
+        //     if(this.Players.length===2) {//
+        //         this.startGame();
+        //     }
+        // }
     }
     startGame() {
-        const cc = this.Players[0].team = getRandomInt(1,2);
-        this.Players[1].team = 1+!(cc-1);
+        // const cc = this.Players[0].team = getRandomInt(1,2);
+        // this.Players[1].team = 1+!(cc-1);
         this.info = {
             ActiveTeam: CONSTANTS.WHITEID,
             Dices: randdice()
@@ -130,24 +147,32 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     }
     /**
      * 
-     * @param {[{from,to,points}]} step 
+     * @param {int} userId 
+     * @returns {TPlayer}
      */
-    stepIfValid(step, code) {
+    getPlayerByID(userId) {
+        /*Debug*/
+        if(userId === 2) 
+            return Debugger;
+        for(const player of this.Players) 
+            if(player.userId === userId) return player
+        return null;
+    }
+    /**
+     * 
+     * @param {TUser} user 
+     * @param {[{from,to,points}]} step 
+     * @param {int} code 
+     */
+    stepIfValid(user, step, code) {
         const {ActiveTeam, Dices} = this.info;
-        // const TempSlots = adv0_range(0, 24, {null:()=>[0,0]});
-        this.curTimer.await();//time to check is step success 
-        // const Skin = new Proxy(this.Slots, {
-        //     get:(Slots, key)=>{
-        //         const [colour, count] = Slots[key];
-        //         const [tcolour, tcount] = TempSlots[key]
-        //         return [colour||tcolour, count+tcount];
-        //     }, set:()=>false
-        // });
-        // const Rele = new Proxy(Skin, {
-        //     get:(Slots, key)=>{
+        this.curTimer.await();//time to check step to success 
+        
+        const player = this.getPlayerByID(user.userId);
+        if(!player) return (console.log('nope', this.Players), {result:'nope', user, player})
+        
 
-        //     }
-        // })
+
         step.map(({from, to, points})=>{
             this.slot(from).take(ActiveTeam);
             this.slot(to).add(ActiveTeam);

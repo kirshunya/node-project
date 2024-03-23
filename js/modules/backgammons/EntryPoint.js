@@ -2,16 +2,19 @@ import { sleep, range, JustEnoughEvents, OEPromise, FCPromise } from './Utilitie
 import { WSEventPool, onnewmsg } from './WSEP.js';
 import * as GamePool from './GamePool.js';
 import { API_URL_PART } from './../config.js'
-// const siteLanguage = {
-//     dominoRoomsMenu:{
-//         gamePrice:'Цена комнаты',
-//         gameDuration:'Длительность игры 5 минут',
-//         classicDurationLabel:'Одна игра',
-//         classic: 'Нарды'
-//     }
-// }
-// var canva;
-// const API_URL_PART = `://194.87.244.199:5001`
+import { BoardConstants } from './BoardConstants.js';
+
+export const onplayerchosen = FCPromise();
+export const localUser = {username:'debug'}
+onplayerchosen.then(userId=>{
+    localUser.userId = userId
+    localUser.username = ['Jimmy', 'Missi', 'Debby'][userId],
+    localUser.team = {
+            0: BoardConstants.BLACK,
+            1: BoardConstants.WHITE,
+            2: BoardConstants.EMPTY
+        }[userId]
+})
 
 function createClientId() {//impNav.createClientId
     // текущее время в миллисекундах
@@ -25,20 +28,9 @@ function createClientId() {//impNav.createClientId
   
     return uniqueId;
 }
-WSEventPool.on('backgammons::connection::self', function(GameInitData) {
-    GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
-    window.TimersTurn = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
-    (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
-});
-WSEventPool.on('TimersTurn', async({TimersTurn})=>{
-    window.TimersTurn = TimersTurn
-    TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
-})
 // WSEventPool.on('backgammons::game::init', function() {
 //     GamePool.ShowGameTable(GameInitData);
 // });
-export const onplayerchosen = FCPromise();
-export const localUser = {username:'debug'}
 const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
 const req = msg=>ws.send(JSON.stringify(msg));
 const send = req;

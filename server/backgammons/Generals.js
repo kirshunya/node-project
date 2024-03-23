@@ -7,8 +7,60 @@ module.exports.Debug = {
     GAMESCOUNT: 0,
     TimersTurn: 'on'
 }
+module.exports.TUser = class TUser {
+    /** @type {int} */
+    userId
+    /** @type {int} */
+    clientId
+    /** @type {string} */
+    username
+    /**
+     * 
+     * @param {int} userId 
+     * @param {int} clientId 
+     * @param {string} username 
+     */
+    constructor(userId, clientId, username) {
+        this.userId = userId
+        this.clientId = clientId
+        this.username = username
+    }
+}
+module.exports.TPlayer = class TPlayer {
+    /** @type {int} */
+    userId
+    /** @type {string} */
+    username
+    /** @type {int} */
+    team
+    /**
+     * 
+     * @param {int} userId 
+     * @param {string} username 
+     * @param {int} team 
+     */
+    constructor(userId, username, team) {
+        this.userId = userId
+        this.username = username
+        this.team = team
+    }
+    /**
+     * 
+     * @param {TUser} user
+     * @returns {TPlayer}
+     */
+    static fromUser(user, team=undefined) {
+        return new TPlayer(user.userId, user.username, team)
+    }
+}
+module.exports.TState = class TState {
+    /** @type {int} */
+    ActiveTeam
+    /** @type {[Number, Number]} */
+    Dices
+}
 module.exports.ConnectionContext = class ConnectionContext {
-    /** @type {userId:int, username:string, clientId:int} */
+    /** @type {TUser} */
     user
     /** @type {WebSocket} */
     ws

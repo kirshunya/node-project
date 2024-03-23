@@ -28,9 +28,14 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // const BETsList = [0.5, 1, /*3, 5, 10*/];
 const GamesLobby = new class {
+    /** @type {[TGame]} */
     Games = [new TGame()];//probe
     constructor() {}
 
+    /**
+     * 
+     * @returns {TGame}
+     */
     getGameByID() {
         if(this.Games[Debug.GAMESCOUNT] === undefined)
             this.Games[Debug.GAMESCOUNT] = new TGame(); 
@@ -52,8 +57,8 @@ const WSPipelineCommands = {
      * @param {*} msg 
      */
     ['backgammons/auth'](ctx, msg) {
-        const {clientID, userId, username} = msg
-        ctx.user = {clientID, userId, username}
+        const {clientId, userId, username} = msg
+        ctx.user = {clientId, userId, username}
     },
     ['backgammons/openLobby'](ctx, msg) {
         ctx.user = {
@@ -75,7 +80,7 @@ const WSPipelineCommands = {
         )};
     },
     /**
-     * 
+     * Connection to room
      * @param {ConnectionContext} ctx 
      * @param {{GameID:[Number, Number]}} msg 
      */
@@ -88,14 +93,30 @@ const WSPipelineCommands = {
         Game.connect(ctx.user, ctx, this);
         //'backgammons::connection'
     },
+    /**
+     * 
+     * @param {ConnectionContext} ctx 
+     * @param {{step:{from:int, to:int, points:int[]}[], code:int}} param1 
+     * @returns 
+     */
     step(ctx, {step, code}) {
-        return GamesLobby.getGameByID(ctx.GameID).stepIfValid(step, code);
+        return GamesLobby.getGameByID(ctx.GameID).stepIfValid(ctx.user, step, code);
     },
+    /**
+     * deprec
+     * @param {ConnectionContext} ctx 
+     * @returns 
+     */
     get(ctx) {
         const event = 'board';
         const Game = GamesLobby.getGameByID(ctx.GameID);
         return {event, slots: Game.Slots, state: Game.info};
     },
+    /**
+     * Debug function, restart game
+     * @param {ConnectionContext} ctx 
+     * @returns 
+     */
     restart__(ctx) {
         // const lastGame = ctx.Game;
         // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
@@ -104,6 +125,11 @@ const WSPipelineCommands = {
         Debug.GAMESCOUNT++;
         ctx.event('restart__', {});
     },
+    /**
+     * Debug function, turn on/off timer
+     * @param {ConnectionContext} ctx 
+     * @returns 
+     */
     TimersTurnSet(ctx, msg) {
         Debug.TimersTurn = msg.TimersTurn
         console.log('settimers', msg)
