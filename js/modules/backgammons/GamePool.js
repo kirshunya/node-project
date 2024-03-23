@@ -1,5 +1,5 @@
-import { ondom, getRandomInt, EventProvider } from './Utilities.js';
-import { WSEventPool } from './WSEP.js'
+import { ondom, getRandomInt, EventProvider, sleep } from './Utilities.js';
+import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
@@ -8,73 +8,353 @@ var GameInitData = null;
 export function setGameInitData(data) {
     GameInitData = data;
 }
-export function ShowGameTable() {
+export function ShowGameTable(localUser) {
     const main = document.getElementsByTagName('main')[0];
-    let localUser = JSON.parse(localStorage.getItem("user"));
-    main.innerHTML = 
-    `<div class="main__container footer__padding">
-        <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
-            <div class="domino-games__container">
-            <div class="domino-game-page__body-wrapper ddt">
-                <div id="TopPan" class="BottomLink">
-                <div class="ProfCol">
-                    <div class="timer">1:00</div>
-                    <div class="prof">
-                    <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
-                    <div class="profrows">
-                        <span class="Nickname">${localUser.username}</span>
-                        <span><span class="turkeyFlag"></span> lvl: 45</span>
-                    </div>
-                    </div>
+    // let localUser = JSON.parse(localStorage.getItem("user"));
+    main.innerHTML = `
+    
+    <div class="main__container footer__padding">
+    <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
+      <div class="domino-games__container">
+        <style>
+          #TopPan, #BottomPan {
+            font-size: smaller;
+            max-width: 640px;
+          }
+          @media only screen and (min-width: 487px) {
+            #TopPan, #BottomPan {
+              font-size: small;
+            }
+          }
+          @media only screen and (min-width: 640px) {
+            #TopPan, #BottomPan {
+              font-size: medium;
+            }
+          }
+          @media only screen and (min-width: 1010px) {
+            #TopPan, #BottomPan {
+              font-size: smaller;
+            }
+          }
+          @media only screen and (min-width: 1280px) {
+            #TopPan, #BottomPan {
+              font-size: larger;
+            }
+          }
+          .ddt {
+            display: flex;
+            align-items: stretch !important;
+            flex-direction: column;
+            margin-top: 5rem !important;
+            justify-content: center;
+          }
+          /* media  */
+          /* .ddt > * {
+            display: flex;
+            flex-direction: column;
+          } */
+          #TopPan {
+            display: flex;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            width: 100%;
+          }
+          #BottomPan {
+            display: flex;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            width: 100%;
+          }
+          .ProfCol {
+            color: white;
+            display: flex;
+            flex-grow: 9;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+
+          }
+          .TopLink .ProfCol, .TopLink .pcontrs {
+            flex-direction: column-reverse;
+          }
+          .TopLink .line {
+            border-radius: 5pt;
+          }
+          #TopPan .pcontrs {
+            margin-left: 1em;
+          }
+          .TopLink .timer {
+            background: linear-gradient(180deg, #295788 0%, #295788 43%, rgba(126, 37, 81, 0) 97%);
+          }
+          .BottomLink .timer {
+            background: linear-gradient(1deg, #295788 0%, #295788 43%, rgba(126, 37, 81, 0) 97%);
+          }
+          #TopPan .pcontrs .buttons {
+            background-color: #572351;
+          }
+          #TopPan .pcontrs .buttons > * {
+          }
+          #BottomPan .pcontrs .buttons > * {
+            background-color: #a8dcae;
+            margin: 1em;
+            width: 5em;
+            height: 5em;
+          }
+          #TopPan .pcontrs .buttons {
+            margin-left: 0.3em;
+          }
+          #BottomPan .pcontrs .buttons {
+            margin-right: 0.3em;
+          }
+          #BottomPan .pcontrs {
+            margin-right: 1rem;
+            align-items: flex-end;
+          }
+          .timer {
+            width: 60%;
+            text-align: center;
+            font-size: 2.75em;
+            background: rgb(52,79,195);
+            color: white;
+          }
+          .prof {
+            display: flex;
+            flex-direction: row;
+            padding: 1em;
+            background-color: #572351;
+            border-radius: 9pt;
+            width: 100%;
+          }
+          .profrows {
+            display: flex;
+            flex-direction: column;
+            margin-left: 1em;
+            margin-right: 1em;
+          }
+          .profrows .Nickname {
+            flex-grow: 1;
+            font-size: 2em;
+          }
+          .pcontrs {
+            display: flex;
+            flex-grow: 7;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-content: center;
+            align-items: flex-start;
+          }
+          .pcontrs .buttons {
+            display: flex;
+            flex-direction: row;
+            border-radius: 6pt;
+            /* background-color: #a8dcae; */
+          }
+          .buttons > * {
+            margin-left: 0.25em;
+            margin-right: 0.25em;
+            width: 4em;
+            height: 4em;
+            /* background-color: #572351; */
+            /* background-color: #a8dcae; */
+            border-radius: 6pt;
+            background-size: 70%;
+            background-repeat: no-repeat;
+            background-position: center center;
+            filter:invert(1);
+          }
+          .pcontrs .line {
+            background-color: #ac964b;
+            width: 100%;
+            height: 3.2em;
+            border-top-left-radius: 5pt;
+            border-top-right-radius: 5pt;
+            display: flex;
+            width: 100%;
+          }
+          .line > * {
+            height: 100%;
+            padding: 0.65em;
+          }
+          .line > .dp::after {
+            content: ' ';
+            width: 100%;
+            height: 100%;
+            display: block;
+            background-color: #951743;
+            border-radius: 7pt;
+          }
+          .turkeyFlag {
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-image: url('img/tr-lang.png');
+            display: inline-block;
+            min-width: 1em;
+            height: 1em;
+          }
+          .ddt.horize {
+            flex-direction: row;
+          }
+          .rightcol {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            margin-left: 1rem;
+            max-width: 640px;
+          }
+          .tabspaces {
+            flex-grow: 1;
+          }
+          .domino-game-page__body-wrapper, .ddt, .domino-game-page__body-wrapper.ddt {
+            margin-left: 0!important;
+            margin-right: 0!important;
+          }
+          .ddt {
+            margin-top: 0px!important;
+          }
+        </style>
+        <div class="domino-game-page__body-wrapper ddt">
+          <div id="TopPan" class="BottomLink">
+            <div class="ProfCol">
+              <div class="timer">1:00</div>
+              <div class="prof">
+                <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
+                <div class="profrows">
+                  <span class="Nickname">Hasan</span>
+                  <span><span class="turkeyFlag"></span> lvl: 45</span>
                 </div>
-                <div class="pcontrs">
-                    <div class="buttons">
-                    <div style="background-image: url('img/flags.png');"></div>
-                    <div style="background-image: url('img/volume.png');
-                                background-size: 57%;"></div>
-                    <div style="background-image: url('img/dice.png');"></div>
-                    </div>
-                    <div class="line">
-                    <div style="flex-grow: 1;"></div>
-                    <div style="flex-grow: 3;"></div>
-                    </div>
-                </div>
-                </div>
-                <canvas id="canvas"></canvas>
-                <script>console.clear()</script>
-                <div id="BottomPan" class="TopLink">
-                    <div class="pcontrs">
-                        <div class="buttons">
-                        <div style="background-image: url('img/icons8-smile-chat-100.png');"></div>
-                        <div style="background-image: url('img/chat50.png');"></div>
-                        </div>
-                        <div class="line">
-                        <div style="flex-grow: 1;"></div>
-                        <div style="flex-grow: 3;"></div>
-                        </div>
-                    </div>
-                    <div class="ProfCol">
-                        <div class="timer">1:00</div>
-                        <div class="prof">
-                        <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
-                        <div class="profrows">
-                            <span class="Nickname">???</span>
-                            <span><span class="turkeyFlag"></span> lvl: 45</span>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="rightcol">
-                <div class="tabspaces"></div>
-                </div>
+              </div>
             </div>
+            <div class="pcontrs">
+              <div class="buttons">
+                <div style="background-image: url('img/flags.png');"></div>
+                <div style="background-image: url('img/volume.png');
+                            background-size: 57%;"></div>
+                <div style="background-image: url('img/dice.png');"></div>
+              </div>
+              <div class="line" style="position: relative;">
+                <div style="flex-grow: 1;" class="dp"></div>
+                <div style="flex-grow: 3;" class="dp"></div>
+                <div style="
+                  position: absolute;
+                  top:0;
+                  bottom: 0;
+                  margin: 0;
+                  padding: 0;
+                " class="DropLunk">
+                  <canvas id="TopDropLunk"></canvas>
+                </div>
+              </div>
             </div>
-        </section>
-    </div>`;
-    if(!GameInitData) {
-        alert('no GameInitData in GamePool.js')
-    }
-    else InitGame(GameInitData, localUser, ws);
+          </div>
+          <canvas id="canvas"></canvas>
+          <script>console.clear()</script>
+          <!-- <script src="https://cdn.jsdelivr.net/npm/fabric"></script> -->
+          <!-- <script src="js/Utilities.js"></script> -->
+          <script src="./js/fabric"></script>
+          <script src="js/modules/backgammons/EntryPoint.js" type="module" defer></script>
+          <div id="BottomPan" class="TopLink">
+            <div class="pcontrs">
+              <div class="buttons">
+                <div style="background-image: url('img/icons8-smile-chat-100.png');"></div>
+                <div style="background-image: url('img/chat50.png');"></div>
+              </div>
+              <div class="line" style="position: relative;">
+                <div style="flex-grow: 1;" class="dp"></div>
+                <div style="flex-grow: 3;" class="dp"></div>
+                <div style="
+                  position: absolute;
+                  top:0;
+                  bottom: 0;
+                  margin: 0;
+                  padding: 0;
+                " class="DropLunk">
+                  <canvas id="BottomDropLunk"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="ProfCol">
+              <div class="timer">1:00</div>
+              <div class="prof">
+                <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
+                <div class="profrows">
+                  <span class="Nickname">Hasan</span>
+                  <span><span class="turkeyFlag"></span> lvl: 45</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="rightcol">
+            <div class="tabspaces"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+      
+  </div>`
+    // `<div class="main__container footer__padding">
+    //     <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
+    //         <div class="domino-games__container">
+    //         <div class="domino-game-page__body-wrapper ddt">
+    //             <div id="TopPan" class="BottomLink">
+    //             <div class="ProfCol">
+    //                 <div class="timer">1:00</div>
+    //                 <div class="prof">
+    //                 <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
+    //                 <div class="profrows">
+    //                     <span class="Nickname">${localUser.username}</span>
+    //                     <span><span class="turkeyFlag"></span> lvl: 45</span>
+    //                 </div>
+    //                 </div>
+    //             </div>
+    //             <div class="pcontrs">
+    //                 <div class="buttons">
+    //                 <div style="background-image: url('img/flags.png');"></div>
+    //                 <div style="background-image: url('img/volume.png');
+    //                             background-size: 57%;"></div>
+    //                 <div style="background-image: url('img/dice.png');"></div>
+    //                 </div>
+    //                 <div class="line">
+    //                 <div style="flex-grow: 1;"></div>
+    //                 <div style="flex-grow: 3;"></div>
+    //                 </div>
+    //             </div>
+    //             </div>
+    //             <canvas id="canvas"></canvas>
+    //             <script>console.clear()</script>
+    //             <div id="BottomPan" class="TopLink">
+    //                 <div class="pcontrs">
+    //                     <div class="buttons">
+    //                     <div style="background-image: url('img/icons8-smile-chat-100.png');"></div>
+    //                     <div style="background-image: url('img/chat50.png');"></div>
+    //                     </div>
+    //                     <div class="line">
+    //                     <div style="flex-grow: 1;"></div>
+    //                     <div style="flex-grow: 3;"></div>
+    //                     </div>
+    //                 </div>
+    //                 <div class="ProfCol">
+    //                     <div class="timer">1:00</div>
+    //                     <div class="prof">
+    //                     <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
+    //                     <div class="profrows">
+    //                         <span class="Nickname">???</span>
+    //                         <span><span class="turkeyFlag"></span> lvl: 45</span>
+    //                     </div>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //             <div class="rightcol">
+    //             <div class="tabspaces"></div>
+    //             </div>
+    //         </div>
+    //         </div>
+    //     </section>
+    // </div>`;
+    ;(async()=>{
+        while(WSRoom.Room) await sleep(100);
+        InitGame(WSRoom.Room.GameInitData, localUser, ws);
+    })
 }
 const User = {userId: 0, username: 'debug'};
 const Uspe = (team)=>({userId: User.userId, username: User.username, team})

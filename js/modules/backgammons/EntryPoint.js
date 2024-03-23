@@ -26,7 +26,6 @@ function createClientId() {//impNav.createClientId
     return uniqueId;
 }
 WSEventPool.on('backgammons::connection::self', function(GameInitData) {
-    // GamePool.ShowGameTable(GameInitData);
     GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
     window.TimersTurn = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
     (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
@@ -35,28 +34,32 @@ WSEventPool.on('TimersTurn', async({TimersTurn})=>{
     window.TimersTurn = TimersTurn
     TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
 })
-WSEventPool.on('backgammons::game::init', function() {
-    GamePool.ShowGameTable(GameInitData);
-});
+// WSEventPool.on('backgammons::game::init', function() {
+//     GamePool.ShowGameTable(GameInitData);
+// });
+export const onplayerchosen = FCPromise();
+export const localUser = {username:'debug'}
 const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
 const req = msg=>ws.send(JSON.stringify(msg));
 const send = req;
 ws.onopen = () => {
     // const localUser = JSON.parse(localStorage.getItem("user"));
     window.ws = ws;
-    req({
-        clientId: createClientId(),
-        // username: localUser.username,
-        // userId: localUser.userId,
-        username: 'debug',
-        userId: 0,
-        method: "backgammons/auth",
-    });
-    req({
-        method: "backgammons/connect", dominoRoomId:0, tableId:0
-    })
-    req({
-        method: "backgammons/connectPage", dominoRoomId:0, tableId:0
+    onplayerchosen.then(playerId=>{
+        req({
+            clientId: createClientId(),
+            // username: localUser.username,
+            // userId: localUser.userId,
+            username: 'debug',
+            userId: playerId,
+            method: "backgammons/auth",
+        });
+        req({
+            method: "backgammons/connect", GameID: [0, 0]
+        })
+        // req({
+        //     method: "backgammons/connectPage", dominoRoomId:0, tableId:0
+        // })
     })
 };
 ws.onmessage = async (event) => {
@@ -66,6 +69,7 @@ ws.onmessage = async (event) => {
         ? WSEventPool.$$send(msg.event, msg, {send})
         : console.log();
 };
+GamePool.ShowGameTable(localUser);
 // const WS = new class {
 //     constructor() {
 //         const self = this;

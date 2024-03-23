@@ -25,19 +25,27 @@ class RoomCashData {
     /** @type {{ActiveTeam:int, Dices:[Number, Number]}} */
     state
 }
-export const ConnectionStables = {
-    Room: new class { // this vals will be filled always when called WSEvents.self.conectionToRoom
-        /** @type {[Number, Number]} */
-        id = [-1,-1]
-        /**@type {RoomCashData} */
-        roomCashedData = null
+export class WSRoom {
+    /**
+     * 
+     * @param {[Number, Number]} id 
+     * @param {{}} GameInitData 
+     */
+    constructor(id, GameInitData) {
+        this.id = id;
+        this.GameInitData = GameInitData;
     }
 }
+export const ConnectionStables = {
+    Room: null
+}
 /*lotoserviced*/const EventsRoutes = ({
-    ["backgammons::connection::self"](msg) {
-        const {dominoRoomId, tableId, colour, players } = msg;
-        window.location.hash = `backgammon-room-table/${dominoRoomId}/${tableId}`;
-        BackgammonGameTable.setGameInitData(msg);
+    ["backgammons::connection::self"](GameInitData) {
+        // const {dominoRoomId, tableId, colour, players } = msg;
+        const {GameID} = GameInitData
+        window.location.hash = `backgammon-room-table/${GameID[0]}/${GameID[1]}`;
+        // BackgammonGameTable.setGameInitData(msg);
+        ConnectionStables.Room = new WSRoom(GameInitData.GameID, GameInitData);
     },
     ["backgammons::lobbyInit"](msg){
         msg.rooms.map((tables, roomId)=>{

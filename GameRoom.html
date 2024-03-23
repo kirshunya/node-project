@@ -323,7 +323,7 @@
     <!-- <script src="js/app.js" type="module"></script> -->
     <div class="debugPan">debug: 
       <input type="button" id="TimersTurnDebugButton"></input>
-      <!-- <button onclick=""></button> -->
+      <input type="button" id="ChosePlayerDebugButton" value="player:"></input>
     </div>
     <style>
       .debugPan {
@@ -350,8 +350,29 @@
         window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
       }
     </script>
-    <!-- <div class="closer">
+    <div class="closer">
       <div class="playerChosePanel">
+        <div class="players">
+          <div class="Jimmy">
+            <img src="./img/backgammons/whitecell4.png">
+            <span>Jimmy</span>
+            <div>:black</div>
+          </div>
+          <div class="Missi">
+            <img src="./img/backgammons/blackcell4.png">
+            <span>Missi</span>
+            <div>:white</div>
+          </div>
+          <div class="Debby">
+            <img src="./img/backgammons/ghost-checker.png">
+            <span>Debby</span>
+            <div>:black&white</div>
+          </div>
+        </div>
+
+        <div class="checkbox">
+          <input type="checkbox" id="cash"> Save value
+        </div>
         <style>
           .closer {
             position: absolute;
@@ -360,19 +381,87 @@
             overflow: auto;
             top: 0;
             left: 0;
+            background-color: #201a0e50;
           }
           .playerChosePanel {
+            width: 300px;
+            height: 225px;
+
+            background-color: #572351;
+            border-radius: 7pt;
+            border: 0.3rem solid #411a3c;
+            padding: 1rem;
+
             position: absolute;
-            width: 250px;
-            min-height: 250px;
             margin: auto;
             top: 0;
             left: 0;
             bottom: 0;
             right: 0;
+            
+            color: aliceblue;
+
+            .players {
+              display: flex;
+              justify-content: space-between;
+            }
+            .checkbox {
+              margin-top: 3rem;
+            }
+          }
+          .Jimmy, .Missi, .Debby {
+            display: inline-flex;
+            flex-direction: column;
+            font-size: large;
+            padding: 0.5rem;
+            min-height: auto;
+          }
+          .playerChosePanel > .players > div > img {
+            width: 66px;
+            height: 66px;
+          }
+          .playerChosePanel > .players > div > span {
+            margin-top: 1rem;
+          }
+          .playerChosePanel > .players > div > div {
+            display: inline;
+            font-size: small;
+            color: rgb(101, 108, 114);
+          }
+          .playerChosePanel > .players > div:hover {
+            background-color: #501f49ee;
+            border-radius: 5pt;
+            border: 2px solid #411a3c;
           }
         </style>
-      </div> -->
+        <script>
+          const EntryPoint = import('./js/modules/backgammons/EntryPoint.js')
+          const playerId = localStorage.getItem('playerId');
+          /**
+           * @return {HTMLElement}
+           */
+          const pl = name=>document.getElementsByClassName(name)[0];
+          if(playerId)
+            chosePlayer(playerId)
+          function chosePlayer(index) {
+            EntryPoint.then(({onplayerchosen})=>{
+              onplayerchosen.resolve(+index);
+            })
+            ChosePlayerDebugButton.value = `player:${['Jimmy', 'Missi', 'Debby'][index]}`
+            if(cash.checked)
+              localStorage.setItem('playerId', index);
+            pl('closer').style.display = 'none'
+          }
+          ChosePlayerDebugButton.addEventListener('click', ()=>{
+            localStorage.removeItem('playerId');
+            window.location.reload();
+          })
+          window.addEventListener('DOMContentLoaded', ()=>{
+            Object.entries(['Jimmy', 'Missi', 'Debby'])
+                .map(([index, name])=>pl(name).addEventListener('click', ()=>chosePlayer(index)))
+          })
+        </script>
+      </div>
     </div>
   </body>
 </html>
