@@ -180,7 +180,7 @@ class CanvasFunctions {
     installImg(texture, additional) {//TODO: rebase
         const self = this;
         return new Promise(resolve=>fabric.Image.fromURL(texture, function (rawImg) {
-                console.log(additional)
+                // console.log(additional)
                 const img = rawImg.set(new StaticImg(additional));
                 self.canvas.add(img)
                 resolve(img);
