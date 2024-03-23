@@ -205,6 +205,7 @@ class TopDropLunk extends CanvasFunctions {
         window.addEventListener('resize', resize);
         ondom.then(resize);
 
+        // this.installImg('./img/backgammons/boardlot.png',  {scaleX:2.75, scaleY:2.75, top:Prefix==="Bottom"?-13:0 });
         const pic = this.pic = {Top:whitecheckerpicurl, Bottom:blackcheckerpicurl}[Prefix];//TODO
         ondom.then(()=>{
             Promise.all([...Array(count).keys()].map((i)=>this.installImg(pic, {left:20+i*50, top:3})))
@@ -224,7 +225,7 @@ class TopDropLunk extends CanvasFunctions {
      * @returns {Promise.<Number>}
      */
     accept(points) {
-        return new Promise((resolve, reject)=>{
+        return new Promise(async(resolve, reject)=>{
             const resolver = val=>()=>resolve(val)
             const Rect = new fabric.Rect({
                 width:this.canvas.getWidth()/this.canvas.getZoom(),
@@ -430,9 +431,9 @@ export class BoardCanvas extends CanvasFunctions {
         _dices.map(Dice => Dice.remove());
         this._dices = [];
         const self = this;
-        const scale = 166/328;
+        const scale = 328/328;
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
-        const dicesize = scale*328; const space = 20;
+        const dicesize = scale*328; const space = 10;
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
 
         class Dice {
@@ -441,7 +442,7 @@ export class BoardCanvas extends CanvasFunctions {
             imgpromise
             constructor(diceNumber, left) {
                 this.diceNumber = diceNumber;
-                this.imgpromise = self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice':'dices'}${diceNumber}.png`, {
+                this.imgpromise = self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice_':'bdice_'}${diceNumber}.png`, {
                     left, top: BoardHeight/2, scaleX:scale, scaleY:scale,
                     hoverCursor: 'pointer',
                 }).then(dice=>{
@@ -471,14 +472,14 @@ export class BoardCanvas extends CanvasFunctions {
         }
 
         if(firstDice!==secondDice) {
-            const firstDicePos = sideleft - (dicesize + space/2) + currentSideSize/2;
-            this._dices.push(new Dice(firstDice, firstDicePos), new Dice(secondDice, firstDicePos+space+dicesize))
+            const firstDicePos = sideleft - (dicesize/2 + space/2) + currentSideSize/2;
+            this._dices.push(new Dice(firstDice, firstDicePos), new Dice(secondDice, firstDicePos+space+dicesize/2))
         } else {
-            const firstDicePos = sideleft - 2*(dicesize + space/2) + currentSideSize/2;
+            const firstDicePos = sideleft - 2*(dicesize/2 + space/2) + currentSideSize/2;
             this._dices.push(new Dice(firstDice, firstDicePos),
-                             new Dice(firstDice, firstDicePos+space+dicesize),
-                             new Dice(secondDice, firstDicePos+2*(space+dicesize)), 
-                             new Dice(secondDice, firstDicePos+3*(space+dicesize)))
+                             new Dice(firstDice, firstDicePos+space+dicesize/2),
+                             new Dice(secondDice, firstDicePos+2*(space+dicesize/2)), 
+                             new Dice(secondDice, firstDicePos+3*(space+dicesize/2)))
         }
     }
     setPTS(pts) {
@@ -843,7 +844,7 @@ export class _BoardCanvas {
         let stepBetweenDices = diceIndex * 200 * scaleFactor;
         let whitePosX = BoardWidth/1.7 * scaleFactor + stepBetweenDices;
         let blackPosX = BoardWidth/6 * scaleFactor + stepBetweenDices;
-        let image;
+        // let image;
         fabric.Image.fromURL(diceUrl, function (rawImage) {
             let img = rawImage.set(new StaticImg({
                 left: currentPlayer === "white" ? whitePosX : blackPosX, // TODO: смени "white" на то, с чем будешь работать.
