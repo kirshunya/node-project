@@ -369,11 +369,11 @@ class BoardCanvasEffects {
                 continue;
             }
             // this.createGhost(key, this.slots[key].count(), fromIndex);
-            self.createGhostChecker(key, BoardCanvas.slots[key].count());
+            self.createGhostChecker(key, BoardCanvas.slots[key].count(), move);
         }
         function move(slotIndex) {
             if(!self.BoardCanvas.gc.move(fromIndex, slotIndex)) alert('some error in checker move command..');
-            BoardCanvas.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
+            self.BoardCanvas.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
             self.clearGhosts();
             onmove?.();
         }
@@ -393,14 +393,14 @@ class BoardCanvasEffects {
     * @param {int} checkerIndex 
     * @returns {Promise.<[fabricImage, Number, Number]>}
     */
-   createGhostChecker(slotIndex, checkerIndex) {
+   createGhostChecker(slotIndex, checkerIndex, onmove) {
        const self = this;
        return self.BoardCanvas.installImg(ghostcheckerpicurl, {
                left: posX(slotIndex),
                top: posY(slotIndex, checkerIndex)
            }).then(img=>{
                img.on('added', () => img.moveTo(checkerIndex));
-               img.on('mousedown', ()=>move(slotIndex));
+               img.on('mousedown', ()=>onmove(slotIndex));
                self.BoardCanvas.canvas.bringToFront(img);
                self.enabledGhosts.push(img);
 
