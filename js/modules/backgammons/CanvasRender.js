@@ -36,8 +36,9 @@ class Slot {
 
     /** @param {Checker} checker  */
     add(checker) {
-        checker.slot = this;
+        this.checkers.map(({img})=>img.lockMovementX = img.lockMovementY = true);
         this.checkers.push(checker);
+        checker.slot = this;
     }
 
     get(checkerIndex){
@@ -46,7 +47,11 @@ class Slot {
 
     getRemoveLast() {
         if (this.checkers.length < 1) return false;
-        return this.checkers.pop();
+        const ret = this.checkers.pop();
+        const newlast = this.checkers[this.checkers.length-1];
+        if (newlast) 
+            newlast.img.lockMovementX = newlast.img.lockMovementY = false;
+        return ret;
     }
 
     count() {
@@ -54,16 +59,17 @@ class Slot {
     }
 }
 const genStaticImgClass = (scF)=>class {
-    constructor(attributes) {
+    constructor(attributes, staticpos=false) {
         return Object.assign({
             hasControls: false,
-            lockMovementX: true,
-            lockMovementY: true,
+            lockMovementX: staticpos,
+            lockMovementY: staticpos,
             lockRotation: true,
             lockScalingX: true,
             lockScalingY: true,
             lockScalingFlip: false,
-            selectable: false,
+            selectable: true,
+            hasBorders: false,
             // scaleX: checkerSize/66 * scaleFactor,
             // scaleY: checkerSize/66 * scaleFactor,
             scaleX: scF,
@@ -94,7 +100,8 @@ const $PageSnapshotData = {
 
     const slotMargin = 0;
     const checkerSize = slotWidth - slotMargin*2;
-    let StaticImg = genStaticImgClass(checkerSize/66)
+    const checkerScale = checkerSize/66;
+    let StaticImg = genStaticImgClass(checkerScale)
 
     const stepY = checkerSize / 2.5;
     const TopY = BordersByY[0];
@@ -117,7 +124,7 @@ const BoardSizesInfo = (()=>{
     return {
     }
 })()
-const [whitetay, blacktay] = ['./img/backgammons/whitepcell3.png', './img/backgammons/blackcell3.png'];
+const [whitetay, blacktay] = [ './img/backgammons/blackpcell3.png', './img/backgammons/whitepcell3.png', './img/backgammons/blackpcell3.png'];
 const {whitecheckerpicurl, blackcheckerpicurl, 
     ghostcheckerpicurl, gameboardpic} = $PageSnapshotData.Graphics
 const CHECKERS_TEXTURES = [ghostcheckerpicurl, whitecheckerpicurl, blackcheckerpicurl]
@@ -303,7 +310,8 @@ class TopDropLunk extends CanvasFunctions {
 class BoardCanvasEffects {
     ghost
     /** @type {Checker[]} */
-    enabledGhosts = []
+    enabledGhosts = [];
+    moving = false
     // eventProviders = {
     //     movechecker: new EventProvider()
     // }
@@ -317,7 +325,7 @@ class BoardCanvasEffects {
     selectionChecker = {
         /** @param {Checker} */
         Checker:null,
-        /** @type {fabricImage} */
+        /** @type {Promise.<fabricImage>} */
         backimg:null,
         canvasRenderAll:()=>{},
         /** @param {Checker} Checker @param {int} awa 0 - if Checker cannot to move */
@@ -343,6 +351,17 @@ class BoardCanvasEffects {
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
             this.Checker = null;
+        }, 
+        moveTo({left, top}) {
+            this.backimg.then(img=>{
+                img.left = left-15;
+                img.top = top-15;
+                img.setCoords();
+                this.BoardCanvas.canvas.renderAll();
+            })
+        },
+        bringToFront() {
+            this.Checker&&this.BoardCanvas.bringToFront(this.Checker)
         }
     }
     /**
@@ -372,7 +391,9 @@ class BoardCanvasEffects {
             // this.createGhost(key, this.slots[key].count(), fromIndex);
             self.createGhostChecker(key, BoardCanvas.slots[key].count(), move);
         }
+        self.selectionChecker.bringToFront();
         function move(slotIndex) {
+            if(self.moving) return;
             if(!self.BoardCanvas.gc.move(fromIndex, slotIndex)) alert('some error in checker move command..');
             self.BoardCanvas.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
             self.clearGhosts();
@@ -387,7 +408,7 @@ class BoardCanvasEffects {
         this.selectionChecker.reset()
         this.BoardCanvas.drops[WHITE.over].clear()
         this.BoardCanvas.drops[BLACK.over].clear()
-        return this.enabledGhosts.map(ghost=>this.BoardCanvas.canvas.remove(ghost));
+        return (this.enabledGhosts.map(([ghostimg])=>this.BoardCanvas.canvas.remove(ghostimg)), this.enabledGhosts.length=0);
     }
     /**
     * @param {int} slotIndex
@@ -403,11 +424,41 @@ class BoardCanvasEffects {
                img.on('added', () => img.moveTo(checkerIndex));
                img.on('mousedown', ()=>onmove(slotIndex));
                self.BoardCanvas.canvas.bringToFront(img);
-               self.enabledGhosts.push(img);
+               self.enabledGhosts.push([img, slotIndex, checkerIndex]);
 
                return ([img, slotIndex, checkerIndex]);
            })
-   }
+    }
+    /**
+     * 
+     * @param {{left:int, top:int}}} param0 
+     * @returns {[fabricImage, int, int]} img, slotIndex, checkerIndex
+     */
+    enteredIntoGhost({left, top, width, height}) {
+        const [l, t] = [
+            left + width/2,
+            top + height/2
+        ]
+        const VerticalBoundsShift = 70;
+        const HorizontalBoundsShift = 70;
+        for(const [img, slotIndex, checkerIndex] of this.enabledGhosts) {
+            // if(top > img.top && top < img.top + img.height
+            //     && left > img.left && left < img.left + img.width)
+            //         return [img, slotIndex, checkerIndex]; 
+            if(t > img.top-VerticalBoundsShift && t < img.top + img.height+VerticalBoundsShift
+                && l > img.left && l < img.left + img.width)
+                    return [img, slotIndex, checkerIndex]; 
+        }
+        for(const [img, slotIndex, checkerIndex] of this.enabledGhosts) {
+            // if(top > img.top && top < img.top + img.height
+            //     && left > img.left && left < img.left + img.width)
+            //         return [img, slotIndex, checkerIndex]; 
+            if(t > img.top-VerticalBoundsShift && t < img.top + img.height+VerticalBoundsShift
+                && l+HorizontalBoundsShift > img.left && l - HorizontalBoundsShift < img.left + img.width)
+                    return [img, slotIndex, checkerIndex]; 
+        }
+        return null;
+    }
 }
 export class BoardCanvas extends CanvasFunctions {
     /** @type {Slot[]} */
@@ -465,6 +516,7 @@ export class BoardCanvas extends CanvasFunctions {
                         .map(checkerIndex=>self.createChecker(slot.Colour, SlotLet, checkerIndex).then(
                             ([CheckerObj, slotIndex, checkerIndex])=>{
                                 SlotLet.checkers[checkerIndex]=CheckerObj
+                                CheckerObj.img.lockMovementX = CheckerObj.img.lockMovementY = checkerIndex !== (slot.Count-1)
                                 return [CheckerObj, slotIndex, checkerIndex];
                             }));
             }).flat(1)).then(ValidatingCheckersLayouting);
@@ -612,6 +664,21 @@ export class BoardCanvas extends CanvasFunctions {
                     if(!img.filters.length) 
                         self._effects.selectionChecker.set(checkerFromImg.slot.last(), awa.length);
                 });
+                img.on('moving', () => {
+                    this._effects.moving = true;
+                    this._effects.selectionChecker.moveTo(img);
+                })
+                img.on('mouseup', ()=>{
+                    this._effects.moving = false;
+                    const enteredTo = this._effects.enteredIntoGhost(img);
+                    if(enteredTo) {
+                        if(!self.gc.move(checkerFromImg.slot.index, enteredTo[1])) alert('some error in checker move command..');
+                        self._effects.clearGhosts();
+                        self.moveChecker(checkerFromImg.slot.index, enteredTo[1])
+                    } else {
+                        self.moveChecker(checkerFromImg.slot.index, checkerFromImg.slot.index)
+                    }
+                })
 
                 return ([checkerFromImg, slotIndex, checkerIndex]);
             })
