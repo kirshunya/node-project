@@ -195,11 +195,11 @@ class CanvasFunctions {
      * @param {{left, top}} additional 
      * @returns {Promise.<fabricImage>}
      */
-    installImg(texture, additional) {//TODO: rebase
+    installImg(texture, additional, movement=false) {//TODO: rebase
         const self = this;
         return new Promise(resolve=>fabric.Image.fromURL(texture, function (rawImg) {
                 // console.log(additional)
-                const img = rawImg.set(new StaticImg(additional));
+                const img = rawImg.set(new StaticImg(additional, !movement));
                 self.canvas.add(img)
                 resolve(img);
             }));
@@ -327,6 +327,8 @@ class BoardCanvasEffects {
         Checker:null,
         /** @type {Promise.<fabricImage>} */
         backimg:null,
+        /** @type {BoardCanvas} */
+        BoardCanvas,
         canvasRenderAll:()=>{},
         /** @param {Checker} Checker @param {int} awa 0 - if Checker cannot to move */
         set(Checker, awa) {
@@ -334,7 +336,7 @@ class BoardCanvasEffects {
             this.Checker = Checker;
             const {top, left} = Checker.img
             const tayurl = {[WHITE.id]:whitetay, [BLACK.id]:blacktay}[WHITE.id];
-            this.backimg = this.BoardCanvas.installImg(tayurl, {top:top-15, left:left-15, scaleX: checkerSize/66*1.1, scaleY: checkerSize/66*1.1})
+            this.backimg = this.BoardCanvas.installImg(tayurl, {top:top-15, left:left-15, scaleX: checkerSize/66*1.1, scaleY: checkerSize/66*1.1}, false)
                     .then(img=>(this.BoardCanvas.canvas.bringToFront(Checker.img), img));
             // this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
             //                 color: awa?'yellow':'red', 
@@ -362,6 +364,9 @@ class BoardCanvasEffects {
         },
         bringToFront() {
             this.Checker&&this.BoardCanvas.bringToFront(this.Checker)
+        },
+        animover() {
+            return [this.backimg, x=>x-15, y=>y-15]
         }
     }
     /**
@@ -658,7 +663,10 @@ export class BoardCanvas extends CanvasFunctions {
                 top: posY(slotIndex, checkerIndex)
             }).then(img=>{
                 const checkerFromImg = new Checker(img, SlotLet);
+                let startpos = {left:0, top:0};
                 img.on('mousedown', () => {
+                    const {left, top} = checkerFromImg.img;
+                    startpos = {left, top};
                     // if (slotIndex !== WHITE.over && slotIndex !== BLACK.over)
                     const awa = self._effects.showGhostsCheckersOfAccesibleSlots(checkerFromImg.slot.index);
                     if(!img.filters.length) 
@@ -666,6 +674,7 @@ export class BoardCanvas extends CanvasFunctions {
                 });
                 img.on('moving', () => {
                     this._effects.moving = true;
+                    checkerFromImg?.abortanim?.();
                     this._effects.selectionChecker.moveTo(img);
                 })
                 img.on('mouseup', ()=>{
@@ -676,7 +685,12 @@ export class BoardCanvas extends CanvasFunctions {
                         self._effects.clearGhosts();
                         self.moveChecker(checkerFromImg.slot.index, enteredTo[1])
                     } else {
-                        self.moveChecker(checkerFromImg.slot.index, checkerFromImg.slot.index)
+                        // const {left, top} = checkerFromImg.img;
+                        // const curpos = {left, top};
+                        // if(startpos.left - left > 10 && startpos.top - top > 10)
+                        self.moveChecker(checkerFromImg.slot.index,
+                                         checkerFromImg.slot.index, false, 
+                                                    this._effects.selectionChecker.animover())
                     }
                 })
 
@@ -688,8 +702,8 @@ export class BoardCanvas extends CanvasFunctions {
      * @param {int} from 
      * @param {int} to 
      */
-    moveChecker(from, to) {
-        this._effects.clearGhosts();
+    moveChecker(from, to, clear=true, umimg) {
+        clear&&this._effects.clearGhosts();
         const {canvas} = this;
         let isOver = to === WHITE.over || to === BLACK.over;
         const checker = (from === WHITE.over || from === BLACK.over)
@@ -711,14 +725,25 @@ export class BoardCanvas extends CanvasFunctions {
             // drop.append();
         } else {
             const checkerIndex = this.slots[to].count();
-            checker.img.animate('left', posX(to), {
-                duration: 400,
-                onChange: canvas.renderAll.bind(canvas)
-            })
-            checker.img.animate('top', posY(to, checkerIndex, indent, -indent), {
-                duration: 400,
-                onChange: canvas.renderAll.bind(canvas)
-            })
+            let abort = false;
+            const [x, y] = [posX(to), posY(to, checkerIndex, indent, -indent)]
+            const list = umimg?[[checker.img, x=>x, y=>y], umimg]:[[checker.img, x=>x, y=>y]]
+            for(const [improm, xer, yer] of list){
+                (async() => {
+                    const img = await improm;
+                    img.animate('left', xer(x), {
+                        duration: 400,
+                        onChange: canvas.renderAll.bind(canvas),
+                        abort: ()=>abort
+                    })
+                    img.animate('top', yer(y), {
+                        duration: 400,
+                        onChange: canvas.renderAll.bind(canvas),
+                        abort: ()=>abort
+                    })
+                })();
+            }
+            checker.abortanim = ()=>abort=true;
             checker.slot = to;
             canvas.bringToFront(checker.img)
             this.slots[to].add(checker);
