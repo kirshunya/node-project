@@ -36,7 +36,9 @@ class Slot {
 
     /** @param {Checker} checker  */
     add(checker) {
+        this.checkers.map(({img})=>img.lockMovementX = img.lockMovementY = true);
         this.checkers.push(checker);
+        checker.slot = this.index;
     }
 
     get(checkerIndex){
@@ -45,7 +47,10 @@ class Slot {
 
     getRemoveLast() {
         if (this.checkers.length < 1) return false;
-        return this.checkers.pop();
+        const ret = this.checkers.pop();
+        const newlast = this.checkers[this.checkers.length-1];
+        newlast.img.lockMovementX = newlast.img.lockMovementY = false;
+        return ret;
     }
 
     count() {
@@ -53,16 +58,17 @@ class Slot {
     }
 }
 const genStaticImgClass = (scF)=>class {
-    constructor(attributes) {
+    constructor(attributes, staticpos=false) {
         return Object.assign({
             hasControls: false,
-            lockMovementX: true,
-            lockMovementY: true,
+            lockMovementX: staticpos,
+            lockMovementY: staticpos,
             lockRotation: true,
             lockScalingX: true,
             lockScalingY: true,
             lockScalingFlip: false,
-            selectable: false,
+            selectable: true,
+            hasBorders: false,
             // scaleX: checkerSize/66 * scaleFactor,
             // scaleY: checkerSize/66 * scaleFactor,
             scaleX: scF,
@@ -116,7 +122,7 @@ const BoardSizesInfo = (()=>{
     return {
     }
 })()
-const [whitetay, blacktay] = ['./img/backgammons/whitepcell3.png', './img/backgammons/blackcell3.png'];
+const [whitetay, blacktay] = [ './img/backgammons/blackpcell3.png', './img/backgammons/whitepcell3.png', './img/backgammons/blackpcell3.png'];
 const {whitecheckerpicurl, blackcheckerpicurl, 
     ghostcheckerpicurl, gameboardpic} = $PageSnapshotData.Graphics
 const CHECKERS_TEXTURES = [ghostcheckerpicurl, whitecheckerpicurl, blackcheckerpicurl]
@@ -342,7 +348,7 @@ class BoardCanvasEffects {
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
             this.Checker = null;
-        }
+        }, 
     }
     /**
      * Расстваляет по полю призраки пешек куда человек сможет сделать ход с выбранной пешки
@@ -464,6 +470,7 @@ export class BoardCanvas extends CanvasFunctions {
                         .map(checkerIndex=>self.createChecker(slot.Colour, SlotLet, checkerIndex).then(
                             ([CheckerObj, slotIndex, checkerIndex])=>{
                                 SlotLet.checkers[checkerIndex]=CheckerObj
+                                CheckerObj.img.lockMovementX = CheckerObj.img.lockMovementY = checkerIndex !== (slot.Count-1)
                                 return [CheckerObj, slotIndex, checkerIndex];
                             }));
             }).flat(1)).then(ValidatingCheckersLayouting);
