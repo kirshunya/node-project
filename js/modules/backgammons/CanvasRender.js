@@ -36,6 +36,7 @@ class Slot {
 
     /** @param {Checker} checker  */
     add(checker) {
+        checker.slot = this;
         this.checkers.push(checker);
     }
 
