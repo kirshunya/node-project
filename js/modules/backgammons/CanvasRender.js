@@ -385,18 +385,18 @@ class BoardCanvasEffects {
         this.clearGhosts();
         /** @type {Array.<[string, (int[]|[Number, Number])]>} */
         const availableKeys = Object.entries(BoardCanvas.gc.UserMovesFrom(fromIndex));
-        for (const [key, points] of availableKeys) {
+        const ghosts = availableKeys.map(([key, points])=>{
             if (key === WHITE.over || key === BLACK.over) {
                 // TODO: DropRegion
                 BoardCanvas.drops[key].accept(points).then(()=>move(key), ()=>{});
                 // let team = key === WHITE.over ? 0 : 1;
                 // this.createGhost(key, this.dropped[team].count(), fromIndex)
-                continue;
+                return new Promise(resolve=>resolve());
             }
             // this.createGhost(key, this.slots[key].count(), fromIndex);
-            self.createGhostChecker(key, BoardCanvas.slots[key].count(), move);
-        }
-        self.selectionChecker.bringToFront();
+            return self.createGhostChecker(key, BoardCanvas.slots[key].count(), move);
+        });
+        Promise.all(ghosts).then(()=>self.selectionChecker.bringToFront());
         function move(slotIndex) {
             if(self.moving) return;
             if(!self.BoardCanvas.gc.move(fromIndex, slotIndex)) alert('some error in checker move command..');
