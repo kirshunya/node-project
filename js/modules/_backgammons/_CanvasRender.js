@@ -557,7 +557,7 @@ export class BoardCanvas extends CanvasFunctions {
                 const SlotLet = self.slots[slotIndex] = new Slot(slotIndex);
                 if(slot.Count<0) new Toast({
                     title: 'Ошибка сервера',
-                    text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможно только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
+                    text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможна только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
                     theme: 'warning',
                 })
                 return range(0, Math.abs(slot.Count))
