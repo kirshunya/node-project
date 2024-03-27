@@ -332,7 +332,7 @@ class Timer {
       const TLabel = Element.getElementsByClassName('timer')[0];
       const TIcon = Element.getElementsByClassName('stimer')[0];
       let [userTime, tsamp] = value;
-      if(tsamp) ConnectionStables.diffsProm.then(diff=>tsamp-=diff);
+      if(tsamp) ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
       let diff = 0;
       function labelTlabel() {
         const seconds = userTime + diff;

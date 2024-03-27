@@ -43,7 +43,7 @@ export class WSRoom {
 export const ConnectionStables = {
     /** @type {WSRoom} */
     Room: null,
-    /** @type {Promise.<int>} */
+    /** @type {Promise.<int>} info about timestamps differentations in client and server*/
     diffsProm: FCPromise()
 }
 /*lotoserviced*/const EventsRoutes = ({
