@@ -332,6 +332,7 @@ class Timer {
       const TLabel = Element.getElementsByClassName('timer')[0];
       const TIcon = Element.getElementsByClassName('stimer')[0];
       let [userTime, tsamp] = value;
+      let loadstamp
       let diff = 0;
       function labelTlabel() {
         const seconds = userTime + diff;
@@ -346,14 +347,16 @@ class Timer {
         TIcon.style.display = enable?'block':'none';
         if(diff&&!init) {
           userTime+=diff;
-          diff = 0;
+          loadstamp = diff = 0;
         }
       }
       this.label = (newval=undefined)=>{
           if(typeof newval === 'number') tsamp = newval;
           const seconds = tsamp?Math.floor((timestamp()-tsamp)/1000):0;
           const secs = 60-seconds;
-          diff = secs<0?secs:0;
+          const _diff = secs<0?secs:0;
+          if(_diff&&!loadstamp) loadstamp = timestamp();
+          if(loadstamp) diff = Math.floor((timestamp() - loadstamp)/1000);
           labelTIcon(secs)
           labelTlabel()
       }
