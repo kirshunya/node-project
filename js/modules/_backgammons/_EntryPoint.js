@@ -1,5 +1,5 @@
-import { sleep, range, JustEnoughEvents, OEPromise, FCPromise } from './Utilities.js';
-import { WSEventPool, onnewmsg } from './WSEP.js';
+import { sleep, range, JustEnoughEvents, OEPromise, FCPromise } from './_Utilities.js';
+import { WSEventPool, onnewmsg } from './_WSEP.js';
 import * as GamePool from './_GamePool.js';
 import { API_URL_PART } from '../config.js'
 import { BoardConstants } from './_BoardConstants.js';
