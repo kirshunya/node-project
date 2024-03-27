@@ -1,4 +1,4 @@
-const { TGame } = require('./backgammons/GameRoom');
+const { TGame, timestamp } = require('./backgammons/GameRoom');
 const { ConnectionContext, Debug } = require('./backgammons/Generals');
 
 console.log(TGame)
@@ -79,6 +79,9 @@ const WSPipelineCommands = {
                      )
         )};
     },
+    ['backgammons/timediffs'](ctx, msg) {
+        ctx.event('backgammons::timediffs', {diff:msg.timestamp-timestamp()})
+    }
     /**
      * Connection to room
      * @param {ConnectionContext} ctx 

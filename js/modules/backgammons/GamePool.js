@@ -3,7 +3,7 @@ import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
-const timestamp = ()=>Date.now();
+export const timestamp = ()=>Date.now();
 var GameInitData = null;
 export function setGameInitData(data) {
     GameInitData = data;

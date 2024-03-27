@@ -49,6 +49,9 @@ ws.onopen = () => {
         req({
             method: "backgammons/connect", GameID: [0, 0]
         })
+        req({
+            method: "backgammons/timediffs", timestamp: GamePool.timestamp()
+        })
         // req({
         //     method: "backgammons/connectPage", dominoRoomId:0, tableId:0
         // })

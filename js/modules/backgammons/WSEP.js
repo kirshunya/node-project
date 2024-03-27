@@ -42,11 +42,17 @@ export class WSRoom {
 }
 export const ConnectionStables = {
     /** @type {WSRoom} */
-    Room: null
+    Room: null,
+    /** @type {Promise.<int>} */
+    diffsProm: FCPromise()
 }
 /*lotoserviced*/const EventsRoutes = ({
     ["backgammons::GameStarted"]({players, slots, state}){
         ConnectionStables.Room.onGameStarted.resolve({players, slots, state})
+    },
+    ["backgammons::timediffs"]({diff}) {
+        ConnectionStables.diffsProm.resolve(diff);
+        console.log('diffs', diff)
     },
     ["backgammons::connection::self"](GameInitData) {
         // const {dominoRoomId, tableId, colour, players } = msg;

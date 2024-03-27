@@ -1,6 +1,7 @@
 const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider } = require("./Generals");
 
 const timestamp = ()=>Date.now();
+module.exports.timestamp = timestamp;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make iterator with Array methods?
 const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
