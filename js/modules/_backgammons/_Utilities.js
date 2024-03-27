@@ -116,6 +116,10 @@ export const [GMmove, GMend] = ['GMmove', 'GMend'];
    * Licensed under MIT (https://github.com/itchief/ui-components/blob/master/LICENSE)
    **/
 export class Toast {
+    /**
+     * 
+     * @param {{title:string|false, text:string,theme:string, autohide:boolean, interval:int}} params 
+     */
     constructor(params) {
       this._title = params['title'] === false ? false : params['title'] || 'Title';
       this._text = params['text'] || 'Message...';
