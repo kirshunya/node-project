@@ -16,9 +16,10 @@ class Checker {
      * @param {fabricImage} img 
      * @param {int} slot 
      */
-    constructor(img, slot) {
+    constructor(img, slot, colour) {
         this.img = img;
         this.slot = slot;
+        this.colour = colour
     }
 }
 
@@ -124,7 +125,7 @@ const BoardSizesInfo = (()=>{
     return {
     }
 })()
-const [whitetay, blacktay] = [ './img/backgammons/blackpcell3.png', './img/backgammons/whitepcell3.png', './img/backgammons/blackpcell3.png'];
+const [whitetay, blacktay] = ['./img/backgammons/whitetay.png', './img/backgammons/blacktay.png'];
 const {whitecheckerpicurl, blackcheckerpicurl, 
     ghostcheckerpicurl, gameboardpic} = $PageSnapshotData.Graphics
 const CHECKERS_TEXTURES = [ghostcheckerpicurl, whitecheckerpicurl, blackcheckerpicurl]
@@ -307,6 +308,7 @@ class TopDropLunk extends CanvasFunctions {
  * * second dice cant be used to moving other checkers, but first can be used to this -- what should to do?
  * * second dice as first can be used to moving other checkers -- all good
  */
+const chbackshift = 27
 class BoardCanvasEffects {
     ghost
     /** @type {Checker[]} */
@@ -335,8 +337,14 @@ class BoardCanvasEffects {
             this.reset();
             this.Checker = Checker;
             const {top, left} = Checker.img
-            const tayurl = {[WHITE.id]:whitetay, [BLACK.id]:blacktay}[WHITE.id];
-            this.backimg = this.BoardCanvas.installImg(tayurl, {top:top-15, left:left-15, scaleX: checkerSize/66*1.1, scaleY: checkerSize/66*1.1}, false)
+            const tayurl = {[WHITE.id]:whitetay, [BLACK.id]:blacktay}[Checker.colour];
+            const scale = checkerSize/115*1.1;
+            this.backimg = this.BoardCanvas.installImg(tayurl, {
+                top:top-chbackshift, 
+                left:left-chbackshift, 
+                scaleX: scale, 
+                scaleY: scale
+            }, false)
                     .then(img=>(this.BoardCanvas.canvas.bringToFront(Checker.img), img));
             // this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
             //                 color: awa?'yellow':'red', 
@@ -356,17 +364,17 @@ class BoardCanvasEffects {
         }, 
         moveTo({left, top}) {
             this.backimg.then(img=>{
-                img.left = left-15;
-                img.top = top-15;
+                img.left = left-chbackshift;
+                img.top = top-chbackshift;
                 img.setCoords();
                 this.BoardCanvas.canvas.renderAll();
             })
         },
         bringToFront() {
-            this.Checker&&this.BoardCanvas.bringToFront(this.Checker)
+            // this.Checker&&this.BoardCanvas.canvas.bringToFront(this.Checker)
         },
         animover() {
-            return [this.backimg, x=>x-15, y=>y-15]
+            return [this.backimg, x=>x-chbackshift, y=>y-chbackshift]
         }
     }
     /**
@@ -662,7 +670,7 @@ export class BoardCanvas extends CanvasFunctions {
                 left: posX(slotIndex),
                 top: posY(slotIndex, checkerIndex)
             }).then(img=>{
-                const checkerFromImg = new Checker(img, SlotLet);
+                const checkerFromImg = new Checker(img, SlotLet, Colour);
                 let startpos = {left:0, top:0};
                 img.on('mousedown', () => {
                     const {left, top} = checkerFromImg.img;
