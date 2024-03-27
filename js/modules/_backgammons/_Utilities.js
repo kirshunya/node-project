@@ -171,7 +171,7 @@ export class Toast {
       } else {
         el.classList.add('toast_message');
       }
-      el.querySelector('.toast__body').textContent = this._text;
+      el.querySelector('.toast__body').innerHTML = this._text;
       this._el = el;
       if (!document.querySelector('.toast-container')) {
         const container = document.createElement('div');
