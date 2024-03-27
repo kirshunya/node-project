@@ -11,9 +11,9 @@ function getRandomInt(min, max) {
 }
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
 /** @type {Number} in seconds*/
-const USERTIME = 10;
+const USERTIME = 60;
 /** @type {Number} in seconds*/
-const STEPTIME = 10;
+const STEPTIME = 60;
 /** @type {Number} in millesecons*/
 const SecondInMilliseconds = 1000;
 
