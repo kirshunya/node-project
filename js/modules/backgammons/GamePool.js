@@ -335,7 +335,7 @@ class Timer {
       let loadstamp
       let diff = 0;
       function labelTlabel() {
-        const seconds = userTime + diff;
+        const seconds = userTime - diff;
         const minuts = Math.floor(Math.abs(seconds)/60);
         const seconds60 = Math.abs(seconds%60);
         TLabel.innerHTML = `${seconds<0?'-':''}${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
@@ -346,7 +346,7 @@ class Timer {
       this.enable = (enable, init=false)=>{
         TIcon.style.display = enable?'block':'none';
         if(diff&&!init) {
-          userTime+=diff;
+          userTime-=diff;
           loadstamp = diff = 0;
         }
       }
