@@ -1,4 +1,4 @@
-import { range, $myeval, ondom, sleep, black, EventProvider } from "./_Utilities.js";
+import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./_Utilities.js";
 import { BoardConstants, refToArr, slotinfo, TState } from "./_BoardConstants.js";
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
@@ -555,7 +555,12 @@ export class BoardCanvas extends CanvasFunctions {
         const PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
                 const slot = new refToArr(slotinfo);
                 const SlotLet = self.slots[slotIndex] = new Slot(slotIndex);
-                return range(0,slot.Count)
+                if(slot.Count<0) new Toast({
+                    title: 'Ошибка сервера',
+                    text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможно только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
+                    theme: 'dangerous',
+                })
+                return range(0, Math.abs(slot.Count))
                         .map(checkerIndex=>self.createChecker(slot.Colour, SlotLet, checkerIndex).then(
                             ([CheckerObj, slotIndex, checkerIndex])=>{
                                 SlotLet.checkers[checkerIndex]=CheckerObj
