@@ -14,7 +14,7 @@ const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
 /** @type {Number} in seconds*/
 const USERTIME = 60;
 /** @type {Number} in seconds*/
-const STEPTIME = 60;
+const STEPTIME = 25;
 /** @type {Number} in millesecons*/
 const SecondInMilliseconds = 1000;
 

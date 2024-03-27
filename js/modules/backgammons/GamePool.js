@@ -327,6 +327,8 @@ export function ShowGameTable(localUser) {
 // window.addEventListener('DOMContentLoaded', 
 //     ()=>WSEventPool.on('backgammons::GameStarted', ({players, state})=>ef = {players, state})
 // );
+/** @type {Number} in seconds*/
+const STEPTIME = 25;
 class Timer {
   constructor(Element, value) {
       const TLabel = Element.getElementsByClassName('timer')[0];
@@ -341,6 +343,7 @@ class Timer {
         TLabel.innerHTML = `${seconds<0?'-':''}${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
       }
       function labelTIcon(seconds) {
+        if(seconds<0) seconds = 0;
         TIcon.innerHTML = seconds;
       }
       this.enable = (enable, init=false)=>{
@@ -353,7 +356,7 @@ class Timer {
       this.label = (newval=undefined)=>{
           if(typeof newval === 'number') tsamp = newval;
           const seconds = tsamp?Math.floor((timestamp()-tsamp)/1000):0;
-          const secs = 60-seconds;
+          const secs = STEPTIME-seconds;
           const _diff = diff = secs<0?secs:0;
           // if(_diff&&!loadstamp) loadstamp = timestamp();
           // if(loadstamp) diff = Math.floor((timestamp() - loadstamp+2500)/1000);
