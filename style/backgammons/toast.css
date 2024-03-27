@@ -17,7 +17,6 @@
   top: 15px;
   right: 15px;
   width: var(--toast-width);
-  font-size: larger;
 }
 
 .toast {
@@ -101,6 +100,7 @@
   padding: 0.5rem 2.25rem 0.5rem 1rem;
   background-color: rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: larger;
 }
 
 .toast__close {
@@ -123,6 +123,7 @@
 
 .toast__body {
   padding: 1rem;
+  font-size: larger;
 }
 
 .toast_message .toast__body {
