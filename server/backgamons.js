@@ -81,7 +81,7 @@ const WSPipelineCommands = {
     },
     ['backgammons/timediffs'](ctx, msg) {
         ctx.event('backgammons::timediffs', {diff:msg.timestamp-timestamp()})
-    }
+    },
     /**
      * Connection to room
      * @param {ConnectionContext} ctx 
