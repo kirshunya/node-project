@@ -337,7 +337,7 @@ class Timer {
         const seconds = userTime + diff;
         const minuts = Math.floor(Math.abs(seconds)/60);
         const seconds60 = Math.abs(seconds%60);
-        TLabel.innerHTML = `${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
+        TLabel.innerHTML = `${seconds<0?'-':''}${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
       }
       function labelTIcon(seconds) {
         TIcon.innerHTML = seconds;
