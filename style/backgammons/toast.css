@@ -17,6 +17,7 @@
   top: 15px;
   right: 15px;
   width: var(--toast-width);
+  font-size: larger;
 }
 
 .toast {
@@ -125,6 +126,5 @@
 }
 
 .toast_message .toast__body {
-  font-size: larger;
   padding-right: 2.25rem;
 }
