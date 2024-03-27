@@ -1,7 +1,7 @@
 module.exports.CONSTANTS = {
     WHITEID: 1,
     BLACKID: 2,
-    RoomStates:{Waiting:0, Started:1},
+    RoomStates:{Waiting:0, Started:1, end:2},
 }
 module.exports.Debug = {
     GAMESCOUNT: 0,
