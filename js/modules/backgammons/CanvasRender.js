@@ -594,9 +594,9 @@ export class BoardCanvas extends CanvasFunctions {
         _dices.map(Dice => Dice.remove());
         this._dices = [];
         const self = this;
-        const scale = (328/328)*1.2;
+        const scale = 230/130;
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
-        const dicesize = scale*328; const space = 10;
+        const dicesize = scale*328; const space = -55*2;
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
 
         class Dice {
@@ -605,11 +605,13 @@ export class BoardCanvas extends CanvasFunctions {
             imgpromise
             constructor(diceNumber, left) {
                 this.diceNumber = diceNumber;
-                this.imgpromise = self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wdice_':'bdice_'}${diceNumber}.png`, {
-                    left, top: BoardHeight/2-dicesize/8, scaleX:scale, scaleY:scale,
+                this.imgpromise = self.installImg(`/img/backgammons/${ActiveTeam===WHITE.id?'wwdice_':'bldice_'}${diceNumber}.png`, {
+                    left, top: BoardHeight/2-dicesize/4, scaleX:scale, scaleY:scale,
                     hoverCursor: 'pointer',
+                    // shadow: 'green -5px -5px 3px'
                 }).then(dice=>{
                     this.img = dice;
+                    this.img.rotate(-45)
                     // img.filters.push(fabric.Image.filters.BlackWhite());
                     // this.img.applyFilters();
                     // self.canvas.renderAll();
@@ -641,7 +643,7 @@ export class BoardCanvas extends CanvasFunctions {
             const firstDicePos = sideleft - (dicesize/2 + space/2) + currentSideSize/2;
             this._dices.push(new Dice(firstDice, firstDicePos), new Dice(secondDice, firstDicePos+space+dicesize/2))
         } else {
-            const firstDicePos = sideleft - 2*(dicesize/2 + space/2) + currentSideSize/2;
+            const firstDicePos = sideleft - 2*(dicesize/2 + space) + currentSideSize/2 + space/4;
             this._dices.push(new Dice(firstDice, firstDicePos),
                              new Dice(firstDice, firstDicePos+space+dicesize/2),
                              new Dice(secondDice, firstDicePos+2*(space+dicesize/2)), 

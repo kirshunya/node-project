@@ -382,10 +382,11 @@ export function InitGame(GameInitData, localUser, ws) {
     /** @type {int} */
     let activetimerind;
 
-    document.getElementById('TopPan')
+    
+      document.getElementById('TopPan')
                 .getElementsByClassName('buttons')[0]
                     .children[0]
-                        .addEventListener('click', req.bind(null, {method:'restart__'}));
+                        .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
 
     // WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices, [0, 0]))
     ConnectionStables.Room.onGameStarted.then(({players, state, slots})=>GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times)) 
