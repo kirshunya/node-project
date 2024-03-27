@@ -402,7 +402,7 @@ class GameState {
 function showToast(pts, playername, colour) {
     return new Toast({
         title:"Пропуск хода",
-        text:`У вас нет хода, вы пропускаете. Кости: [${pts.join(', ')}], \nИгрок ${playername} цвета [${colour.name}]`,
+        text:`У вас нет хода, вы пропускаете. Кости: <font color="darkgreen">[${pts.join(', ')}]</font>, \nИгрок <font color="blue">${playername}</font> цвета <font color="darkgreen">[${colour.name}]</font>`,
         autohide:true,
         interval:3000
     })
