@@ -100,7 +100,7 @@ const Timer = class {
     json() {
         const diff = this.snap?.actual?.();
         console.log('json()', this, diff)
-        return [this.userTime - (diff?diff:0), this.snap?this.snap.timestamp:0 ];
+        return [this.userTime, this.snap?this.snap.timestamp:0 ];
     }
 }
 class Timers {
