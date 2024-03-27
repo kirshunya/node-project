@@ -356,7 +356,7 @@ class Timer {
           const secs = 60-seconds;
           const _diff = secs<0?secs:0;
           if(_diff&&!loadstamp) loadstamp = timestamp();
-          if(loadstamp) diff = Math.floor((timestamp() - loadstamp)/1000)-2;
+          if(loadstamp) diff = Math.floor((timestamp() - loadstamp)/1000)+2;
           labelTIcon(secs)
           labelTlabel()
       }
