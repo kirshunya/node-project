@@ -363,7 +363,7 @@ class BoardCanvasEffects {
             })
         },
         bringToFront() {
-            this.Checker&&this.BoardCanvas.bringToFront(this.Checker)
+            // this.Checker&&this.BoardCanvas.canvas.bringToFront(this.Checker)
         },
         animover() {
             return [this.backimg, x=>x-15, y=>y-15]
