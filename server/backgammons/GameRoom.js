@@ -43,7 +43,7 @@ class timersnapshot {
  */
 const Timer = class {
     /** @type {int} in seconds*/
-    userTime = 60
+    userTime = USERTIME
     /** @type {timersnapshot || null} null if deactive*/
     snap
     onfinish = new EventProvider();
@@ -64,7 +64,7 @@ const Timer = class {
                 if(!(snap.actual() >= Timer.userTime))
                     console.log('timer in backgammons/GameRoom.js completed byt userTime bigger than skipped time..',
                                 '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
-                Timer.onfinish.send(this.Team, Timer, snap);
+                Timer.onfinish.send(Timer.Team, Timer, snap);
             }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
     }
@@ -93,8 +93,8 @@ const Timer = class {
     /** @returns {[Number, Number]} */
     json() {
         const diff = this.snap?.actual?.();
-        console.log(this)
-        return [this.userTime - diff?diff:0, this.snap?this.snap.timestamp:0 ];
+        console.log('json()', this, diff)
+        return [this.userTime - (diff?diff:0), this.snap?this.snap.timestamp:0 ];
     }
 }
 class Timers {

@@ -219,12 +219,24 @@ export function ShowGameTable(localUser) {
             .ddt {
               margin-top: 0px!important;
             }
+            .stimer {                         
+                position: absolute;
+                width: 4.1rem;
+                height: 4.1rem;
+                display: table-cell;
+                text-align: center;
+                line-height: 4.1rem;
+                background-color: #282b30cc;
+                font-size: 2.89rem;
+            }
+            }
           </style>
           <div class="domino-game-page__body-wrapper ddt">
             <div id="TopPan" class="BottomLink">
               <div class="ProfCol">
                 <div class="timer">1:00</div>
                 <div class="prof">
+                  <div class="stimer" style="display:none">66</div>
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
@@ -283,6 +295,7 @@ export function ShowGameTable(localUser) {
               <div class="ProfCol">
                 <div class="timer">1:00</div>
                 <div class="prof">
+                  <div class="stimer" style="display:none">66</div>
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
@@ -314,6 +327,31 @@ export function ShowGameTable(localUser) {
 // window.addEventListener('DOMContentLoaded', 
 //     ()=>WSEventPool.on('backgammons::GameStarted', ({players, state})=>ef = {players, state})
 // );
+class Timer {
+  constructor(Element, value) {
+      const TLabel = Element.getElementsByClassName('timer')[0];
+      const TIcon = Element.getElementsByClassName('stimer')[0];
+      let [userTime, tsamp] = value
+      function labelTlabel() {
+        const seconds = userTime;
+        const minuts = Math.floor(seconds/60);
+        const seconds60 = seconds%60;
+        TLabel.innerHTML = `${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
+      }
+      function labelTIcon(seconds) {
+        TIcon.innerHTML = seconds;
+      }
+      this.enable = (enable)=>{
+        TIcon.style.display = enable?'block':'none'
+      }
+      this.label = (newval=undefined)=>{
+          if(typeof newval === 'number') tsamp = newval;
+          const seconds = tsamp?Math.floor((timestamp()-tsamp)/1000):0;
+          labelTIcon(60-seconds)
+          labelTlabel()
+      }
+  }
+}
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
 export function InitGame(GameInitData, localUser, ws) {
@@ -325,7 +363,10 @@ export function InitGame(GameInitData, localUser, ws) {
             .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
     const gp = new GameProvider({ User:localUser, Slots:slots, sendstep, Drops });
     const { GameCanvas } = gp;
-    let TimersByTeam, activetimerind;
+    /** @type {Timer[]} */
+    let TimersByTeam
+    /** @type {int} */
+    let activetimerind;
 
     document.getElementById('TopPan')
                 .getElementsByClassName('buttons')[0]
@@ -362,22 +403,6 @@ export function InitGame(GameInitData, localUser, ws) {
         window.location.reload();
     })
     function InitUI(user, opponent, [whiteval, blackval]) {
-        class Timer {
-            constructor(Element, value) {
-                const TLabel = Element.getElementsByClassName('timer')[0];
-                let val = value;
-                this.label = (newval=undefined)=>{
-                    if(typeof newval === 'number') val = newval;
-                    function timer() {
-                        const seconds = val?Math.floor((timestamp()-val)/1000):0;
-                        const minuts = Math.floor(seconds/60);
-                        const seconds60 = seconds%60;
-                        return `${minuts}:${seconds60<10?`0${seconds60}`:seconds60}`
-                    }
-                    TLabel.innerHTML = val===0?'1:00':timer();
-                }
-            }
-        }
         document.getElementById('TopPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = user.username;
         document.getElementById('BottomPan')
@@ -400,6 +425,8 @@ export function InitGame(GameInitData, localUser, ws) {
         activetimerind = TimerIndByTeam[ActiveTeam];
         // TimerByTeam[prevtimer].label(0);
         TimersByTeam[activetimerind].label(isinit?undefined:timestamp());
+        TimersByTeam[activetimerind].enable(true);
+        TimersByTeam[prevtimer]?.enable(false);
         return activetimerind;
     }
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
