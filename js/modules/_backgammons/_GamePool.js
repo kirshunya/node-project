@@ -10,9 +10,9 @@ export function setGameInitData(data) {
 }
 let stepComplete;
 export const autostep = {value:true};
-StepCompletor.addEventListener('click', ()=>stepComplete?.())
 export function lightstepbutton(active=true) {
   StepCompletor.classList.toggle('active', active);
+  PermStepCompletor.classList.toggle('active');
 }
 export function ShowGameTable(localUser) {
     const main = document.getElementsByTagName('main')[0];
@@ -387,7 +387,8 @@ export function InitGame(GameInitData, localUser, ws) {
             .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
     /** @type {GameProvider} */
     const gp = new GameProvider({ User:localUser, Slots:slots, sendstep, Drops });
-    StepCompletor.addEventListener('click', ()=>gp.eventHandlers.PermStepByButton())
+    PermStepCompletor.addEventListener('click', ()=>(gp.eventHandlers.PermStepByButton(), lightstepbutton(false)))
+    StepCompletor.addEventListener('click', ()=>(gp.eventHandlers.AcceptStep(), lightstepbutton(false)))
     const { GameCanvas } = gp;
     /** @type {Timer[]} */
     let TimersByTeam

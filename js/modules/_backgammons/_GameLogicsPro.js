@@ -63,6 +63,17 @@ class Board {
         // 0 -> MAP.firstSlotIndex // TODO: change 0 index to unaviable index =D
         emptyslot = new Slot(new slotinfo(CHECKERS.empty, EMPTY.id), 0, this.Slots0);
     }
+    AcceptStep(GameState) {
+        if(!this.CheckersWhichCanMove(GameState))
+            this.StepComplete(GameState.CurrentStepCash.MovesStack, true)
+        else new Toast({
+            title: false,
+            theme: 'warning',
+            text: 'Но вы не можете завершить ход!',
+            autohide: true,
+            interval: 3000
+        });
+    }
     StepComplete(steps, perm=false) {
         if(perm){
             this.sendstep(steps);
@@ -440,6 +451,9 @@ export class GameProvider {
         this.eventHandlers = {
             PermStepByButton() {
                 self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);
+            },
+            AcceptStep() {
+                self.Board.AcceptStep(GameState);
             },
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);

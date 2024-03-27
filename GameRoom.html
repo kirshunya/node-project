@@ -330,10 +330,11 @@
     <div class="debugPan">debug: 
       <input type="button" id="TimersTurnDebugButton"></input>
       <input type="button" id="ChosePlayerDebugButton" value="player:"></input>
-      <input type="button" id="StepCompletor" value="Принудительно завершить ход"></input>
+      <input type="button" id="PermStepCompletor" value="Принудительно завершить ход"></input>
+      <input type="button" id="StepCompletor" value="Потдвердить ход"></input>
     </div>
     <style>
-      #StepCompletor.active {
+      #PermStepCompletor.active, #StepCompletor.active {
         background-color: yellow;
       }
       .debugPan {
