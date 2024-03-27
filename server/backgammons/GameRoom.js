@@ -61,7 +61,7 @@ const Timer = class {
         }
         function startUserTimer() {
             if(Timer.finished) return
-            if(Timer.userTime<=0 || Timer.userTime*SecondInMilliseconds - snap.actualms())
+            if(Timer.userTime<=0 || ((Timer.userTime*SecondInMilliseconds - snap.actualms()) <= 0))
                 return (!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap));
             setTimeout(()=>{
                 if(snap.success) return;
