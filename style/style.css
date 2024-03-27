@@ -5,7 +5,7 @@ body {
 }
 
 main {
-  background: url("../img/bg.png") no-repeat 0 0 / cover;
+  background: url("../img/tiny/bg.jpg") no-repeat 0 0 / cover;
 }
 
 .main__container {

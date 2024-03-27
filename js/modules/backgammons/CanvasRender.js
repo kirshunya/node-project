@@ -86,7 +86,7 @@ const $PageSnapshotData = {
         whitecheckerpicurl: `img/backgammons/blackcell4.png`, 
         blackcheckerpicurl: `img/backgammons/whitecell4.png`,
         ghostcheckerpicurl: `img/backgammons/ghost-checker.png`, 
-        gameboardpic: `img/backgammons/tiny/bcbg.png`
+        gameboardpic: `img/backgammons/tiny/bcbg.jpg`
     }
 }
 //Выделить в отдельный класс позиционирования и масштабирования
