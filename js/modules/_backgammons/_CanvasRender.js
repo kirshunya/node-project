@@ -211,7 +211,7 @@ class TopDropLunk extends CanvasFunctions {
     _effects = []
     _effectsRejects = []
     pic = ghostcheckerpicurl
-    /** @type {Promise.<fabricImage>} of Checkers*/
+    /** @type {Promise.<fabricImage>} Initialization Promise */
     readyPromise
     constructor(Prefix, count=0) {
         super(`${Prefix}DropLunk`);
@@ -247,7 +247,7 @@ class TopDropLunk extends CanvasFunctions {
      */
     accept(points) {
         return new Promise(async(resolve, reject)=>{
-            const resolver = val=>()=>resolve(val)
+            const resolver = val=>()=>(resolve(val), this.resolver=null)
             const Rect = new fabric.Rect({
                 width:this.canvas.getWidth()/this.canvas.getZoom(),
                 height:this.canvas.getHeight()/this.canvas.getZoom(),
@@ -267,6 +267,7 @@ class TopDropLunk extends CanvasFunctions {
                 this.createDice(points[0][0], 0).then(resolver(-1), reject)
             }
             Rect.on('mousedown', points.length?resolver(points.reduce((acc,pm)=>acc<pm?acc:pm)):resolver(-1));
+            this.resolver = points.length?resolver(points.reduce((acc,pm)=>acc<pm?acc:pm)):resolver(-1);
         })
 
     }
@@ -296,6 +297,7 @@ class TopDropLunk extends CanvasFunctions {
         this._effectsRejects = [];
         _effects.map(effect=>this.canvas.remove(effect));
         _effectsRejects.map(rej=>rej());
+        this.resolver=null;
     }
 }
 // BoardPresentation -> Canvas
@@ -418,10 +420,35 @@ class BoardCanvasEffects {
         this.clearGhosts();
     }
     clearGhosts() {
+        this.yellowCheckersClear()
         this.selectionChecker.reset()
         this.BoardCanvas.drops[WHITE.over].clear()
         this.BoardCanvas.drops[BLACK.over].clear()
         return (this.enabledGhosts.map(([ghostimg])=>this.BoardCanvas.canvas.remove(ghostimg)), this.enabledGhosts.length=0);
+    }
+    yellowCheckers = []
+    /**
+     * 
+     * @param {[int, int][]} indexes 
+     */
+    showCheckersWhichCanMove() {
+        this.clear()
+        this.yellowCheckers = this.BoardCanvas.gc.MovesByDices().map(([awa, index])=>{
+            const checker = this.BoardCanvas.slots[index].last();
+            checker.img.filters.push(new fabric.Image.filters.BlendColor({
+                color: 'yellow', 
+                alpha: 0.5, 
+                mode:'tint'
+            }))
+            checker.img.applyFilters();
+            return checker;
+        })
+        this.BoardCanvas.canvas.renderAll();
+    }
+    yellowCheckersClear() {
+        this.yellowCheckers.map(checker=>(checker.img.filters.length=0, checker.img.applyFilters()))
+        this.yellowCheckers = [];
+        this.BoardCanvas.canvas.renderAll();
     }
     /**
     * @param {int} slotIndex
@@ -478,7 +505,7 @@ export class BoardCanvas extends CanvasFunctions {
     slots = []
     /** @type {{whiteover:TopDropLunk, blackover:TopDropLunk} */
     drops
-    /** @type {{UserMovesFrom, move}} */
+    /** @type {{UserMovesFrom, move, MovesByDices}} */
     gc
     /** @type {BoardCanvasEffects} */
     _effects
@@ -486,16 +513,16 @@ export class BoardCanvas extends CanvasFunctions {
      * 
      * @param {[Number, Number][]} GSlots 
      * @param {[Number, Number]} GDropped 
-     * @param {{UserMovesFrom:Function, move:Function}} param2 
+     * @param {{UserMovesFrom:Function, move:Function, UserMovesFrom:Function}} param2 
      */
-    constructor(GSlots, GDropped, {UserMovesFrom, move}) {
+    constructor(GSlots, GDropped, gc) {
         super('canvas');
         const canvas = canva = this.canvas;
 
         board = this; //debug
         console.log(`[BoardCanvas]: vars inited`)
         const self = this;
-        this.gc = {UserMovesFrom, move}; //provides
+        this.gc = gc; //provides
         this._effects = new BoardCanvasEffects(this);
 
         // slot = {
@@ -612,6 +639,7 @@ export class BoardCanvas extends CanvasFunctions {
                 }).then(dice=>{
                     this.img = dice;
                     this.img.rotate(-45)
+                    this.img.on('mousedown', ()=>self._effects.showCheckersWhichCanMove())
                     // img.filters.push(fabric.Image.filters.BlackWhite());
                     // this.img.applyFilters();
                     // self.canvas.renderAll();
@@ -695,12 +723,13 @@ export class BoardCanvas extends CanvasFunctions {
                         self._effects.clearGhosts();
                         self.moveChecker(checkerFromImg.slot.index, enteredTo[1])
                     } else {
-                        // const {left, top} = checkerFromImg.img;
-                        // const curpos = {left, top};
-                        // if(startpos.left - left > 10 && startpos.top - top > 10)
-                        self.moveChecker(checkerFromImg.slot.index,
-                                         checkerFromImg.slot.index, false, 
-                                                    this._effects.selectionChecker.animover())
+                        if(Colour === WHITE.id && img.top < 10 && this.drops[WHITE.over].resolver) {
+                            this.drops[WHITE.over].resolver()
+                        } else if(Colour === BLACK.id && img.top+img.height > BoardHeight-66 && this.drops[BLACK.over].resolver) {
+                            this.drops[BLACK.over].resolver()
+                        } else self.moveChecker(checkerFromImg.slot.index,
+                                                checkerFromImg.slot.index, false, 
+                                                            this._effects.selectionChecker.animover())
                     }
                 })
 

@@ -169,7 +169,7 @@ class Board {
             // for beauty should use Slot.next(1) from Sloter[0] to Sloter[17] 
             // but we can think this is optimized variant
             if(isBlack) {
-                for(let index = from; index < 23 && !outerhouse; ++index) 
+                for(let index = from; index <= 23 && !outerhouse; ++index) 
                     outerhouse |= Sloter[index].ismy();
                 for(let index = 0; index < 6 && !outerhouse; ++index) 
                     outerhouse |= Sloter[index].ismy();
@@ -260,7 +260,14 @@ class Board {
                     .reduce((acc,k)=>acc+k);
     }
     UserMovesByDice(GameState, Dice) {
-
+        return [...Array(24).keys()]
+                .map(i=>([Object.keys(this.UserMovesFrom(GameState, i)).length, i]))
+                    .filter(([awa, i])=>awa)
+    }
+    UserMovesByDices(GameState) {
+        return [...Array(24).keys()]
+                .map(i=>([Object.keys(this.UserMovesFrom(GameState, i)).length, i]))
+                    .filter(([awa, i])=>awa)
     }
     /**
      * 
@@ -415,7 +422,8 @@ export class GameProvider {
                     self.Board.StepComplete(this.GameState.CurrentStepCash.MovesStack)
                 }
                 return ret;
-            }
+            },
+            MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState)
         });
         
         this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
