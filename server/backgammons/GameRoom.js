@@ -57,7 +57,7 @@ const Timer = class {
         function ontimeout() {
             if(snap.success) return;
             if(snap.pending) snap.waiting = startUserTimer;
-            startUserTimer();
+            return startUserTimer();
         }
         function startUserTimer() {
             const finish = ()=>(!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap))
