@@ -539,7 +539,10 @@ export class BoardCanvas extends CanvasFunctions {
              */
             newstate: newstate=>{
 
-            }
+            },
+            MovesComplete: (ActiveTeam)=>{
+                self.showAcceptStepLabel(ActiveTeam)
+            } 
         }
 
         super.setbackground(gameboardpic);
@@ -608,6 +611,26 @@ export class BoardCanvas extends CanvasFunctions {
         window.addEventListener('resize', ()=>(CanvasValidate(),CanvasValidate()));
         window.addEventListener('load', ()=>sleep(300).then(CanvasValidate(),CanvasValidate()));
         CanvasValidate(); CanvasValidate();
+    }
+    showAcceptStepLabel(ActiveTeam) {
+        const sideleft = +BordersByX[0]
+        const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
+        const left = sideleft + currentSideSize/2;
+        const top = BoardHeight/2+checkerSize;
+        const text = new fabric.Text('Бросить Кости', {
+            left, top,
+            fontSize: 130,
+            fill: 'red',
+            shadow: 'black 5px 5px 3px',
+            hoverCursor: 'pointer'
+            // originX: 'top',
+            // originY: 'top',
+        })
+        text.on('mousedown', ()=>{
+            this.gc.AcceptStep()
+            this.canvas.remove(text);
+        })
+        this.canvas.add(text);
     }
     /** @type {{diceNumber:int, img:fabricImage, remove:Function}} */
     _dices = []

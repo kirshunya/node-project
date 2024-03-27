@@ -27,6 +27,7 @@ class Board {
         MovesCash: {},
         MovesStack: []
     }
+    onMovesComplete = new EventProvider();
     constructor(BoardInits) {
         const self = this;
         const {User} = BoardInits;
@@ -81,7 +82,7 @@ class Board {
             if(autostep.value) {
                 this.StepComplete(steps, true)
             } else {
-                lightstepbutton(true);
+                this.onMovesComplete.send();
             }
         }
     }
@@ -442,11 +443,15 @@ export class GameProvider {
                 }
                 return ret;
             },
-            MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState)
+            MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState),
+            AcceptStep: ()=>(self.Board.AcceptStep(self.GameState), lightstepbutton(false)),
         });
         
         this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
-
+        this.Board.onMovesComplete(()=>{
+            lightstepbutton(true);
+            self.GameCanvas.eventHandlers.MovesComplete(self.GameState.ActivePlayer.team.id);
+        })
         /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
         this.eventHandlers = {
             PermStepByButton() {
