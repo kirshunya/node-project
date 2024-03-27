@@ -342,9 +342,9 @@ class Timer {
       function labelTIcon(seconds) {
         TIcon.innerHTML = seconds;
       }
-      this.enable = (enable)=>{
+      this.enable = (enable, init=false)=>{
         TIcon.style.display = enable?'block':'none';
-        if(diff) {
+        if(diff&&!init) {
           userTime+=diff;
           diff = 0;
         }
@@ -433,8 +433,8 @@ export function InitGame(GameInitData, localUser, ws) {
         activetimerind = TimerIndByTeam[ActiveTeam];
         // TimerByTeam[prevtimer].label(0);
         TimersByTeam[activetimerind].label(isinit?undefined:timestamp());
-        TimersByTeam[activetimerind].enable(true);
-        TimersByTeam[prevtimer]?.enable(false);
+        TimersByTeam[activetimerind].enable(true, isinit);
+        TimersByTeam[prevtimer]?.enable(false, isinit);
         return activetimerind;
     }
     // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
