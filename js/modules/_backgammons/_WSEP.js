@@ -1,4 +1,4 @@
-import { sleep, range, JustEnoughEvents, OEPromise, FCPromise } from './_Utilities.js';
+import { sleep, range, JustEnoughEvents, OEPromise, FCPromise, Toast } from './_Utilities.js';
 export const WSEventPool = new JustEnoughEvents();
 
 import { BoardConstants, GameInitData, TGameStartedData, slotinfo } from './_BoardConstants.js';
@@ -44,7 +44,8 @@ export const ConnectionStables = {
     /** @type {WSRoom} */
     Room: null,
     /** @type {Promise.<int>} info about timestamps differentations in client and server*/
-    diffsProm: FCPromise()
+    diffsProm: FCPromise(),
+    debmess: []
 }
 /*lotoserviced*/const EventsRoutes = ({
     ["backgammons::GameStarted"]({players, slots, state}){
@@ -82,6 +83,14 @@ export const ConnectionStables = {
     async ['TimersTurn']({TimersTurn}){
         window.TimersTurn = TimersTurn
         TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
+    },
+    ['message'](msg) {
+        new Toast({
+            title: 'Сообщение',
+            theme: 'success',
+            text: msg.text,
+            autohide: true
+        })
     }
 });
 Object.entries(EventsRoutes).map(([eventname, CallBack])=>WSEventPool.on(eventname, CallBack));

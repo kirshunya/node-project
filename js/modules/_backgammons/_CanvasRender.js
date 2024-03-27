@@ -613,19 +613,21 @@ export class BoardCanvas extends CanvasFunctions {
         CanvasValidate(); CanvasValidate();
     }
     showAcceptStepLabel(ActiveTeam) {
-        const sideleft = +BordersByX[0]
+        const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
         const left = sideleft + currentSideSize/2;
         const top = BoardHeight/2+checkerSize;
         const text = new fabric.Text('Бросить Кости', {
             left, top,
-            fontSize: 130,
+            fontSize: 110,
             fill: 'red',
-            shadow: 'black 5px 5px 3px',
-            hoverCursor: 'pointer'
+            shadow: 'gray 5px 5px 3px',
+            hoverCursor: 'pointer',
+            backgroundColor: '#c49a26c2'
             // originX: 'top',
             // originY: 'top',
         })
+        text.left -= text.width/2
         text.on('mousedown', ()=>{
             this.gc.AcceptStep()
             this.canvas.remove(text);

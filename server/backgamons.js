@@ -96,6 +96,9 @@ const WSPipelineCommands = {
         Game.connect(ctx.user, ctx, this);
         //'backgammons::connection'
     },
+    ['chat'](ctx, msg) {
+        GamesLobby.getGameByID(ctx.GameID).chat(msg);
+    },
     /**
      * 
      * @param {ConnectionContext} ctx 

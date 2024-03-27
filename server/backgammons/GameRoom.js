@@ -191,6 +191,9 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         }
         this.Timers.onfinish(Team=>this.endGame(nextTeamDict[Team], 'time end', 'timer'))
     }
+    chat(msg) {
+        this.event('message', {text:msg.text})
+    }
     connect(user, ctx, ws) {
         // const __u = {user.}
         super.connect(user, ctx, ws);

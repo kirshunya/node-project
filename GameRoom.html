@@ -332,6 +332,7 @@
       <input type="button" id="ChosePlayerDebugButton" value="player:"></input>
       <input type="button" id="PermStepCompletor" value="Принудительно завершить ход"></input>
       <input type="button" id="StepCompletor" value="Потдвердить ход"></input>
+      <input type="button" id="MessageBtn" value="Chat👀">
     </div>
     <style>
       #PermStepCompletor.active, #StepCompletor.active {
@@ -370,6 +371,11 @@
         if(typeof window.TimersTurn !== 'boolean') return;
         window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
       }
+      MessageBtn.addEventListener('click', ()=>{
+        const text = prompt('Какое сообщение отправить: ')
+        if(text)
+          window.ws.send(JSON.stringify({method:'chat', text}))
+      })
     </script>
     <div class="closer">
       <div class="playerChosePanel">
@@ -482,7 +488,6 @@
                 .map(([index, name])=>pl(name).addEventListener('click', ()=>chosePlayer(index)))
           })
         </script>
-        
       </div>
     </div>
   </body>
