@@ -354,9 +354,9 @@ class Timer {
           if(typeof newval === 'number') tsamp = newval;
           const seconds = tsamp?Math.floor((timestamp()-tsamp)/1000):0;
           const secs = 60-seconds;
-          const _diff = secs<0?secs:0;
-          if(_diff&&!loadstamp) loadstamp = timestamp();
-          if(loadstamp) diff = Math.floor((timestamp() - loadstamp+2500)/1000);
+          const _diff = diff = secs<0?secs:0;
+          // if(_diff&&!loadstamp) loadstamp = timestamp();
+          // if(loadstamp) diff = Math.floor((timestamp() - loadstamp+2500)/1000);
           labelTIcon(secs)
           labelTlabel()
       }
