@@ -60,13 +60,16 @@ const Timer = class {
             startUserTimer();
         }
         function startUserTimer() {
+            if(Timer.finished) return
+            if(Timer.userTime<=0 || Timer.userTime*SecondInMilliseconds - snap.actualms())
+                return (!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap));
             setTimeout(()=>{
                 if(snap.success) return;
                 if(!(snap.actual() >= Timer.userTime))
                     console.log('timer in backgammons/GameRoom.js completed byt userTime bigger than skipped time..',
                                 '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
                 
-                (!this.finished)&&(this.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap));
+                (!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap));
             }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
     }
