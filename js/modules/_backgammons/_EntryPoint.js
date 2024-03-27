@@ -1,8 +1,8 @@
 import { sleep, range, JustEnoughEvents, OEPromise, FCPromise } from './Utilities.js';
 import { WSEventPool, onnewmsg } from './WSEP.js';
-import * as GamePool from './GamePool.js';
-import { API_URL_PART } from './../config.js'
-import { BoardConstants } from './BoardConstants.js';
+import * as GamePool from './_GamePool.js';
+import { API_URL_PART } from '../config.js'
+import { BoardConstants } from './_BoardConstants.js';
 
 export const onplayerchosen = FCPromise();
 export const localUser = {username:'debug'}

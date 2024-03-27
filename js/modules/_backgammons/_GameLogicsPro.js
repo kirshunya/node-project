@@ -1,7 +1,7 @@
-import { $myeval, EventProvider } from "./Utilities.js";
-import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './BoardConstants.js';
-import { BoardCanvas } from './CanvasRender.js'
-import { autostep, lightstepbutton } from "./GamePool.js";
+import { $myeval, EventProvider } from "./_Utilities.js";
+import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './_BoardConstants.js';
+import { BoardCanvas } from './_CanvasRender.js'
+import { autostep, lightstepbutton } from "./_GamePool.js";
 
 
 const SlotsIterator = (slots, CB)=>(
