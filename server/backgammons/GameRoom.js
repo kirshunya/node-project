@@ -275,6 +275,8 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     }
     endGame(WinnerTeam, msg, code) {
         if(!Debug.TimersTurn&&code === 'timer') return; //debig
+        if(this.RoomState === CONSTANTS.RoomStates.end) return;
+        this.RoomState = CONSTANTS.RoomStates.end;
         this.event('end', {winner: WinnerTeam, msg, code});
         Debug.GAMESCOUNT++;
     }
