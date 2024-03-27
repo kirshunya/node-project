@@ -77,3 +77,12 @@ module.exports.ConnectionContext = class ConnectionContext {
         return this.send(Object.assign(response, {event, method:'backgammons::event'}))
     }
 }
+module.exports.EventProvider = class EventProvider {
+    constructor() {
+        const EventListeners = []
+        const subsrcibe = (CB)=>EventListeners.push(CB);
+        subsrcibe.subsrcibe = subsrcibe
+        subsrcibe.send = (...args)=>EventListeners.map(CB=>CB?.(...args));
+        return subsrcibe;
+    }
+}

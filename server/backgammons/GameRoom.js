@@ -1,4 +1,4 @@
-const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext } = require("./Generals");
+const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider } = require("./Generals");
 
 const timestamp = ()=>Date.now();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -10,36 +10,120 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
+/** @type {Number} in seconds*/
+const USERTIME = 60;
+/** @type {Number} in seconds*/
+const STEPTIME = 60;
+/** @type {Number} in millesecons*/
+const SecondInMilliseconds = 1000;
 
+class timersnapshot {
+    success = false
+    pending = false
+    timestamp = timestamp()
+    /** @type {Function || undefined} */
+    waiting
+    /** @returns {Number} spended userTime in seconds*/
+    actual() {
+        const diff = Math.floor((timestamp() - this.timestamp)/SecondInMilliseconds) - STEPTIME;
+        return diff>0?diff:0;
+    }
+    /** @returns {Number} spended userTime in milliseconds*/
+    actualms() {
+        const diff = timestamp() - this.timestamp - STEPTIME*SecondInMilliseconds;
+        return diff>0?diff:0;
+    }
+}
+/**
+ * start to start
+ * pause to pause
+ * resume to resume or complete timer if not success
+ * success to decline completing on resume
+ * 
+ */
 const Timer = class {
-    /**
-     * do some on calc 
-     * @param {()=>{}} oncomplete 
-     * @param {()=>{}} onreject handle some if sended into .cancel(...) method and if reurns some, return this to cancel
-     */
-    constructor(times, oncomplete, onreject=(...args)=>{}) {
-        this.reject = false;
-        this.waiting = false;
-        this.waited = null;
-        this.onreject = onreject;
-        setTimeout(()=>onTimeout.call(this), times);
-        function onTimeout() {
-            if(this.reject) return;
-            if(this.waiting) this.waited = oncomplete;
-            else oncomplete()
+    /** @type {int} in seconds*/
+    userTime = 60
+    /** @type {timersnapshot || null} null if deactive*/
+    snap
+    onfinish = new EventProvider();
+
+    constructor(Team) { this.Team = Team; }
+    start() {
+        const Timer = this;
+        const snap = this.snap = new timersnapshot();
+        setTimeout(ontimeout, STEPTIME*SecondInMilliseconds);
+        function ontimeout() {
+            if(snap.success) return;
+            if(snap.pending) snap.waiting = startUserTimer;
+            startUserTimer();
+        }
+        function startUserTimer() {
+            setTimeout(()=>{
+                if(snap.success) return;
+                if(!(snap.actual() >= Timer.userTime))
+                    console.log('timer in backgammons/GameRoom.js completed byt userTime bigger than skipped time..',
+                                '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
+                Timer.onfinish.send(Team, Timer, snap);
+            }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
     }
-    cancel(...args) {
-        this.reject = false;
-        return this.onreject(...args);
-    }
-    await() {
-        this.waiting = true;
+    pause() {
+        if(this.snap)
+            this.snap.pending = true;
     }
     resume() {
-        this.waiting = true;
-        if(this.reject) return;
-        this.waited?.();
+        if(this.snap?.success||this.snap === undefined) return;
+        this.snap.pending = false;
+        this.snap.waiting?.();
+        // if(!this.snap.waiting) console.log('timer in backgammons/GameRoom.js resumed, but not found \'waiting\' callback!')
+    }
+    success() {
+        console.log('success', this);
+        if(!this.snap) return
+        this.snap.success = true;
+        const userTimerMinus = this.snap.actual();
+        this.snap = null;
+        this.userTime -= userTimerMinus;
+        return userTimerMinus;
+    }
+    reject() {
+        if(this.snap) console.log('in step end timer snap not null??!!')
+    }
+    /** @returns {[Number, Number]} */
+    json() {
+        const diff = this.snap?.actual?.();
+        console.log(this)
+        return [this.userTime - diff?diff:0, this.snap?this.snap.timestamp:0 ];
+    }
+}
+class Timers {
+    /** @type {Number} */
+    activetimer = 0;
+    /** @type {[Timer, Timer]} */
+    timers = [new Timer(CONSTANTS.WHITEID), new Timer(CONSTANTS.BLACKID)]
+    onfinish = new EventProvider();
+    get curTimer() {
+        this.timers.map(({onfinish})=>onfinish((...args)=>this.onfinish.send(...args)))
+        return this.timers[this.activetimer];
+    }
+    set curTimer(ActiveTeam) {
+        const timesIndex = {
+            [CONSTANTS.WHITEID]: 0,
+            [CONSTANTS.BLACKID]: 1
+        }
+        this.curTimer.reject();
+        this.activetimer = timesIndex[ActiveTeam];
+        this.curTimer.start();
+        // this.curTimer = new Timer(60*1000, ()=>
+        //         this.endGame(ActiveTeam/* in context this is OpponentTeam */, 'Time end', 'timer'));
+    }
+    // get success() {return this.curTimer.success.bind(this.curTimer)}
+
+
+
+    json() {
+        return this.timers.map(timer=>timer.json())
     }
 }
 
@@ -78,15 +162,12 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         new TPlayer(0, 'Jimmy', CONSTANTS.BLACKID),
         new TPlayer(1, 'Missy', CONSTANTS.WHITEID)
     ];
-    /** @type {Timer} */
-    curTimer = new Timer(0, ()=>{});
+    Timers = new Timers;
     /** @type {TState} */
     info = {
         ActiveTeam: CONSTANTS.WHITEID,
         Dices: [1, 1]
     }
-    /** @type {[Number, Number]} */
-    times = [0, 0];
     /** @type {[Number, Number][]} */
     Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
     // this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
@@ -97,6 +178,11 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     };
     constructor(GameID) {
         super(GameID);
+        const nextTeamDict = {
+            [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
+            [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
+        }
+        this.Timers.onfinish(Team=>this.endGame(nextTeamDict[Team], 'time end', 'timer'))
     }
     connect(user, ctx, ws) {
         // const __u = {user.}
@@ -114,7 +200,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
                     players:this.Players,
                     
                     ['TimersTurn']:(Debug.TimersTurn?'on':'off'),
-                    times: this.times,
+                    times: this.Timers.json(),
 
                     debug:Object.keys(this.Connections),
         });
@@ -166,26 +252,26 @@ module.exports.TGame = class TGame extends SharedRoom0 {
      */
     stepIfValid(user, step, code) {
         const {ActiveTeam, Dices} = this.info;
-        this.curTimer.await();//time to check step to success 
+        this.Timers.curTimer.pause();
+        const ret = ret=>(this.Timers.curTimer.resume(), ret);
+        // this.curTimer.await();//time to check step to success 
         
         const player = this.getPlayerByID(user.userId);
-        if(!player) return (console.log('nope', this.Players), {result:'nope', user, player})
-        
-
-
+        if(!player) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
+        //implement GameLogistics here
         step.map(({from, to, points})=>{
             this.slot(from).take(ActiveTeam);
             this.slot(to).add(ActiveTeam);
             // typeof to === 'string' && to = 
         });
-        this.curTimer.cancel();//if succes step
-        this.curTimer.resume();
+        this.Timers.curTimer.success();//if succes step
         const prevstate = this.info;
         this.event('step', {step, prevstate, newstate: this.nextState(), code});//if success step
+
         if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
             this.endGame(ActiveTeam, 'Players dropped all checkers', 'win')
         }
-        return {result:'success'};
+        return ret({result:'success'});
     }
     endGame(WinnerTeam, msg, code) {
         if(!Debug.TimersTurn&&code === 'timer') return; //debig
@@ -199,15 +285,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
             [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
         }
         const nextTeam = nextTeamDict[ActiveTeam];
-        const timesIndex = {
-            [CONSTANTS.WHITEID]: 0,
-            [CONSTANTS.BLACKID]: 1
-        }
-        this.times[timesIndex[ActiveTeam]] = 0
-        this.times[timesIndex[nextTeam]] = timestamp();
-        this.curTimer.cancel();
-        this.curTimer = new Timer(60*1000, ()=>
-                this.endGame(ActiveTeam/* in context this is OpponentTeam */, 'Time end', 'timer'));
+        this.Timers.curTimer = nextTeam;
         return this.info = {
             ActiveTeam: nextTeam,
             Dices: randdice()
