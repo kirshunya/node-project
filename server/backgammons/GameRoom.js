@@ -64,7 +64,7 @@ const Timer = class {
                 if(!(snap.actual() >= Timer.userTime))
                     console.log('timer in backgammons/GameRoom.js completed byt userTime bigger than skipped time..',
                                 '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
-                Timer.onfinish.send(Team, Timer, snap);
+                Timer.onfinish.send(this.Team, Timer, snap);
             }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
     }
