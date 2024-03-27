@@ -160,7 +160,7 @@ class Board {
                     outerhouse |= Sloter[index].ismy();
                 for(let index = 0; index < 6 && !outerhouse; ++index) 
                     outerhouse |= Sloter[index].ismy();
-            } else for(let index = from; index < to && !outerhouse; ++index) 
+            } else for(let index = from; index <= to && !outerhouse; ++index) 
                     outerhouse |= Sloter[index].ismy();
             
             
