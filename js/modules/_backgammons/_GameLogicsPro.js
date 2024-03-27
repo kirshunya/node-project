@@ -464,6 +464,10 @@ export class GameProvider {
             },
             ustep(Step, newGameStateData) {
                 self.GameState.state(newGameStateData, self.GameCanvas);
+                if(!self.Board.CheckersWhichCanMove(self.GameState)) {
+                    showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+                    self.Board.StepComplete([]);
+                }
             },
             end() {
 

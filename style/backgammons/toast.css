@@ -125,6 +125,6 @@
 }
 
 .toast_message .toast__body {
-  font-size: large;
+  font-size: larger;
   padding-right: 2.25rem;
 }
