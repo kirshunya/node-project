@@ -11,9 +11,9 @@ function getRandomInt(min, max) {
 }
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
 /** @type {Number} in seconds*/
-const USERTIME = 60;
+const USERTIME = 10;
 /** @type {Number} in seconds*/
-const STEPTIME = 60;
+const STEPTIME = 10;
 /** @type {Number} in millesecons*/
 const SecondInMilliseconds = 1000;
 
@@ -60,16 +60,17 @@ const Timer = class {
             startUserTimer();
         }
         function startUserTimer() {
-            if(Timer.finished) return
-            if(Timer.userTime<=0 || ((Timer.userTime*SecondInMilliseconds - snap.actualms()) <= 0))
-                return (!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap));
+            const finish = ()=>(!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap))
+            if(Timer.finished) return;
+            if(Timer.userTime <= 0 || ((Timer.userTime*SecondInMilliseconds - snap.actualms()) <= 0))
+                return finish();
             setTimeout(()=>{
                 if(snap.success) return;
+                if(snap.pending) return snap.waiting = startUserTimer;
                 if(!(snap.actual() >= Timer.userTime))
                     console.log('timer in backgammons/GameRoom.js completed byt userTime bigger than skipped time..',
                                 '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
-                
-                (!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap));
+                finish();
             }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
     }
