@@ -1,6 +1,7 @@
 import { $myeval, EventProvider } from "./Utilities.js";
 import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './BoardConstants.js';
 import { BoardCanvas } from './CanvasRender.js'
+import { autostep, lightstepbutton } from "./GamePool.js";
 
 
 const SlotsIterator = (slots, CB)=>(
@@ -28,6 +29,7 @@ class Board {
     constructor(BoardInits) {
         const self = this;
         const {User} = BoardInits;
+        this.sendstep = BoardInits.sendstep
         this.User = User;//need field @team -> BoardConstant[WHITE||BLACK];
         this.Slots = SlotsIterator(BoardInits.Slots, data=>data);
         this.eventProviders = {
@@ -59,6 +61,17 @@ class Board {
         });
         // 0 -> MAP.firstSlotIndex // TODO: change 0 index to unaviable index =D
         emptyslot = new Slot(new slotinfo(CHECKERS.empty, EMPTY.id), 0, this.Slots0);
+    }
+    StepComplete(steps, perm=false) {
+        if(perm){
+            this.sendstep(steps);
+        } else {
+            if(autostep.value) {
+                this.StepComplete(steps, true)
+            } else {
+                lightstepbutton(true);
+            }
+        }
     }
     /**
      * 
@@ -394,9 +407,9 @@ export class GameProvider {
                 if(this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState)) {
                     if(this.GameState.PTS?.length) {
                         const [f, s] = self.GameState.Dices
-                        alert(`У вас нет хода, вы пропускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                        alert(`У вас нет хода, вы пропускаете. Кости: [${this.GameState.PTS.join(', ')}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
                     }
-                    BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
+                    self.Board.StepComplete(this.GameState.CurrentStepCash.MovesStack)
                 }
                 return ret;
             }
@@ -406,12 +419,15 @@ export class GameProvider {
 
         /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
         this.eventHandlers = {
+            PermStepByButton() {
+                self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);
+            },
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
                 if(!self.Board.CheckersWhichCanMove(self.GameState)) {
                     const [f, s] = self.GameState.Dices
-                    alert(`У вас нет хода, вы пропускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
-                    BoardInits.sendstep([]);
+                    alert(`У вас нет хода, вы пропускаете. Кости: [${self.GameState.PTS.join(', ')}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    self.Board.StepComplete([]);
                 }
             },
             /**
@@ -423,9 +439,8 @@ export class GameProvider {
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
                 if(!self.Board.CheckersWhichCanMove(self.GameState)) {
-                    const [f, s] = self.GameState.Dices
-                    alert(`У вас нет хода, вы пропускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
-                    BoardInits.sendstep([]);
+                    alert(`У вас нет хода, вы пропускаете. Кости: [${self.GameState.join(', ')}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    self.Board.StepComplete([]);
                 }
             },
             ustep(Step, newGameStateData) {

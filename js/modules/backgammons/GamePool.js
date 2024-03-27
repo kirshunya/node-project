@@ -8,6 +8,12 @@ var GameInitData = null;
 export function setGameInitData(data) {
     GameInitData = data;
 }
+let stepComplete;
+export const autostep = {value:true};
+StepCompletor.addEventListener('click', ()=>stepComplete?.())
+export function lightstepbutton(active=true) {
+  StepCompletor.classList.toggle('active', active);
+}
 export function ShowGameTable(localUser) {
     const main = document.getElementsByTagName('main')[0];
     // let localUser = JSON.parse(localStorage.getItem("user"));
@@ -40,6 +46,7 @@ export function ShowGameTable(localUser) {
                 font-size: larger;
               }
             }
+
             .ddt {
               display: flex;
               align-items: stretch !important;
@@ -182,6 +189,9 @@ export function ShowGameTable(localUser) {
               height: 100%;
               padding: 0.65em;
             }
+            .autostep.active {
+              background-color: yellow
+            }
             .line > .dp::after {
               content: ' ';
               width: 100%;
@@ -249,7 +259,7 @@ export function ShowGameTable(localUser) {
                   <div style="background-image: url('img/flags.png');"></div>
                   <div style="background-image: url('img/volume.png');
                               background-size: 57%;"></div>
-                  <div style="background-image: url('img/dice.png');"></div>
+                  <div style="background-image: url('img/dice.png');" class="autostep active"></div>
                 </div>
                 <div class="line" style="position: relative;">
                   <!-- <div style="flex-grow: 1;" class="dp"></div>
@@ -375,7 +385,9 @@ export function InitGame(GameInitData, localUser, ws) {
 
     const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
             .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
+    /** @type {GameProvider} */
     const gp = new GameProvider({ User:localUser, Slots:slots, sendstep, Drops });
+    StepCompletor.addEventListener('click', ()=>gp.eventHandlers.PermStepByButton())
     const { GameCanvas } = gp;
     /** @type {Timer[]} */
     let TimersByTeam
@@ -418,6 +430,8 @@ export function InitGame(GameInitData, localUser, ws) {
         window.location.reload();
     })
     function InitUI(user, opponent, [whiteval, blackval]) {
+        const autostepToggler = document.getElementsByClassName('autostep')[0]
+        autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
         document.getElementById('TopPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = user.username;
         document.getElementById('BottomPan')
