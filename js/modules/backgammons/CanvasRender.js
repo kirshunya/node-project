@@ -346,11 +346,11 @@ class BoardCanvasEffects {
                 scaleY: scale
             }, false)
                     .then(img=>(this.BoardCanvas.canvas.bringToFront(Checker.img), img));
-            // this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
-            //                 color: awa?'yellow':'red', 
-            //                 alpha: 0.5, 
-            //                 mode:'tint'
-            //             }))
+            awa&&this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
+                            color: 'red', 
+                            alpha: 0.5, 
+                            mode:'tint'
+                        }))
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
         },
