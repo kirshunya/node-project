@@ -391,8 +391,13 @@ export class GameProvider {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
                 const ret = this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
-                if(this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
+                if(this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState)) {
+                    if(this.GameState.PTS?.length) {
+                        const [f, s] = self.GameState.Dices
+                        alert(`У вас нет хода, вы попускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    }
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
+                }
                 return ret;
             }
         });
@@ -403,6 +408,11 @@ export class GameProvider {
         this.eventHandlers = {
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
+                if(!self.Board.CheckersWhichCanMove(self.GameState)) {
+                    const [f, s] = self.GameState.Dices
+                    alert(`У вас нет хода, вы попускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    BoardInits.sendstep([]);
+                }
             },
             /**
              * @param {{from, to}[]} Step 
@@ -412,6 +422,11 @@ export class GameProvider {
                 self.Board.PermStep(self.GameState, Step);
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
+                if(!self.Board.CheckersWhichCanMove(self.GameState)) {
+                    const [f, s] = self.GameState.Dices
+                    alert(`У вас нет хода, вы попускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    BoardInits.sendstep([]);
+                }
             },
             ustep(Step, newGameStateData) {
                 self.GameState.state(newGameStateData, self.GameCanvas);
