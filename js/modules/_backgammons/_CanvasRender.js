@@ -558,7 +558,7 @@ export class BoardCanvas extends CanvasFunctions {
                 if(slot.Count<0) new Toast({
                     title: 'Ошибка сервера',
                     text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможно только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
-                    theme: 'danger',
+                    theme: 'secondary',
                 })
                 return range(0, Math.abs(slot.Count))
                         .map(checkerIndex=>self.createChecker(slot.Colour, SlotLet, checkerIndex).then(
