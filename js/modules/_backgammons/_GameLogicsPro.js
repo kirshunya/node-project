@@ -453,7 +453,7 @@ export class GameProvider {
                 self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);
             },
             AcceptStep() {
-                self.Board.AcceptStep(GameState);
+                self.Board.AcceptStep(self.GameState);
             },
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
