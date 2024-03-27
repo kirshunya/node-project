@@ -394,7 +394,7 @@ export class GameProvider {
                 if(this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState)) {
                     if(this.GameState.PTS?.length) {
                         const [f, s] = self.GameState.Dices
-                        alert(`У вас нет хода, вы попускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                        alert(`У вас нет хода, вы пропускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
                     }
                     BoardInits.sendstep(this.GameState.CurrentStepCash.MovesStack);
                 }
@@ -410,7 +410,7 @@ export class GameProvider {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
                 if(!self.Board.CheckersWhichCanMove(self.GameState)) {
                     const [f, s] = self.GameState.Dices
-                    alert(`У вас нет хода, вы попускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    alert(`У вас нет хода, вы пропускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
                     BoardInits.sendstep([]);
                 }
             },
@@ -424,7 +424,7 @@ export class GameProvider {
                 self.GameState.state(newGameStateData, self.GameCanvas);
                 if(!self.Board.CheckersWhichCanMove(self.GameState)) {
                     const [f, s] = self.GameState.Dices
-                    alert(`У вас нет хода, вы попускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
+                    alert(`У вас нет хода, вы пропускаете. Кости: [${f}, ${s}], \nИгрок ${self.GameState.ActivePlayer.username} цвета [${self.GameState.ActivePlayer.team.name}]`)
                     BoardInits.sendstep([]);
                 }
             },
