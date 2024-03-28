@@ -268,6 +268,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         
         const player = this.getPlayerByID(user.userId);
         if(!player) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
+        if(!(player.userId === 2 || player.team === ActiveTeam)) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
         //implement GameLogistics here
         step.map(({from, to, points})=>{
             this.slot(from).take(ActiveTeam);
