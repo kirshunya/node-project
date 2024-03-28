@@ -462,7 +462,7 @@ export class GameProvider {
             },
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
-                if(!self.Board.CheckersWhichCanMove(self.GameState)) {
+                if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     const [f, s] = self.GameState.Dices
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
@@ -476,14 +476,14 @@ export class GameProvider {
                 self.Board.PermStep(self.GameState, Step);
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
-                if(!self.Board.CheckersWhichCanMove(self.GameState)) {
+                if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
                 }
             },
             ustep(Step, newGameStateData) {
                 self.GameState.state(newGameStateData, self.GameCanvas);
-                if(!self.Board.CheckersWhichCanMove(self.GameState)) {
+                if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
                 }
