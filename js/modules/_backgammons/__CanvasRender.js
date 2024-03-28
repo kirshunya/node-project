@@ -1,5 +1,5 @@
-import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./_Utilities.js";
-import { BoardConstants, refToArr, slotinfo, TState } from "./_BoardConstants.js";
+import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./__Utilities.js";
+import { BoardConstants, refToArr, slotinfo, TState } from "./__BoardConstants.js";
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
 var scaleFactor = 1.3;

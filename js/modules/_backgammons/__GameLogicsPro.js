@@ -1,8 +1,8 @@
-import { $myeval, EventProvider } from "./_Utilities.js";
-import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './_BoardConstants.js';
-import { BoardCanvas } from './_CanvasRender.js'
-import { autostep, lightstepbutton } from "./_GamePool.js";
-import { Toast } from "./_Utilities.js";
+import { $myeval, EventProvider } from "./__Utilities.js";
+import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './__BoardConstants.js';
+import { BoardCanvas } from './__CanvasRender.js'
+import { autostep, lightstepbutton } from "./__GamePool.js";
+import { Toast } from "./__Utilities.js";
 
 
 const SlotsIterator = (slots, CB)=>(
@@ -72,7 +72,7 @@ class Board {
             theme: 'warning',
             text: 'Но вы не можете завершить ход!',
             autohide: true,
-            interval: 3000
+            interval: 5000
         });
     }
     StepComplete(steps, perm=false) {
@@ -416,7 +416,7 @@ function showToast(pts, playername, colour) {
         title:"Пропуск хода",
         text:`У вас нет хода, вы пропускаете. Кости: <font color="darkgreen">[${pts.join(', ')}]</font>, \nИгрок <font color="blue">${playername}</font> цвета <font color="darkgreen">[${colour.name}]</font>`,
         autohide:true,
-        interval:3000
+        interval:5000
     })
 }
 export class GameProvider {
