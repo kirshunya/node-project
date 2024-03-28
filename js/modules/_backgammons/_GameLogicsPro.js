@@ -434,7 +434,8 @@ export class GameProvider {
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
                 const ret = this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
-                if(this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState)) {
+                if((this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
+                && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     if(this.GameState.PTS?.length) {
                         const [f, s] = self.GameState.Dices
                         showToast(this.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
