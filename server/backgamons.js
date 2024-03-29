@@ -36,10 +36,10 @@ const GamesLobby = new class {
      * 
      * @returns {TGame}
      */
-    getGameByID() {
-        if(this.Games[Debug.GAMESCOUNT] === undefined)
-            this.Games[Debug.GAMESCOUNT] = new TGame(); 
-        return this.Games[Debug.GAMESCOUNT];//probe
+    getGameByID(GameID) {
+        if(this.Games[GameID] === undefined)
+            this.Games[GameID] = new TGame(); 
+        return this.Games[GameID];//probe
     }
 }
 const WSPipelineCommands = {
@@ -91,7 +91,8 @@ const WSPipelineCommands = {
         // Lobby.UnlistenLobby(ctx, this);
 
         const {GameID} = msg;
-        const Game = GamesLobby.getGameByID(GameID);
+        ctx.GameID = Debug.GAMESCOUNT;
+        const Game = GamesLobby.getGameByID(ctx.GameID);
 
         Game.connect(ctx.user, ctx, this);
         //'backgammons::connection'
