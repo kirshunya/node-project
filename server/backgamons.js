@@ -145,6 +145,7 @@ const WSPipelineCommands = {
         // Game.Listeners = lastGame.Listeners;
         // this.Games[Debug.GAMESCOUNT];
         const Game = GamesLobby.getGameByID(ctx.GameID)
+        GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
         GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'test');
         Game.event('restart__', {});
     },
@@ -159,6 +160,7 @@ const WSPipelineCommands = {
         // Game.Listeners = lastGame.Listeners;
         // this.Games[Debug.GAMESCOUNT];
         const Game = GamesLobby.getGameByID(ctx.GameID)
+        GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
         GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'flud');
         Game.event('restart__', {});
     },
