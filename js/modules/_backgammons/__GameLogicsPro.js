@@ -501,9 +501,9 @@ export class GameProvider {
                 const spendedPoints = Step.map(({points})=>points).flat(10);
                 if(f===s && spendedPoints.length!==4) 
                     showToast(range(0, 4 - spendedPoints.length).map(()=>f),
-                                self.GameState.players[prevstate.ActiveTeam],username,
+                                self.GameState.players[prevstate.ActiveTeam].username,
                                 [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
-                else if(spendedPoints.length!==2) 
+                else if(spendedPoints.length !== 2) 
                     showToast([f,s].filter(x=>spendedPoints[0]!==x),
                                 self.GameState.players[prevstate.ActiveTeam].username,
                                 [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
