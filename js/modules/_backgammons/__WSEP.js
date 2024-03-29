@@ -84,6 +84,9 @@ export const ConnectionStables = {
         window.TimersTurn = TimersTurn
         TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
     },
+    ['autodiceset']({value}) {
+        GamePool.autostep.setdice(value);
+    },
     ['message'](msg) {
         new Toast({
             title: 'Сообщение',

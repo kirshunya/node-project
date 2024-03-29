@@ -83,13 +83,13 @@ const Timer = class {
             this.snap.pending = true;
     }
     resume() {
-        if(this.snap?.success||this.snap === undefined) return;
+        if(this.snap?.success||!this.snap) return;
         this.snap.pending = false;
         this.snap.waiting?.();
         // if(!this.snap.waiting) console.log('timer in backgammons/GameRoom.js resumed, but not found \'waiting\' callback!')
     }
     success() {
-        console.log('success', this);
+        // console.log('success', this);
         if(!this.snap) return
         this.snap.success = true;
         const userTimerMinus = this.snap.actual();
@@ -103,7 +103,7 @@ const Timer = class {
     /** @returns {[Number, Number]} */
     json() {
         const diff = this.snap?.actual?.();
-        console.log('json()', this, diff)
+        // console.log('json()', this, diff)
         return [this.userTime, this.snap?this.snap.timestamp:0 ];
     }
 }
@@ -205,6 +205,14 @@ module.exports.TGame = class TGame extends SharedRoom0 {
             this.Slots = adv0_range(0, 24, { 0:[9,1], 12:[14,2], 11:[1,2], 18:[1,1],13:[1,1],14:[1,1],15:[1,1],16:[1,1],17:[1,1],null:()=>[0,0] });
         this.Timers.onfinish(Team=>this.endGame(nextTeamDict[Team], 'time end', 'timer'))
     }
+    /**
+     * 
+     * @param {int} userId 
+     * @param {boolean} value 
+     */
+    setAutostep(userId, value) {
+        this.getPlayerByID(userId).autodice = value
+    }
     chat(msg) {
         this.event('message', {text:msg.text})
     }
@@ -216,6 +224,8 @@ module.exports.TGame = class TGame extends SharedRoom0 {
             GameID: this.GameID, GAMESCOUNT:Debug.GAMESCOUNT, 
                     
                     state: this.info, 
+                    awaitingTeam:this.awaitingTeam,
+                    awaitingTeamstr:`${this.awaitingTeam}`,
                     slots: this.Slots, 
                     dropped: this.Drops,
 
@@ -255,6 +265,9 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players});
         this.RoomState = CONSTANTS.RoomStates.Started;
     }
+    opponent() {
+        return this.Players.filter(({team})=>team !== this.info.ActiveTeam)[0]
+    }
     /**
      * 
      * @param {int} userId 
@@ -291,12 +304,26 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         });
         this.Timers.curTimer.success();//if succes step
         const prevstate = this.info;
-        this.event('step', {step, prevstate, newstate: this.nextState(), code});//if success step
+        this.event('step', {step, prevstate, code});//if success step
+        console.log('dicerolling by ', this.opponent())
+        if(this.opponent().autodice) {
+            this.event('state', {newstate: this.nextState()});
+        } else {
+            const nextTeamDict = {
+                [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
+                [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
+            }
+            this.awaitingTeam = this.info.awaitingTeam = nextTeamDict[ActiveTeam]
+        }
 
         if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
             this.endGame(ActiveTeam, 'Players dropped all checkers', 'win')
-        }
+        } 
         return ret({result:'success'});
+    }
+    rollDice() {
+        this.awaitingTeam = this.info.awaitingTeam = 0;
+        this.event('state', {newstate: this.nextState()});
     }
     endGame(WinnerTeam, msg, code) {
         if(!Debug.TimersTurn&&code === 'timer') return; //debig

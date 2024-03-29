@@ -33,6 +33,8 @@ module.exports.TPlayer = class TPlayer {
     username
     /** @type {int} */
     team
+    /** @type {boolean} */
+    autodice = true
     /**
      * 
      * @param {int} userId 

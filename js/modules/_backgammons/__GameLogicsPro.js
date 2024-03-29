@@ -35,7 +35,8 @@ class Board {
         this.User = User;//need field @team -> BoardConstant[WHITE||BLACK];
         this.Slots = SlotsIterator(BoardInits.Slots, data=>data);
         this.eventProviders = {
-            showPTS: new EventProvider()
+            showPTS: new EventProvider(),
+            rollDicesClick: new EventProvider()
         }
 
         this.Drops = [
@@ -416,14 +417,16 @@ class GameState {
      * 
      * @param {{ActiveTeam:int, Dices:[Number, Number]}} param0
      */
-    state({ActiveTeam, Dices}, canvas) {
+    state(state, canvas, awaiting=false) {
+        const {ActiveTeam, Dices} = state
         this.CurrentStepCash = {
             MovesStack: [],
             MovesCash: {}
         }
         this.ActivePlayer = this.players[ActiveTeam];
         this.Dices = Dices;
-        canvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].id);
+        if(!state.awaitinTeam)
+            canvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].id);
     }
     finish(WinnerTeam) {
 
@@ -439,6 +442,7 @@ function showToast(pts, playername, colour) {
     })
 }
 export class GameProvider {
+    onRollDicesClick = new EventProvider();
     /**
      * 
      * @param {{User:{userId,username}, Slots:int[], sendstep:Function, Drops:[Number, Number]}} BoardInits 
@@ -466,6 +470,7 @@ export class GameProvider {
             // MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState),
             MovesByDices: (Dice)=>self.Board.UserMovesByDices(self.GameState.PermDice(Dice)),
             AcceptStep: ()=>(self.Board.AcceptStep(self.GameState), lightstepbutton(false)),
+            rollDices: ()=>this.onRollDicesClick.send()
         });
         
         this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
@@ -483,6 +488,9 @@ export class GameProvider {
             }
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
+                if(GameStateData.awaitinTeam) {
+                    self.GameCanvas.showAcceptDiceRollLabel(awaitinTeam);
+                }
                 if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     const [f, s] = self.GameState.Dices
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
@@ -496,17 +504,29 @@ export class GameProvider {
             step(Step, newGameStateData, prevstate) {
                 self.Board.PermStep(self.GameState, Step);
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
+                jad()
+                function jad() {
+                    const [f,s] = prevstate.Dices;
+                    const spendedPoints = Step.map(({points})=>points).flat(10);
+                    if(f===s && spendedPoints.length!==4) 
+                        showToast(range(0, 4 - spendedPoints.length).map(()=>f),
+                                    self.GameState.players[prevstate.ActiveTeam].username,
+                                    [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
+                    else if(spendedPoints.length !== 2) 
+                        showToast([f,s].filter(x=>spendedPoints[0]!==x),
+                                    self.GameState.players[prevstate.ActiveTeam].username,
+                                    [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
+                }
+                const nextTeamDict = {
+                    [WHITE.id]: BLACK.id,
+                    [BLACK.id]: WHITE.id
+                }
+                if(!autostep.dice)
+                    self.GameCanvas.showAcceptDiceRollLabel(nextTeamDict[prevstate.ActiveTeam]);
+                return true;
+            }
+            state(newGameStateData) {
                 self.GameState.state(newGameStateData, self.GameCanvas);
-                const [f,s] = prevstate.Dices;
-                const spendedPoints = Step.map(({points})=>points).flat(10);
-                if(f===s && spendedPoints.length!==4) 
-                    showToast(range(0, 4 - spendedPoints.length).map(()=>f),
-                                self.GameState.players[prevstate.ActiveTeam].username,
-                                [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
-                else if(spendedPoints.length !== 2) 
-                    showToast([f,s].filter(x=>spendedPoints[0]!==x),
-                                self.GameState.players[prevstate.ActiveTeam].username,
-                                [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
                 if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
@@ -514,12 +534,12 @@ export class GameProvider {
                 return true;
             }
             ustep(Step, newGameStateData, oldGameData) {
-                self.GameState.state(newGameStateData, self.GameCanvas);
-                if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
-                    showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
-                    self.Board.StepComplete([]);
-                }
-                return true;
+                // self.GameState.state(newGameStateData, self.GameCanvas);
+                // if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                //     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+                //     self.Board.StepComplete([]);
+                // }
+                // return true;
             }
             end() {
 

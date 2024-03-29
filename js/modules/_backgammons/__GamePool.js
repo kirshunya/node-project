@@ -9,7 +9,11 @@ export function setGameInitData(data) {
     GameInitData = data;
 }
 let stepComplete;
-export const autostep = {value:true};
+export const autostep = {value:true, dice:true, setdice(value) {
+  this.dice = value
+  const autostepToggler = document.getElementsByClassName('autostep')[0]
+  autostepToggler.classList.toggle('active', value)
+}};
 export function lightstepbutton(active=true) {
   StepCompletor.classList.toggle('active', active);
   PermStepCompletor.classList.toggle('active');
@@ -389,6 +393,7 @@ export function InitGame(GameInitData, localUser, ws) {
     const gp = new GameProvider({ User:localUser, Slots:slots, sendstep, Drops });
     PermStepCompletor.addEventListener('click', ()=>(gp.eventHandlers.PermStepByButton(), lightstepbutton(false)))
     StepCompletor.addEventListener('click', ()=>(gp.eventHandlers.AcceptStep(), lightstepbutton(false)))
+    gp.onRollDicesClick(()=>req({method:'rollDice'}));
     const { GameCanvas } = gp;
     /** @type {Timer[]} */
     let TimersByTeam
@@ -409,18 +414,25 @@ export function InitGame(GameInitData, localUser, ws) {
         if(localUser.userId === 2)
             localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
         gp.eventHandlers.start({ActiveTeam, Dices}, [firstPlayer, secondPlayer]);
+        const cplayer = firstPlayer.userId === localUser.userId?firstPlayer:secondPlayer;
+        autostep.setdice(cplayer.autodice)
         
         const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
         TimersByTeam = InitUI(whiteplayer, blackplayer, times);
         startTimer(ActiveTeam)
     }
     WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
+            // if(localUser.userId === 2)
+            //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+            // setActiveTimer(newstate.ActiveTeam);
+            code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
+                           || gp.eventHandlers.ustep(step, newstate, prevstate)
+        });
+    WSEventPool.on('state', ({newstate})=>{
             if(localUser.userId === 2)
                 localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
             setActiveTimer(newstate.ActiveTeam);
-            code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
-                           || gp.eventHandlers.ustep(step, newstate, prevstate)
-                    GameCanvas.createDices(newstate.Dices[0], newstate.Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1].id);
+            gp.eventHandlers.state(newstate)
         });
     WSEventPool.on('end', ({winner})=>{
         alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
@@ -432,7 +444,12 @@ export function InitGame(GameInitData, localUser, ws) {
     })
     function InitUI(user, opponent, [whiteval, blackval]) {
         const autostepToggler = document.getElementsByClassName('autostep')[0]
-        autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
+        // autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
+        autostepToggler.addEventListener('click', ()=>{
+          autostep.dice=!autostep.dice
+          autostepToggler.classList.toggle('active', autostep.dice)
+          window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
+        })
         document.getElementById('TopPan')
                 .getElementsByClassName('Nickname')[0].innerHTML = user.username;
         document.getElementById('BottomPan')

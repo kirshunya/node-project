@@ -110,6 +110,25 @@ const WSPipelineCommands = {
         return GamesLobby.getGameByID(ctx.GameID).stepIfValid(ctx.user, step, code);
     },
     /**
+     * 
+     * @param {ConnectionContext} ctx 
+     * @param {{value:boolean}} param1 
+     * @returns 
+     */
+    autodice(ctx, {value}) {
+        GamesLobby.getGameByID(ctx.GameID).setAutostep(ctx.user.userId, value)
+        ctx.event('autodiceset', {value})
+    },
+    /**
+     * 
+     * @param {ConnectionContext} ctx 
+     * @param {{value:boolean}} param1 
+     * @returns 
+     */
+    rollDice(ctx) {
+        GamesLobby.getGameByID(ctx.GameID).rollDice(ctx.user)
+    },
+    /**
      * deprec
      * @param {ConnectionContext} ctx 
      * @returns 
