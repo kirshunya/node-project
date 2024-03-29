@@ -377,7 +377,7 @@ class BoardCanvasEffects {
             // this.Checker&&this.BoardCanvas.canvas.bringToFront(this.Checker)
         },
         animover() {
-            return [this.backimg, x=>x-chbackshift, y=>y-chbackshift]
+            // return [this.backimg, x=>x-chbackshift, y=>y-chbackshift]
         }
     }
     /**
