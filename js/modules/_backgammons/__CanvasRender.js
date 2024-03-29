@@ -341,36 +341,37 @@ class BoardCanvasEffects {
             const {top, left} = Checker.img
             const tayurl = {[WHITE.id]:whitetay, [BLACK.id]:blacktay}[Checker.colour];
             const scale = checkerSize/115*1.1;
-            this.backimg = this.BoardCanvas.installImg(tayurl, {
-                top:top-chbackshift, 
-                left:left-chbackshift, 
-                scaleX: scale, 
-                scaleY: scale
-            }, false)
-                    .then(img=>(this.BoardCanvas.canvas.bringToFront(Checker.img), img));
-            (!awa)&&this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
-                            color: 'red', 
-                            alpha: 0.5, 
-                            mode:'tint'
-                        }))
+            // this.backimg = this.BoardCanvas.installImg(tayurl, {
+            //     top:top-chbackshift, 
+            //     left:left-chbackshift, 
+            //     scaleX: scale, 
+            //     scaleY: scale
+            // }, false)
+            //         .then(img=>(this.BoardCanvas.canvas.bringToFront(Checker.img), img));
+            // (!awa)&&this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
+            //                 color: 'red', 
+            //                 alpha: 0.5, 
+            //                 mode:'tint'
+            //             }))
+            this.Checker.img.set('shadow', 'rgba(0,0,0,50) 0px 0px 25px');
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
         },
         reset() {
             if(!this.Checker) return;
-            this.backimg.then(img=>this.BoardCanvas.canvas.remove(img));
+            // this.backimg.then(img=>this.BoardCanvas.canvas.remove(img));
             this.Checker.img.filters.length = 0;
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
             this.Checker = null;
         }, 
         moveTo({left, top}) {
-            this.backimg.then(img=>{
-                img.left = left-chbackshift;
-                img.top = top-chbackshift;
-                img.setCoords();
-                this.BoardCanvas.canvas.renderAll();
-            })
+            // this.backimg.then(img=>{
+            //     img.left = left-chbackshift;
+            //     img.top = top-chbackshift;
+            //     img.setCoords();
+            //     this.BoardCanvas.canvas.renderAll();
+            // })
         },
         bringToFront() {
             // this.Checker&&this.BoardCanvas.canvas.bringToFront(this.Checker)
@@ -758,8 +759,7 @@ export class BoardCanvas extends CanvasFunctions {
                         } else if(Colour === BLACK.id && img.top+img.height > BoardHeight-66 && this.drops[BLACK.over].resolver) {
                             this.drops[BLACK.over].resolver()
                         } else self.moveChecker(checkerFromImg.slot.index,
-                                                checkerFromImg.slot.index, false, 
-                                                            this._effects.selectionChecker.animover())
+                                                checkerFromImg.slot.index, false)
                     }
                 })
 
