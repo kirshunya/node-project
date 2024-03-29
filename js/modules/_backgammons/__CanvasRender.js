@@ -623,7 +623,7 @@ export class BoardCanvas extends CanvasFunctions {
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
         const left = sideleft + currentSideSize/2;
         const top = BoardHeight/2+checkerSize;
-        const text = new fabric.Text('Бросить Кости', {
+        const text = new fabric.Text('Подтвердить ход', {
             left, top,
             fontSize: 110,
             fill: 'red',
