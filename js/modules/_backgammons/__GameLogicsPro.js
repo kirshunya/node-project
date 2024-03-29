@@ -1,4 +1,4 @@
-import { $myeval, EventProvider } from "./__Utilities.js";
+import { $myeval, EventProvider, range } from "./__Utilities.js";
 import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './__BoardConstants.js';
 import { BoardCanvas } from './__CanvasRender.js'
 import { autostep, lightstepbutton } from "./__GamePool.js";
@@ -272,7 +272,7 @@ class Board {
                     .map(i=>Object.keys(this.UserMovesFrom(GameState, i)).length)
                     .reduce((acc,k)=>acc+k);
     }
-    UserMovesByDice(GameState, Dice) {
+    UserMovesByDice(GameState) {
         return [...Array(24).keys()]
                 .map(i=>([Object.keys(this.UserMovesFrom(GameState, i)).length, i]))
                     .filter(([awa, i])=>awa)
@@ -330,11 +330,15 @@ class Board {
     PermStep(GameState, step) {
         step.map(({from, to})=>{
             const FromSlot = this.Slots0[from]
+            if(--FromSlot.refToArr.Count===0)
+                FromSlot.refToArr.Colour = 0;
+            if([WHITE.over, BLACK.over].includes(to)) {
+                this.Slots0[to].permPushChecker();
+                return;
+            }
             const ToSlot = this.Slots0[to]
             if(ToSlot.refToArr.Count++===0)
                 ToSlot.refToArr.Colour = GameState.ActivePlayer.team.id;
-            if(--FromSlot.refToArr.Count===0)
-                FromSlot.refToArr.Colour = 0;
         })
     }
 }
@@ -375,6 +379,20 @@ class GameState {
         })
         return renewalPTS;
     }
+    PermDice(Dice) {
+        const GameState = this
+        const [f, s] = this.Dices
+        if(f===s) return this;
+        else return new Proxy(this, {
+            get(target, key) {
+                if(key === 'PTS'){
+                    const usedPTS = GameState.CurrentStepCash.MovesStack.map(({points})=>points).flat(10);
+                    return [Dice].filter(Dice=>!usedPTS.includes(Dice));
+                }
+                return target[key]
+            }
+        })
+    }
     /**
      * @returns {boolean}
      */
@@ -414,7 +432,7 @@ class GameState {
 function showToast(pts, playername, colour) {
     return new Toast({
         title:"Пропуск хода",
-        text:`У вас нет хода, вы пропускаете. Кости: <font color="darkgreen">[${pts.join(', ')}]</font>, \nИгрок <font color="blue">${playername}</font> цвета <font color="darkgreen">[${colour.name}]</font>`,
+        text:`Игрок <font color="blue">${playername}</font> цвета <font color="darkgreen">[${colour.name}]</font> пропускает ходы: <font color="darkgreen">[${pts.join(', ')}]</font>`,
         autohide:true,
         interval:5000
     })
@@ -444,7 +462,8 @@ export class GameProvider {
                 }
                 return ret;
             },
-            MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState),
+            // MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState),
+            MovesByDices: (Dice)=>self.Board.UserMovesByDices(self.GameState.PermDice(Dice)),
             AcceptStep: ()=>(self.Board.AcceptStep(self.GameState), lightstepbutton(false)),
         });
         
@@ -454,13 +473,13 @@ export class GameProvider {
             self.GameCanvas.eventHandlers.MovesComplete(self.GameState.ActivePlayer.team.id);
         })
         /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
-        this.eventHandlers = {
+        this.eventHandlers = new class {
             PermStepByButton() {
                 self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);
-            },
+            }
             AcceptStep() {
                 self.Board.AcceptStep(self.GameState);
-            },
+            }
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
                 if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
@@ -468,27 +487,39 @@ export class GameProvider {
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
                 }
-            },
+            }
             /**
              * @param {{from, to}[]} Step 
              * @param {{ActiveTeam, Dice}} newGameStateData 
              */
-            step(Step, newGameStateData) {
+            step(Step, newGameStateData, prevstate) {
                 self.Board.PermStep(self.GameState, Step);
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
+                const [f,s] = prevstate.Dices;
+                const spendedPoints = Step.map(({points})=>points).flat(1);
+                if(f===s && spendedPoints.length!==4) 
+                    showToast(range(0, 4 - spendedPoints.length).map(()=>f),
+                                self.GameState.players[prevstate.ActiveTeam],username,
+                                [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
+                else if(spendedPoints.length!==1) 
+                    showToast([f,s].filter(x=>spendedPoints[0]!==x),
+                                self.GameState.players[prevstate.ActiveTeam].username,
+                                [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
                 if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
                 }
-            },
-            ustep(Step, newGameStateData) {
+                return true;
+            }
+            ustep(Step, newGameStateData, oldGameData) {
                 self.GameState.state(newGameStateData, self.GameCanvas);
                 if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                     self.Board.StepComplete([]);
                 }
-            },
+                return true;
+            }
             end() {
 
             }

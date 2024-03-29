@@ -183,12 +183,21 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         whiteover: 0,
         blackover: 0
     };
-    constructor(GameID) {
+    /**
+     * 
+     * @param {[Number, Number]} GameID 
+     * @param {'test' || undefined} test 
+     */
+    constructor(GameID, test) {
         super(GameID);
         const nextTeamDict = {
             [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
             [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
         }
+        if(test==='test')
+            this.Slots = adv0_range(0, 24, { 18:[15,1], 6:[15,2], null:()=>[0,0] });
+        if(test==='flud')
+            this.Slots = adv0_range(0, 24, { 0:[9,1], 12:[14,2], 11:[1,2], 18:[1,1],13:[1,1],14:[1,1],15:[1,1],16:[1,1],17:[1,1],null:()=>[0,0] });
         this.Timers.onfinish(Team=>this.endGame(nextTeamDict[Team], 'time end', 'timer'))
     }
     chat(msg) {

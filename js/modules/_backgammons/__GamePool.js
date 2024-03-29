@@ -418,8 +418,8 @@ export function InitGame(GameInitData, localUser, ws) {
             if(localUser.userId === 2)
                 localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
             setActiveTimer(newstate.ActiveTeam);
-            code !== ncode && gp.eventHandlers.step(step, newstate)
-                           || gp.eventHandlers.ustep(step, newstate)
+            code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
+                           || gp.eventHandlers.ustep(step, newstate, prevstate)
                     GameCanvas.createDices(newstate.Dices[0], newstate.Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1].id);
         });
     WSEventPool.on('end', ({winner})=>{

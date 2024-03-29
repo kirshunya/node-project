@@ -15,7 +15,9 @@
 .toast-container {
   position: fixed;
   top: 15px;
-  right: 15px;
+  left: 0;
+  right: 0;
+  margin: auto;
   width: var(--toast-width);
 }
 

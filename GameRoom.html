@@ -337,6 +337,8 @@
       <input type="button" id="PermStepCompletor" value="Принудительно завершить ход"></input>
       <input type="button" id="StepCompletor" value="Потдвердить ход"></input>
       <input type="button" id="MessageBtn" value="Chat👀">
+      <input type="button" id="LateGameRestartButton" value="test lateGame">
+      <input type="button" id="FludGameRestartButton" value="test flud">
     </div>
     <style>
       #PermStepCompletor.active, #StepCompletor.active {
@@ -376,11 +378,22 @@
         if(typeof window.TimersTurn !== 'boolean') return;
         window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
       }
+      LateGameRestartButton.addEventListener('click', ()=>{
+        if(confirm('Вы действительно хотите >перезапустить< игру?'))
+            window.ws.send(JSON.stringify({method:'restartTest'}))
+      })
+      FludGameRestartButton.addEventListener('click', ()=>{
+        if(confirm('Вы действительно хотите >перезапустить< игру?'))
+            window.ws.send(JSON.stringify({method:'restartFlud'}))
+      })
       MessageBtn.addEventListener('click', ()=>{
         const text = prompt('Какое сообщение отправить: ')
         if(text)
           window.ws.send(JSON.stringify({method:'chat', text}))
       })
+      const Utilities = import('./js/modules/_backgammons/__Utilities.js')
+      let Toast;
+      Utilities.then(M=>Toast = M.Toast)
     </script>
     <div class="closer">
       <div class="playerChosePanel">

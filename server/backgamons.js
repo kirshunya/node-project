@@ -128,8 +128,37 @@ const WSPipelineCommands = {
         // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
         // Game.Listeners = lastGame.Listeners;
         // this.Games[Debug.GAMESCOUNT];
+        const Game = GamesLobby.getGameByID(ctx.GameID)
         Debug.GAMESCOUNT++;
-        ctx.event('restart__', {});
+        Game.event('restart__', {});
+    },
+    /**
+     * Debug function, restart game
+     * @param {ConnectionContext} ctx 
+     * @returns 
+     */
+    restartTest(ctx) {
+        // const lastGame = ctx.Game;
+        // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
+        // Game.Listeners = lastGame.Listeners;
+        // this.Games[Debug.GAMESCOUNT];
+        const Game = GamesLobby.getGameByID(ctx.GameID)
+        GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'test');
+        Game.event('restart__', {});
+    },
+    /**
+     * Debug function, restart game
+     * @param {ConnectionContext} ctx 
+     * @returns 
+     */
+    restartFlud(ctx) {
+        // const lastGame = ctx.Game;
+        // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
+        // Game.Listeners = lastGame.Listeners;
+        // this.Games[Debug.GAMESCOUNT];
+        const Game = GamesLobby.getGameByID(ctx.GameID)
+        GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'flud');
+        Game.event('restart__', {});
     },
     /**
      * Debug function, turn on/off timer

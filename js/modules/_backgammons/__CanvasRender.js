@@ -431,9 +431,9 @@ class BoardCanvasEffects {
      * 
      * @param {[int, int][]} indexes 
      */
-    showCheckersWhichCanMove() {
+    showCheckersWhichCanMove(Dice) {
         this.clear()
-        this.yellowCheckers = this.BoardCanvas.gc.MovesByDices().map(([awa, index])=>{
+        this.yellowCheckers = this.BoardCanvas.gc.MovesByDices(Dice).map(([awa, index])=>{
             const checker = this.BoardCanvas.slots[index].last();
             checker.img.filters.push(new fabric.Image.filters.BlendColor({
                 color: 'yellow', 
@@ -513,7 +513,7 @@ export class BoardCanvas extends CanvasFunctions {
      * 
      * @param {[Number, Number][]} GSlots 
      * @param {[Number, Number]} GDropped 
-     * @param {{UserMovesFrom:Function, move:Function, UserMovesFrom:Function}} param2 
+     * @param {{UserMovesFrom:Function, move:Function, MovesByDices:Function}} param2 
      */
     constructor(GSlots, GDropped, gc) {
         super('canvas');
@@ -669,7 +669,7 @@ export class BoardCanvas extends CanvasFunctions {
                 }).then(dice=>{
                     this.img = dice;
                     this.img.rotate(-45)
-                    this.img.on('mousedown', ()=>self._effects.showCheckersWhichCanMove())
+                    this.img.on('mousedown', ()=>self._effects.showCheckersWhichCanMove(diceNumber))
                     // img.filters.push(fabric.Image.filters.BlackWhite());
                     // this.img.applyFilters();
                     // self.canvas.renderAll();
