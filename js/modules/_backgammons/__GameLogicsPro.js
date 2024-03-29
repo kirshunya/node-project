@@ -489,7 +489,7 @@ export class GameProvider {
                 }
             }
             /**
-             * @param {{from, to}[]} Step 
+             * @param {{from, to, points:number[]}[]} Step 
              * @param {{ActiveTeam, Dice}} newGameStateData 
              */
             step(Step, newGameStateData, prevstate) {
@@ -497,12 +497,12 @@ export class GameProvider {
                 Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
                 self.GameState.state(newGameStateData, self.GameCanvas);
                 const [f,s] = prevstate.Dices;
-                const spendedPoints = Step.map(({points})=>points).flat(1);
+                const spendedPoints = Step.map(({points})=>points).flat(10);
                 if(f===s && spendedPoints.length!==4) 
                     showToast(range(0, 4 - spendedPoints.length).map(()=>f),
                                 self.GameState.players[prevstate.ActiveTeam],username,
                                 [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
-                else if(spendedPoints.length!==1) 
+                else if(spendedPoints.length!==2) 
                     showToast([f,s].filter(x=>spendedPoints[0]!==x),
                                 self.GameState.players[prevstate.ActiveTeam].username,
                                 [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
