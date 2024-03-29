@@ -56,13 +56,13 @@ const Timer = class {
         const snap = this.snap = new timersnapshot();
         setTimeout(ontimeout, STEPTIME*SecondInMilliseconds);
         function ontimeout() {
-            if(snap.success) return;
+            if(snap.success || Timer.__off) return;
             if(snap.pending) snap.waiting = startUserTimer;
             return startUserTimer();
         }
         function startUserTimer() {
             const finish = ()=>(!Timer.finished)&&(Timer.finished=true, Timer.onfinish.send(Timer.Team, Timer, snap))
-            if(Timer.finished) return;
+            if(Timer.finished || Timer.__off) return;
             if(Timer.userTime <= 0 || ((Timer.userTime*SecondInMilliseconds - snap.actualms()) <= 0))
                 return finish();
             setTimeout(()=>{
@@ -74,6 +74,9 @@ const Timer = class {
                 finish();
             }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
+    }
+    off(){
+        this.__off = true;
     }
     pause() {
         if(this.snap)
@@ -127,7 +130,9 @@ class Timers {
     }
     // get success() {return this.curTimer.success.bind(this.curTimer)}
 
-
+    off() {
+        this.timers.map(timer=>timer.off());
+    }
 
     json() {
         return this.timers.map(timer=>timer.json())
@@ -298,6 +303,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         if(this.RoomState === CONSTANTS.RoomStates.end) return;
         this.RoomState = CONSTANTS.RoomStates.end;
         this.event('end', {winner: WinnerTeam, msg, code});
+        this.Timers.off();
         Debug.GAMESCOUNT++;
     }
     nextState() {

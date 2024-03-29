@@ -129,7 +129,8 @@ const WSPipelineCommands = {
         // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
         // Game.Listeners = lastGame.Listeners;
         // this.Games[Debug.GAMESCOUNT];
-        const Game = GamesLobby.getGameByID(ctx.GameID)
+        const Game = GamesLobby.getGameByID(ctx.GameID);
+        GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
         Debug.GAMESCOUNT++;
         Game.event('restart__', {});
     },
