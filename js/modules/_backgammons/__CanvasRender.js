@@ -1,5 +1,6 @@
 import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./__Utilities.js";
 import { BoardConstants, refToArr, slotinfo, TState } from "./__BoardConstants.js";
+import { CONFIGS } from "./Configurations.js";
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
 var scaleFactor = 1.3;
@@ -327,7 +328,7 @@ class BoardCanvasEffects {
     }
     
     selectionChecker = {
-        /** @param {Checker} */
+        /** @type {Checker} */
         Checker:null,
         /** @type {Promise.<fabricImage>} */
         backimg:null,
@@ -336,11 +337,12 @@ class BoardCanvasEffects {
         canvasRenderAll:()=>{},
         /** @param {Checker} Checker @param {int} awa 0 - if Checker cannot to move */
         set(Checker, awa) {
+            if(this.Checker === Checker) return;
             this.reset();
             this.Checker = Checker;
-            const {top, left} = Checker.img
-            const tayurl = {[WHITE.id]:whitetay, [BLACK.id]:blacktay}[Checker.colour];
-            const scale = checkerSize/115*1.1;
+            // const {top, left} = Checker.img
+            // const tayurl = {[WHITE.id]:whitetay, [BLACK.id]:blacktay}[Checker.colour];
+            // const scale = checkerSize/115*1.1;
             // this.backimg = this.BoardCanvas.installImg(tayurl, {
             //     top:top-chbackshift, 
             //     left:left-chbackshift, 
@@ -348,12 +350,13 @@ class BoardCanvasEffects {
             //     scaleY: scale
             // }, false)
             //         .then(img=>(this.BoardCanvas.canvas.bringToFront(Checker.img), img));
-            // (!awa)&&this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
-            //                 color: 'red', 
-            //                 alpha: 0.5, 
-            //                 mode:'tint'
-            //             }))
-            this.Checker.img.set('shadow', 'rgba(0,0,0,50) 0px 0px 25px');
+            (!awa)&&this.Checker.img.filters.push(new fabric.Image.filters.BlendColor({
+                            color: 'red', 
+                            alpha: 0.5, 
+                            mode:'tint'
+                        }))
+            const config = CONFIGS.CANVAS.selectionedCheckerLightning;
+            this.Checker.img.set('shadow', config.getShadowByTeam(this.Checker.colour));
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
         },
@@ -361,6 +364,7 @@ class BoardCanvasEffects {
             if(!this.Checker) return;
             // this.backimg.then(img=>this.BoardCanvas.canvas.remove(img));
             this.Checker.img.filters.length = 0;
+            this.Checker.img.set('shadow', '#FFFFFF 0px 0px 0px');
             this.Checker.img.applyFilters();
             this.canvasRenderAll();
             this.Checker = null;
@@ -754,13 +758,10 @@ export class BoardCanvas extends CanvasFunctions {
                 top: posY(slotIndex, checkerIndex)
             }).then(img=>{
                 const checkerFromImg = new Checker(img, SlotLet, Colour);
-                let startpos = {left:0, top:0};
                 img.on('mousedown', () => {
-                    const {left, top} = checkerFromImg.img;
-                    startpos = {left, top};
                     // if (slotIndex !== WHITE.over && slotIndex !== BLACK.over)
                     const awa = self._effects.showGhostsCheckersOfAccesibleSlots(checkerFromImg.slot.index);
-                    if(!img.filters.length) 
+                    if(!img.filters.length)
                         self._effects.selectionChecker.set(checkerFromImg.slot.last(), awa.length);
                 });
                 img.on('moving', () => {
