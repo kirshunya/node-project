@@ -211,7 +211,10 @@ module.exports.TGame = class TGame extends SharedRoom0 {
      * @param {boolean} value 
      */
     setAutostep(userId, value) {
-        this.getPlayerByID(userId).autodice = value
+        const player = this.getPlayerByID(userId)
+        if(!player) return;
+        player.autodice = value;
+        this.event('autodiceset', {userId, value})
     }
     chat(msg) {
         this.event('message', {text:msg.text})

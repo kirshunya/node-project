@@ -489,7 +489,8 @@ export class GameProvider {
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
                 if(GameStateData.awaitingTeam) {
-                    self.GameCanvas.showAcceptDiceRollLabel(awaitingTeam);
+                    if(GameStateData.awaitingTeam === self.GameState.ActivePlayer.team.id)
+                        self.GameCanvas.showAcceptDiceRollLabel(GameStateData.awaitingTeam);
                 }
                 if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     const [f, s] = self.GameState.Dices

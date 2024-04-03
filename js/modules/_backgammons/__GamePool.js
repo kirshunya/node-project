@@ -407,13 +407,13 @@ export function InitGame(GameInitData, localUser, ws) {
                         .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
 
     // WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices, [0, 0]))
-    ConnectionStables.Room.onGameStarted.then(({players, state, slots})=>GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times)) 
+    ConnectionStables.Room.onGameStarted.then(({players, state, slots, awaitingTeam})=>GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, awaitingTeam)) 
     // if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
     // if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices, GameInitData.times);//debug----TODO
-    function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times) {
+    function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times, awaitingTeam) {
         if(localUser.userId === 2)
             localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
-        gp.eventHandlers.start({ActiveTeam, Dices}, [firstPlayer, secondPlayer]);
+        gp.eventHandlers.start({ActiveTeam, Dices, awaitingTeam}, [firstPlayer, secondPlayer]);
         const cplayer = firstPlayer.userId === localUser.userId?firstPlayer:secondPlayer;
         autostep.setdice(cplayer.autodice)
         

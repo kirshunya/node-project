@@ -186,10 +186,11 @@ export class TGameStartedData {
     /** @type {TPlayer[]} */
     players
 
-    constructor(slots, state, players) {
+    constructor(slots, state, players, awaitingTeam) {
         this.slots = slots
         this.state = state
         this.players = players
+        this.awaitingTeam = awaitingTeam
     }
 }
 export class GameInitData {

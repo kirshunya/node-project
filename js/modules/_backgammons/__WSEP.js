@@ -4,6 +4,7 @@ export const WSEventPool = new JustEnoughEvents();
 import { BoardConstants, GameInitData, TGameStartedData, slotinfo } from './__BoardConstants.js';
 import * as BackgammonMenu from "./__LobbyPool.js";
 import * as GamePool from "./__GamePool.js";
+import { localUser } from './_EntryPoint.js';
 //TODO: продумать мессаджинг
 export const WSEvents = {
     self: {
@@ -37,7 +38,7 @@ export class WSRoom {
         this.GameID = GameID;
         this.GameInitData = GameInitData;
         if(GameInitData.RoomState === 1)
-            this.onGameStarted.resolve(new TGameStartedData(GameInitData.slots, GameInitData.state, GameInitData.players))
+            this.onGameStarted.resolve(new TGameStartedData(GameInitData.slots, GameInitData.state, GameInitData.players, GameInitData.awaitingTeam))
     }
 }
 export const ConnectionStables = {
@@ -84,8 +85,8 @@ export const ConnectionStables = {
         window.TimersTurn = TimersTurn
         TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
     },
-    ['autodiceset']({value}) {
-        GamePool.autostep.setdice(value);
+    ['autodiceset']({userId, value}) {
+        if(!userId || userId === localUser.userId) GamePool.autostep.setdice(value);
     },
     ['message'](msg) {
         new Toast({
