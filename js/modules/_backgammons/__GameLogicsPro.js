@@ -425,7 +425,7 @@ class GameState {
         }
         this.ActivePlayer = this.players[ActiveTeam];
         this.Dices = Dices;
-        if(!state.awaitinTeam)
+        if(!state.awaitingTeam)
             canvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].id);
     }
     finish(WinnerTeam) {
@@ -488,8 +488,8 @@ export class GameProvider {
             }
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
-                if(GameStateData.awaitinTeam) {
-                    self.GameCanvas.showAcceptDiceRollLabel(awaitinTeam);
+                if(GameStateData.awaitingTeam) {
+                    self.GameCanvas.showAcceptDiceRollLabel(awaitingTeam);
                 }
                 if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                     const [f, s] = self.GameState.Dices
