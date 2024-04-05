@@ -1,4 +1,4 @@
-import { musicEnabled } from "./config";
+import { musicEnabled } from "./config.js";
 
 let menuSoundsAllowed = localStorage.getItem(`sounds-menu`);
 let gameSoundsAllowed = localStorage.getItem(`sounds-game`);
