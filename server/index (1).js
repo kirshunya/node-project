@@ -35,7 +35,6 @@ app.use(
   })
 );
 app.use("/api", router);
-app.use('/', express.static(__dirname+'/../'))
 app.use(errorMiddleware);
 
 const getCurrency = async () => {
@@ -144,8 +143,6 @@ const timeouts = [
   { roomId: 5, timeoutId: null, timeoutStarted: false },
 ];
 
-const backgammonwss = require("./backgamons");
-app.ws("/backgammons", backgammonwss);
 // web sockets для подключения к играм
 app.ws("/game", (ws, req) => {
   ws.on("message", async (msg) => {
@@ -269,7 +266,7 @@ app.ws("/game", (ws, req) => {
         await LotoCard.update({ isActive: false }, { where: { id: cardId } });
     }
   });
-  backgammonwss(ws, req);
+
   ws.on("close", async (status, msg) => {
     if (status > 1000) {
       // let roomOnline = await checkPeopleOnline();
