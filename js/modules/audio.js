@@ -1,3 +1,5 @@
+import { musicEnabled } from "./config";
+
 let menuSoundsAllowed = localStorage.getItem(`sounds-menu`);
 let gameSoundsAllowed = localStorage.getItem(`sounds-game`);
 
@@ -11,11 +13,12 @@ const loadCaskSounds = () => {
     if (language == `AZ` || language == `TR`) {
       language = `AZ-TR`;
     }
-
-    // let audio = new Audio(
-    //   `${path}/${language}/${i}${language.split(`-`)[0].toLowerCase()}.mp3`
-    // );
-    // casksSounds.push(audio);
+    if(musicEnabled){
+      let audio = new Audio(
+        `${path}/${language}/${i}${language.split(`-`)[0].toLowerCase()}.mp3`
+      );
+      casksSounds.push(audio);
+    }
   }
 };
 
