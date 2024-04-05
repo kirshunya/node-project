@@ -6,7 +6,7 @@ import * as impNav from "./navigation.js";
 import * as authinterface from "./authinterface.js";
 import * as impDominoNav from "./domino/domino-navigation.js";
 import * as impdominoGame from "./domino/domino-game.js";
-import * as BackgammonsWS from "../WSEP.js";
+import * as BackgammonsWS from "./backgammons/WSEP.js";
 import * as impAudio from "./audio.js";
 import { API_URL_PART } from "./config.js";
 
