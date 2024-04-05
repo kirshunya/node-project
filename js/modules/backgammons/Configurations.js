@@ -1,4 +1,4 @@
-import { BoardConstants } from "./__BoardConstants.js"
+import { BoardConstants } from "./BoardConstants.js"
 
 class shadowPropertiesRecord {
     htmlcolour = '#FFFFFF'

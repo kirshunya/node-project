@@ -1,10 +1,10 @@
-import { sleep, range, JustEnoughEvents, OEPromise, FCPromise, Toast } from './__Utilities.js';
+import { sleep, range, JustEnoughEvents, OEPromise, FCPromise, Toast } from './Utilities.js';
 export const WSEventPool = new JustEnoughEvents();
 
-import { BoardConstants, GameInitData, TGameStartedData, slotinfo } from './__BoardConstants.js';
-import * as BackgammonMenu from "./__LobbyPool.js";
-import * as GamePool from "./__GamePool.js";
-import { localUser } from './_EntryPoint.js';
+import { BoardConstants, GameInitData, TGameStartedData, slotinfo } from './BoardConstants.js';
+import * as BackgammonMenu from "./LobbyPool.js";
+import * as GamePool from "./GamePool.js";
+import { localUser } from './EntryPoint.js';
 //TODO: продумать мессаджинг
 export const WSEvents = {
     self: {

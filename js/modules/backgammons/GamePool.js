@@ -1,8 +1,8 @@
-import { ondom, getRandomInt, EventProvider, sleep } from './__Utilities.js';
-import { WSEventPool, ConnectionStables, WSRoom } from './__WSEP.js'
+import { ondom, getRandomInt, EventProvider, sleep } from './Utilities.js';
+import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
-import { GameProvider } from './__GameLogicsPro.js';
-import { BoardConstants } from './__BoardConstants.js';
+import { GameProvider } from './GameLogicsPro.js';
+import { BoardConstants } from './BoardConstants.js';
 export const timestamp = ()=>Date.now();
 var GameInitData = null;
 export function setGameInitData(data) {

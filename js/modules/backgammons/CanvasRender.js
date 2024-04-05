@@ -1,5 +1,5 @@
-import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./__Utilities.js";
-import { BoardConstants, refToArr, slotinfo, TState } from "./__BoardConstants.js";
+import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./Utilities.js";
+import { BoardConstants, refToArr, slotinfo, TState } from "./BoardConstants.js";
 import { CONFIGS } from "./Configurations.js";
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
