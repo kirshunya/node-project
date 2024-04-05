@@ -11,25 +11,20 @@ const {
   BotStats,
   Bot,
   UserGame,
-  DominoUserGame,
 } = require("../models/db-models");
-const mailService = require("./mail-service");
 
 class UserService {
   async registrationUser(username, name, email, password) {
-    console.log(password.length);
-    if (password.length < 6) {
-      throw ApiError.BadRequest("ERR_INVALID_PASSWORD");
-    }
-
     const candidateEmail = await User.findOne({ where: { email } });
     if (candidateEmail) {
-      throw ApiError.BadRequest(`ERR_EMAIL_ALREADY_EXISTS`);
+      throw ApiError.BadRequest(`Аккаунт с почтой ${email} уже существует`);
     }
 
     const candidateUsername = await User.findOne({ where: { username } });
     if (candidateUsername) {
-      throw ApiError.BadRequest("ERR_USERNAME_ALREADY_EXISTS");
+      throw ApiError.BadRequest(
+        `Аккаунт с никнеймом ${username} уже существует`
+      );
     }
     const hashPassword = await bcrypt.hash(password, 3);
 
@@ -50,9 +45,6 @@ class UserService {
     const userDto = new UserDto(user); // id, email, isActivated
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-    // отправляем письмо пользователю
-    mailService.sendRegistrationMail(email, username, password);
 
     return { ...tokens, user: userDto };
   }
@@ -80,50 +72,6 @@ class UserService {
     return token;
   }
 
-  async dropPassRequest(email) {
-    let user = await User.findOne({ where: { email: email } });
-    if (!user) {
-      throw ApiError.BadRequest(`ERR_EMAIL_NOT_FOUND`);
-    }
-    const resetLink = uuid.v4();
-    const resetLinkExp = Date.now() + 60 * 60 + 1000;
-    // user.resetToken = resetLink;
-    // user.resetTokenExp = resetLinkExp;
-
-    await User.update(
-      { resetToken: resetLink, resetLinkExp: resetLinkExp },
-      { where: { email: email } }
-    );
-
-    await mailService.sendResetPasswordLetter(
-      email,
-      `${process.env.API_URL}/api/drop-password/${resetLink}`
-    );
-
-    return { message: "OK", status: 200 };
-  }
-
-  async dropPassword(resetToken, newPassword) {
-    let userCandidate = await User.findOne({
-      resetToken: resetToken,
-    });
-
-    if (!userCandidate || userCandidate.resetTokenExp > Date.now()) {
-      return res.redirect(`${process.env.CLIENT_URL}`);
-    }
-
-    let hashPassword = await bcrypt.hash(newPassword, 3);
-
-    await User.update(
-      { resetToken: null, resetLinkExp: null, password: hashPassword },
-      {
-        where: { resetToken: resetToken },
-      }
-    );
-
-    return { message: "password changed", status: 200 };
-  }
-
   async changePassword(userId, oldPassword, newPassword) {
     const user = await User.findOne({ where: { id: userId } });
     const isPassEquals = await bcrypt.compare(oldPassword, user.password);
@@ -139,12 +87,7 @@ class UserService {
     const authorizationHeader = req.headers.authorization;
     const accessToken = authorizationHeader.split(" ")[1];
     const userData = tokenService.validateAccessToken(accessToken);
-    const user = await User.findOne({
-      where: { id: userData.id, username: userData.username },
-    });
-    if (!user) {
-      throw ApiError.BadRequest("User not found!");
-    }
+    const user = await User.findOne({ where: { id: userData.id } });
     return user;
   }
 
@@ -240,18 +183,26 @@ class UserService {
       });
       return nardsStats;
     } else if (gameType == "domino") {
+      //получаем всех юзеров з лото
       let dominoStats = [];
-      const dominoUserGames = await DominoUserGame.findAll();
       allStats.forEach((user) => {
         if (user.gameDominoPlayed > 0) {
           let userDto = {
             username: user.user.username,
-            gamesWon: dominoUserGames.filter(
-              (game) => game.userId == user.userId && game.isWinner == true
-            ).length,
+            moneyWon: user.moneyDominoWon,
             tokens: user.dominoTokens,
           };
           dominoStats.push(userDto);
+        }
+      });
+      bots.forEach((bot) => {
+        if (bot.gameDominoPlayed > 0) {
+          let botDto = {
+            username: bot.username,
+            moneyWon: bot.moneyDominoWon,
+            tokens: bot.dominoTokens,
+          };
+          dominoStats.push(botDto);
         }
       });
       return dominoStats;

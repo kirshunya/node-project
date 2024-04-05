@@ -13,21 +13,6 @@ const {
 } = require("../models/db-models");
 
 class RoomsService {
-  // DOMINO
-  sendToClientsInTable(aWss, dominoRoomId, tableId, playerMode, gameMode, msg) {
-    aWss.clients.forEach((client) => {
-      if (
-        client.dominoRoomId == dominoRoomId &&
-        client.tableId == tableId &&
-        client.playerMode == playerMode &&
-        client.gameMode == gameMode
-      ) {
-        client.send(JSON.stringify(msg));
-      }
-    });
-  }
-
-  // LOTO
   async getAllRoomsOnline(aWss) {
     const games = await LotoGame.findAll();
     let rooms = {
@@ -97,7 +82,7 @@ class RoomsService {
     }
   }
 
-  sendAll(aWss, methodStr, body) {
+  async sendAll(aWss, methodStr, body) {
     let message = body;
     message.method = methodStr;
 
@@ -134,12 +119,18 @@ class RoomsService {
     // получение информации о всех играх
     let gameInfo = await LotoGame.findAll();
     // получение всех билетов в базе
-    let cardsInRoom = await LotoCard.findAll({ where: { gameLevel: +roomId } });
+    let cardsInRoom = await LotoCard.findAll({});
     // console.log(cardsInRoom);
+
+    let roomsCards = [];
+
+    cardsInRoom.forEach((card) => {
+      roomsCards.push(card);
+    });
 
     // отправка даных
 
-    let thisRoomInfo = gameInfo.find((game) => game.gameLevel == +roomId);
+    let thisRoomInfo = gameInfo[roomId - 1];
     let roomComminsionInfo = this.getRoomCommisionInfo(roomId);
 
     let botsTicketsNum = 0;
@@ -149,7 +140,7 @@ class RoomsService {
       botsTicketsNum += Number(ticket);
     });
 
-    roomBet = (cardsInRoom.length + botsTicketsNum) * roomComminsionInfo.bet;
+    roomBet = (roomsCards.length + botsTicketsNum) * roomComminsionInfo.bet;
 
     return roomBet;
   }
