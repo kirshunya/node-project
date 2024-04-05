@@ -20,19 +20,17 @@ window.siteLanguage = siteLanguage;
 impLocalization.translateAuthPage();
 impLocalization.translateGameChooseMenu();
 
-try {
-  impAuth.registrationForm();
-  impAuth.createLoginForm();
-} catch (e) {}
+impAuth.registrationForm();
+impAuth.createLoginForm();
+
 impNav.applyDefaultSettings();
 
 impNav.addUnauthorizedHashListeners();
 
 window.scrollTo(0, 0);
 
-if (await impAuth.isAuth()) 
-{
-  preloader.classList.remove("d-none");
+if (await impAuth.isAuth()) {
+  // preloader.classList.remove("d-none");
   location.hash = "";
   impNav.hideAuthorization();
 
@@ -55,21 +53,20 @@ if (await impAuth.isAuth())
 
   window.scrollTo(0, 0);
 
-  preloader.classList.add("d-none");
+  // preloader.classList.add("d-none");
 
-  let navMenu = document.querySelector(".menu-footer");
-  if (navMenu) {
-    const navButtons = navMenu.querySelectorAll(".active");
-    navButtons.forEach((button) => button.classList.remove("active"));
-    let openGamesLobbyBtn = document.querySelector(".open-games-menu");
-    openGamesLobbyBtn.classList.add("active");
-  }
+  // let navMenu = document.querySelector(".menu-footer");
+  // if (navMenu) {
+  //   const navButtons = navMenu.querySelectorAll(".active");
+  //   navButtons.forEach((button) => button.classList.remove("active"));
+  //   let openGamesLobbyBtn = document.querySelector(".open-games-menu");
+  //   openGamesLobbyBtn.classList.add("active");
+  // }
 
-  impDominoNav.openDominoChoosePage();
-} 
-// else {
-//   console.log("not auth");
-// }
+  // impDominoNav.openDominoChoosePage();
+} else {
+  console.log("not auth");
+}
 
 // розблокировать чат после f5 а то он будет заблочен
 window.isChatBlocked = false;

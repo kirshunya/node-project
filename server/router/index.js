@@ -6,7 +6,6 @@ const { body } = require("express-validator");
 const authMiddleware = require("../middlewares/auth-middleware");
 
 const gameRouter = require("./game-router");
-const backgamons = require("../backgamons");
 
 // user
 router.post(
@@ -18,6 +17,8 @@ router.post(
 );
 
 router.get("/get-user", authMiddleware, userController.getUser);
+
+router.put("/change-password", authMiddleware, userController.changePassword);
 
 router.post("/deposit", authMiddleware, userController.deposit);
 router.get("/getCurrencyRate", authMiddleware, userController.getCurrencyRate);
@@ -34,15 +35,6 @@ router.post("/logout", userController.logout);
 
 router.get("/checkAuth", authMiddleware, userController.checkAuth);
 
-// edit user
-router.put("/change-password", authMiddleware, userController.changePassword);
-router.post("/uploadAvatar", authMiddleware, userController.uploadAvatar);
-router.delete("/uploadAvatar", authMiddleware, userController.deleteAvatar);
-
-router.post("/drop-password-request", userController.dropPasswordRequest);
-router.get("/drop-password/:link", userController.dropPassCallback);
-router.post("/drop-password", userController.dropPassword);
-
 // leaders page
 
 router.get("/leaders/:gameType", authMiddleware, userController.getLeaders);
@@ -55,15 +47,10 @@ router.get("/botsStat/:gameType", authMiddleware, userController.getBots);
 router.get("/allUsersStats", authMiddleware, userController.getAllUsersStats);
 router.get("/userStats", authMiddleware, userController.getUserStats);
 router.get("/bot-wins", authMiddleware, userController.getBotWins);
-router.get("/played-games", userController.getPlayedGames);
-router.get("/played-domino-games", userController.getPlayedDominoGames);
-router.get("/rooms-control", userController.getRoomsControl);
-router.put("/rooms-control/:mode", userController.updateRoomsControl);
 
 // game
 
 router.use("/game", authMiddleware, gameRouter);
-router.get("/is-page-available/:page", userController.isPageAvailable);
 
 // loto settings
 
