@@ -1,3 +1,5 @@
+import { range } from "./Utilities.js";
+
 export function setOnlineToTable(roomId, tableId, players) {
     // const playerMode = getPlayerMode();
   
@@ -23,7 +25,7 @@ export function setOnlineToTable(roomId, tableId, players) {
     // ) {
     //   return;
     // }
-  
+
     const tableBlock = document.querySelector(
         `.domino-room[dominoRoomId="${roomId}"] .domino-room-content__table[tableId="${tableId}"]`
     );
@@ -200,8 +202,7 @@ function onclick([dominoRoomId, tableId]) {
     window.ws.send(
       JSON.stringify({
         method: "backgammons/connect",
-        dominoRoomId,
-        tableId,
+        GameID: [dominoRoomId, tableId]
       })
     );
 }

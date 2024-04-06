@@ -4,17 +4,17 @@ import * as GamePool from './GamePool.js';
 import { API_URL_PART } from '../config.js'
 import { BoardConstants } from './BoardConstants.js';
 
-export const onplayerchosen = FCPromise();
-export const localUser = {username:'debug'}
-onplayerchosen.then(userId=>{
-    localUser.userId = userId
-    localUser.username = ['Jimmy', 'Missi', 'Debby'][userId],
-    localUser.team = {
-            0: BoardConstants.BLACK,
-            1: BoardConstants.WHITE,
-            2: BoardConstants.EMPTY
-        }[userId]
-})
+// export const onplayerchosen = FCPromise();
+// export const localUser = {username:'debug'}
+// onplayerchosen.then(userId=>{
+//     localUser.userId = userId
+//     localUser.username = ['Jimmy', 'Missi', 'Debby'][userId],
+//     localUser.team = {
+//             0: BoardConstants.BLACK,
+//             1: BoardConstants.WHITE,
+//             2: BoardConstants.EMPTY
+//         }[userId]
+// })
 
 function createClientId() {//impNav.createClientId
     // текущее время в миллисекундах
@@ -31,40 +31,45 @@ function createClientId() {//impNav.createClientId
 // WSEventPool.on('backgammons::game::init', function() {
 //     GamePool.ShowGameTable(GameInitData);
 // });
-const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
-const req = msg=>ws.send(JSON.stringify(msg));
-const send = req;
-ws.onopen = () => {
-    // const localUser = JSON.parse(localStorage.getItem("user"));
-    window.ws = ws;
-    onplayerchosen.then(playerId=>{
-        req({
-            clientId: createClientId(),
-            // username: localUser.username,
-            // userId: localUser.userId,
-            username: 'debug',
-            userId: playerId,
-            method: "backgammons/auth",
-        });
-        req({
-            method: "backgammons/connect", GameID: [0, 0]
-        })
-        req({
-            method: "backgammons/timediffs", timestamp: GamePool.timestamp()
-        })
-        // req({
-        //     method: "backgammons/connectPage", dominoRoomId:0, tableId:0
-        // })
-    })
-};
-ws.onmessage = async (event) => {
-    const msg = JSON.parse(event.data); 
+// const ws = new WebSocket(`ws${API_URL_PART}/backgammons`);
+// const req = msg=>ws.send(JSON.stringify(msg));
+// const send = req;
+// ws.onopen = () => {
+//     // const localUser = JSON.parse(localStorage.getItem("user"));
+//     window.ws = ws;
+//     onplayerchosen.then(playerId=>{
+//         req({
+//             clientId: createClientId(),
+//             // username: localUser.username,
+//             // userId: localUser.userId,
+//             username: 'debug',
+//             userId: playerId,
+//             method: "backgammons/auth",
+//         });
+//         req({
+//             method: "backgammons/connect", GameID: [0, 0]
+//         })
+//         req({
+//             method: "backgammons/timediffs", timestamp: GamePool.timestamp()
+//         })
+//         // req({
+//         //     method: "backgammons/connectPage", dominoRoomId:0, tableId:0
+//         // })
+//     })
+// };
+// ws.onmessage = async (event) => {
+//     const msg = JSON.parse(event.data); 
     
-    'event' in msg 
-        ? WSEventPool.$$send(msg.event, msg, {send})
-        : console.log();
-};
-GamePool.ShowGameTable(localUser);
+//     'event' in msg 
+//         ? WSEventPool.$$send(msg.event, msg, {send})
+//         : console.log();
+// };
+// GamePool.ShowGameTable(localUser);
+
+
+
+
+
 // const WS = new class {
 //     constructor() {
 //         const self = this;

@@ -4,7 +4,7 @@ export const WSEventPool = new JustEnoughEvents();
 import { BoardConstants, GameInitData, TGameStartedData, slotinfo } from './BoardConstants.js';
 import * as BackgammonMenu from "./LobbyPool.js";
 import * as GamePool from "./GamePool.js";
-import { localUser } from './EntryPoint.js';
+// import { localUser } from './EntryPoint.js';
 //TODO: продумать мессаджинг
 export const WSEvents = {
     self: {
@@ -86,7 +86,7 @@ export const ConnectionStables = {
         TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
     },
     ['autodiceset']({userId, value}) {
-        if(!userId || userId === localUser.userId) GamePool.autostep.setdice(value);
+        if(!userId || userId === localUser().userId) GamePool.autostep.setdice(value);
     },
     ['message'](msg) {
         new Toast({
@@ -98,7 +98,20 @@ export const ConnectionStables = {
     }
 });
 Object.entries(EventsRoutes).map(([eventname, CallBack])=>WSEventPool.on(eventname, CallBack));
-
+/** 
+ * @typedef TlocalUser
+ * @property {int} userId 
+ * @property {string} username
+ */
+/**
+ * 
+ * @param {*} CB 
+ * @returns {any | {userId, username, }}
+ */
+export const localUser = (CB=localUser=>localUser)=>{
+    const localUser = localStorage.getItem("user");
+    if (localUser) { return CB(JSON.parse(localUser)); }
+}
 export function onnewmsg(msg) {
     // EventsRoutes[msg.event]?.(msg);
     WSEventPool.$$send(msg.event, msg);

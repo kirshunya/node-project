@@ -25,6 +25,16 @@ module.exports.TUser = class TUser {
         this.clientId = clientId
         this.username = username
     }
+    // static fromUser(User) {
+    //     return new TPlayer
+    // }
+}
+class RoomComponent {
+    /** @param {TGame} Game  */
+    constructor(Game) { 
+        /** @type {TGame} */ 
+        this.Game = Game; 
+    }
 }
 module.exports.TPlayer = class TPlayer {
     /** @type {int} */
@@ -53,6 +63,31 @@ module.exports.TPlayer = class TPlayer {
      */
     static fromUser(user, team=undefined) {
         return new TPlayer(user.userId, user.username, team)
+    }
+    static PlayersContainer = class TPlayers extends RoomComponent {
+        list = []
+        appendPlayer(User) {
+            if(this.isalready()) return 0;
+            if(this.getPlayerByID(User.userId)) return 1;
+            return this.list.push(TPlayer.fromUser(User));
+        }
+        getPlayerByID(userId) {
+            /*Debug*/
+            if(userId === 2) 
+                return Debugger;
+            for(const player of this.Players) 
+                if(player.userId === userId) return player
+            return null;
+        }
+        isalready() {
+            return this.list.length===2;
+        }
+        opponent() {
+            return this.Players.filter(({team})=>team !== this.Game.info.ActiveTeam)[0]
+        }
+        json() {
+            return this.list;
+        }
     }
 }
 module.exports.TState = class TState {

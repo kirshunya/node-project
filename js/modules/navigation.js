@@ -340,7 +340,7 @@ export async function hashNavigation() {
     const dominoRoomId = +hash.split("/")[1];
     const tableId = +hash.split("/")[2];
     if (dominoRoomId && tableId) {
-      BackgammonGameTable.ShowGameTable();
+      BackgammonGameTable.ShowGameTable(localUser);
       // try {
       //   ws.send(
       //     JSON.stringify({

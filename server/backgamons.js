@@ -1,5 +1,6 @@
-const { TGame, timestamp } = require('./backgammons/GameRoom');
-const { ConnectionContext, Debug } = require('./backgammons/Generals');
+const { range, WSListeners } = require('./backgammons/Utility.js');
+const { TGame, timestamp } = require('./backgammons/GameRoom.js');
+const { ConnectionContext, Debug } = require('./backgammons/Generals.js');
 
 console.log(TGame)
 // const timestamp = ()=>Date.now();
@@ -27,30 +28,28 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // }
 
 // const BETsList = [0.5, 1, /*3, 5, 10*/];
-const GamesLobby = new class {
+const GamesLobby = new class extends WSListeners {
     /** @type {[TGame]} */
-    Games = [new TGame()];//probe
-    constructor() {}
-
+    Games = [[], []]
+    constructor() {
+        super('likey');
+        this.Games = this.Games.map(betId=>{
+            return range(1,7).map(roomId=>new TGame([betId, roomId], '', this));
+        })
+    }
     /**
-     * 
+     * @param {[int, int]} GameID 
      * @returns {TGame}
      */
     getGameByID(GameID) {
-        if(this.Games[GameID] === undefined)
+        const [betId, roomId] = GameID;
+        if(this.Games[betId][roomId] === undefined)
             this.Games[GameID] = new TGame(); 
-        return this.Games[GameID];//probe
+        return this.Games[betId][roomId];//probe
     }
 }
+
 const WSPipelineCommands = {
-    /* this -> ws of connection */
-    // auth(ctx, msg) {
-    //     const {clientID, userId, username} = msg;
-    //     ctx.user = {clientID, userId, username};
-    //         /////////////////////<<add auth check by token or pagetoken.. later
-    //     this.externalPipes.push(LobbyPipe);
-    //     return ctx.user;
-    // },
     /**
      * 
      * @param {ConnectionContext} ctx 
@@ -61,13 +60,8 @@ const WSPipelineCommands = {
         ctx.user = {clientId, userId, username}
     },
     ['backgammons/openLobby'](ctx, msg) {
-        ctx.user = {
-            clientID: this.clientId,
-            username: this.loginUsername,
-            userId: this.userId
-        }
-        Lobby.ListenLobby(ctx, this);
-        console.log("Games", Games);
+        GamesLobby.connect(ctx.user, ctx, this);
+        // console.log("Games", Games);
         return {
             event:  'backgammons::lobbyInit', 
             method: 'backgammons::event', 
@@ -90,8 +84,7 @@ const WSPipelineCommands = {
     ['backgammons/connect'](ctx, msg) {
         // Lobby.UnlistenLobby(ctx, this);
 
-        const {GameID} = msg;
-        ctx.GameID = Debug.GAMESCOUNT;
+        ctx.GameID = msg.GameID;
         const Game = GamesLobby.getGameByID(ctx.GameID);
 
         Game.connect(ctx.user, ctx, this);
@@ -196,10 +189,20 @@ const WSPipelineCommands = {
 }
 
 var fs = require('fs');
+/**
+ * 
+ * @param {WebSocket} ws 
+ * @param {import('express').Request} req 
+ */
 module.exports = function(ws, req) {
     console.log('new Connection', new Date())
     ws._socket.setKeepAlive(true);
     const ctx = new ConnectionContext(ws);
+    ctx.user = {
+        clientID: ws.clientId,
+        username: ws.loginUsername,
+        userId: ws.userId
+    }
 
     ws.on('message', function(_msgblob) {
         const msg = JSON.parse(_msgblob);
@@ -208,7 +211,7 @@ module.exports = function(ws, req) {
             response && ctx.send(response);//skips undeifned n' nulls..
         } catch(e) {
             console.error(e);
-            ctx.send({msg:'somerror', e});
+            ctx.send({msg:'somerror in backgamons', e});
         }
     });
     ws.on('close', function() {

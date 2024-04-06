@@ -3,6 +3,7 @@ import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
+import { debugPan }  from './debugPan.js';
 export const timestamp = ()=>Date.now();
 var GameInitData = null;
 export function setGameInitData(data) {
@@ -19,9 +20,11 @@ export function lightstepbutton(active=true) {
   PermStepCompletor.classList.toggle('active');
 }
 export function ShowGameTable(localUser) {
+    debugPan.install()
     const main = document.getElementsByTagName('main')[0];
     // let localUser = JSON.parse(localStorage.getItem("user"));
-    main.innerHTML = `
+    const html = ([html])=>html
+    main.innerHTML = html`
     <div class="main__container footer__padding">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
         <div class="domino-games__container">
@@ -394,20 +397,21 @@ export function InitGame(GameInitData, localUser, ws) {
     PermStepCompletor.addEventListener('click', ()=>(gp.eventHandlers.PermStepByButton(), lightstepbutton(false)))
     StepCompletor.addEventListener('click', ()=>(gp.eventHandlers.AcceptStep(), lightstepbutton(false)))
     gp.onRollDicesClick(()=>req({method:'rollDice'}));
-    const { GameCanvas } = gp;
     /** @type {Timer[]} */
     let TimersByTeam
     /** @type {int} */
     let activetimerind;
 
     
-      document.getElementById('TopPan')
-                .getElementsByClassName('buttons')[0]
-                    .children[0]
-                        .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
+    document.getElementById('TopPan')
+              .getElementsByClassName('buttons')[0]
+                  .children[0]
+                      .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
 
     // WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices, [0, 0]))
-    ConnectionStables.Room.onGameStarted.then(({players, state, slots, awaitingTeam})=>GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, awaitingTeam)) 
+    ConnectionStables.Room.onGameStarted
+          .then(({players, state, slots, awaitingTeam})=>
+              GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, awaitingTeam)) 
     // if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
     // if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices, GameInitData.times);//debug----TODO
     function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times, awaitingTeam) {

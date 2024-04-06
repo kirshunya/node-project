@@ -1,15 +1,11 @@
 const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider } = require("./Generals");
+const { getRandomInt } = require("./Utility");
 
 const timestamp = ()=>Date.now();
 module.exports.timestamp = timestamp;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make iterator with Array methods?
 const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 const randdice = ()=>[getRandomInt(1,6), getRandomInt(1,6)];
 /** @type {Number} in seconds*/
 const USERTIME = 60;
@@ -139,7 +135,7 @@ class Timers {
     }
 }
 
-class SharedRoom0 {
+class SharedRoom0 { // deprec // TODO: extends from WSListeners
     Connections = {};
     RoomState = CONSTANTS.RoomStates.Waiting;
 
@@ -154,8 +150,8 @@ class SharedRoom0 {
      */
     connect(user, ctx, ws) {
         const rikey = ctx.rikey = `${user.clientId}-${user.userId}-${getRandomInt(-10,100)}`;
-        this.Connections[rikey] = ({user, ctx, ws, send:(...args)=>ctx.send(...args)});
         this.event('backgammons::connection', user, 'add ignoreList and send current user..');//? player:visitor
+        this.Connections[rikey] = ({user, ctx, ws, send:(...args)=>ctx.send(...args)});
         console.log(rikey, user);
     }
     disconnect(user, ctx, ws) {
@@ -170,10 +166,11 @@ class SharedRoom0 {
 const Debugger = new TPlayer(2, 'Debby', -1);
 module.exports.TGame = class TGame extends SharedRoom0 {
     /** @type {TPlayer[]} */
-    Players = [
-        new TPlayer(0, 'Jimmy', CONSTANTS.BLACKID),
-        new TPlayer(1, 'Missy', CONSTANTS.WHITEID)
-    ];
+    Players = new TPlayer.PlayersContainer(this)
+    // [
+    //     new TPlayer(0, 'Jimmy', CONSTANTS.BLACKID),
+    //     new TPlayer(1, 'Missy', CONSTANTS.WHITEID)
+    // ];
     Timers = new Timers;
     /** @type {TState} */
     info = {
@@ -191,7 +188,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     /**
      * 
      * @param {[Number, Number]} GameID 
-     * @param {'test' || undefined} test 
+     * @param {'test' || 'flud' || undefined} test 
      */
     constructor(GameID, test) {
         super(GameID);
@@ -211,7 +208,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
      * @param {boolean} value 
      */
     setAutostep(userId, value) {
-        const player = this.getPlayerByID(userId)
+        const player = this.Players.getPlayerByID(userId)
         if(!player) return;
         player.autodice = value;
         this.event('autodiceset', {userId, value})
@@ -227,22 +224,34 @@ module.exports.TGame = class TGame extends SharedRoom0 {
             GameID: this.GameID, GAMESCOUNT:Debug.GAMESCOUNT, 
                     
                     state: this.info, 
-                    awaitingTeam:this.awaitingTeam,
-                    awaitingTeamstr:`${this.awaitingTeam}`,
+                        awaitingTeam:this.awaitingTeam,
+                        awaitingTeamstr:`${this.awaitingTeam}`,
+                    //TODO: moveTo TableRecord.
                     slots: this.Slots, 
                     dropped: this.Drops,
 
+                    // moveTo state record
                     RoomState:this.RoomState,
                     GameState:this.RoomState,
-                    players:this.Players,
-                    
+
+                    players:this.Players.json(),
+                    // moveTo debug record
                     ['TimersTurn']:(Debug.TimersTurn?'on':'off'),
+                    // moveTo state record
                     times: this.Timers.json(),
 
-                    debug:Object.keys(this.Connections),
+                    debug: Object.keys(this.Connections),//TODO: disconnections.. //TODO: Lobby anons of GamesEnd
         });
-        if(this.RoomState === CONSTANTS.RoomStates.Waiting)
-            this.startGame()
+        if(this.Players.isalready())
+            this.Players.appendVisitor(user);
+        else {
+            this.Players.appendPlayer(user);
+            if(this.Players.isalready())
+                if(this.RoomState === CONSTANTS.RoomStates.Waiting)//__0?
+                    this.startGame()
+        }
+
+        
         // let rec = this.Players.filter(({userId})=>userId===user.userId)[0];
         // if(rec) {
         //     user.team = rec.team;
@@ -265,24 +274,8 @@ module.exports.TGame = class TGame extends SharedRoom0 {
             ActiveTeam: CONSTANTS.WHITEID,
             Dices: randdice()
         }
-        this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players});
+        this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players.json()});
         this.RoomState = CONSTANTS.RoomStates.Started;
-    }
-    opponent() {
-        return this.Players.filter(({team})=>team !== this.info.ActiveTeam)[0]
-    }
-    /**
-     * 
-     * @param {int} userId 
-     * @returns {TPlayer}
-     */
-    getPlayerByID(userId) {
-        /*Debug*/
-        if(userId === 2) 
-            return Debugger;
-        for(const player of this.Players) 
-            if(player.userId === userId) return player
-        return null;
     }
     /**
      * 
@@ -296,7 +289,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         const ret = ret=>(this.Timers.curTimer.resume(), ret);
         // this.curTimer.await();//time to check step to success 
         
-        const player = this.getPlayerByID(user.userId);
+        const player = this.Players.getPlayerByID(user.userId);
         if(!player) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
         if(!(player.userId === 2 || player.team === ActiveTeam)) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
         //implement GameLogistics here
@@ -308,8 +301,8 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         this.Timers.curTimer.success();//if succes step
         const prevstate = this.info;
         this.event('step', {step, prevstate, code});//if success step
-        console.log('dicerolling by ', this.opponent())
-        if(this.opponent().autodice) {
+        console.log('dicerolling by ', this.Players.opponent())
+        if(this.Players.opponent().autodice) {
             this.event('state', {newstate: this.nextState()});
         } else {
             const nextTeamDict = {
