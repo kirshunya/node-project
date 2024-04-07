@@ -62,16 +62,16 @@ const WSPipelineCommands = {
     ['backgammons/openLobby'](ctx, msg) {
         GamesLobby.connect(ctx.user, ctx, this);
         // console.log("Games", Games);
-        return {
-            event:  'backgammons::lobbyInit', 
-            method: 'backgammons::event', 
-            rooms:   Object.values(Games).map(rooms=>
-                        Object.values(rooms).map(room=>({
-                            players: room.Players, 
-                            RoomState: room.RoomState
-                        })
-                     )
-        )};
+        // return {
+        //     event:  'backgammons::lobbyInit', 
+        //     method: 'backgammons::event', 
+        //     rooms:   Object.values(Games).map(rooms=>
+        //                 Object.values(rooms).map(room=>({
+        //                     players: room.Players, 
+        //                     RoomState: room.RoomState
+        //                 })
+        //              )
+        // )};
     },
     ['backgammons/timediffs'](ctx, msg) {
         ctx.event('backgammons::timediffs', {diff:msg.timestamp-timestamp()})

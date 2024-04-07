@@ -337,9 +337,8 @@ export async function hashNavigation() {
     }, 50);
   } else if (hash.includes("#backgammon-room-table")) {
     hideNavigation();
-    const dominoRoomId = +hash.split("/")[1];
-    const tableId = +hash.split("/")[2];
-    if (dominoRoomId && tableId) {
+    const [hashName, dominoRoomId, tableId] = hash.split("/");
+    if (dominoRoomId || tableId) {
       BackgammonGameTable.ShowGameTable(localUser);
       // try {
       //   ws.send(

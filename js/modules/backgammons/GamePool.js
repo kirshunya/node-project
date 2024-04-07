@@ -4,6 +4,7 @@ import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from './debugPan.js';
+import { html } from './prophtml.js';
 export const timestamp = ()=>Date.now();
 var GameInitData = null;
 export function setGameInitData(data) {
@@ -23,7 +24,6 @@ export function ShowGameTable(localUser) {
     debugPan.install()
     const main = document.getElementsByTagName('main')[0];
     // let localUser = JSON.parse(localStorage.getItem("user"));
-    const html = ([html])=>html
     main.innerHTML = html`
     <div class="main__container footer__padding">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">

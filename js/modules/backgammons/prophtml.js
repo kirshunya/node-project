@@ -1,0 +1,1 @@
+export const html = (htmls)=>htmls.join('');

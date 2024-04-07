@@ -151,12 +151,12 @@ export const debugPan = new class {
         if(text)
         window.ws.send(JSON.stringify({method:'chat', text}))
     })
-    const Utilities = import('./js/modules/_backgammons/__Utilities.js')
+    const Utilities = import('/js/modules/backgammons/Utilities.js')
     let Toast;
     Utilities.then(M=>Toast = M.Toast)
 
 
-    const EntryPoint = import('./js/modules/_backgammons/_EntryPoint.js')
+    const EntryPoint = import('/js/modules/backgammons/EntryPoint.js')
     const playerId = localStorage.getItem('playerId');
     /**
      * @return {HTMLElement}

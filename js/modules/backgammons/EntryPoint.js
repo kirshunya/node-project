@@ -4,7 +4,7 @@ import * as GamePool from './GamePool.js';
 import { API_URL_PART } from '../config.js'
 import { BoardConstants } from './BoardConstants.js';
 
-// export const onplayerchosen = FCPromise();
+export const onplayerchosen = FCPromise();
 // export const localUser = {username:'debug'}
 // onplayerchosen.then(userId=>{
 //     localUser.userId = userId
