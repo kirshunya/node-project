@@ -7,9 +7,10 @@ const Modules = setOnResolve({
     provider: importBackgammons('GameLogicsPro'),
     Configs: importBackgammons('Configurations'),
 });
+Promise.all(Modules._promises).then(()=>console.log('repl Modules loaded'));
 // Promise.all(Modules._promises)
 function setOnResolve(AList, additionalPromises = []) {
-    return;
+    // return;
     const out = {}
     additionalPromises.push(...(out._promises = [
             ...Object.entries(AList).map(async ([name, promise])=>{

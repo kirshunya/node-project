@@ -8,6 +8,10 @@ function getRandomInt(min, max) {
 module.exports = {
     getRandomInt, range, sleep
 };
+module.exports.FCPromise = ()=>{
+    const [promise, resolve, reject] = OEPromise();
+    return Object.assign(promise, {promise, resolve, reject});
+}
 /**
  * @template T
  */

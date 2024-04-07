@@ -1,4 +1,5 @@
-import { range } from "./Utilities.js";
+import { getRandomInt, range } from "./Utilities.js";
+import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { html } from "./prophtml.js";
 
 export function setOnlineToTable(roomId, tableId, players) {
@@ -64,62 +65,6 @@ export function setOnlineToTable(roomId, tableId, players) {
       // playersOnline.innerHTML = Number(playersOnline.innerHTML) + 1;
     }
 }
-/**
- * 
- * @param {string} tag 
- * @param {string[]} classList 
- * @param {{$attrname:string}[]} attributes 
- * @param {{$dataname:string}[]} dataset 
- * @param {{$eventname:Function}[]} events
- * @returns 
- */
-function htmlelement(tag, classList, attributes, dataset, events) {
-  const el = document.createElement(tag);
-  classList&&(typeof classList === 'string')
-                  ? el.classList.add(...classList.split(' '))
-                  : el.classList.add(...classList);
-  attributes&&Object.entries(attributes).map(([name, value])=>el[name] = value);
-  dataset&&Object.entries(dataset).map(([name, value])=>el.dataset[name] = value);
-  events&&Object.entries(events).map(([name, callback])=>el.addEventListener(name, callback));
-  return el;
-}
-/**
- * 
- * @param {string} tag 
- * @param {string[]} classList 
- * @param {string} innerHTML
- * @param {{$attrname:string}[]} attributes 
- * @param {{$dataname:string}[]} dataset 
- * @param {{$eventname:Function}[]} events
- * @returns 
- */
-function htmltext(tag, classList, innerHTML, attributes, dataset, events) {
-  const el = htmlelement(tag, classList, attributes, dataset, events);
-  el.innerHTML = innerHTML;
-  return el;
-}
-/**
- * 
- * @param {HTMLElement} element
- * @param {{$tag:{classList:string[], attributes:{$attrname:string}[], dataset:{$dataname:string}[], events:{$eventname:Function}[]}}[]} contains 
- */
-function __htmlcontainer(element, contains) {
-  for(const [tag, elinfo] of contains) {
-    /** @type {{classList:string[], attributes:{$attrname:string}[], dataset:{$dataname:string}[], events:{$eventname:Function}[]}} */
-    const {classList, attributes, dataset, events} = elinfo
-    element.appendChild(htmlelement(tag, classList, attributes, dataset, events))
-  }
-  return element;
-}
-/**
- * 
- * @param {HTMLElement} element
- * @param {HTMLElement[]} contains 
- */
-function htmlcontainer(element, contains) {
-  contains.map(child=>element.appendChild(child));
-  return element;
-}
 export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
   /** @type {HTMLElement} */
   htmlview
@@ -134,9 +79,14 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     tableparts = []
     timerlabel
     playersinfo
-    constructor() {
+    eyelabel
+    /** @param {[int, int]} GameID  */
+    constructor(GameID) {
+      /** @type {[int, int]} */
+      this.GameID = GameID;
       const element = this.content = htmlcontainer(
-        htmlelement('div', 'domino-room-content__table swiper-slide swiper-slide-active'), [
+        htmlelement('div', 'domino-room-content__table swiper-slide', {tableId:GameID[1]}), [
+          this.eyelabel = htmltext('div', 'backgammons-visitor', '<img src="img/backgammons/eyek.png">'),
           htmlcontainer(
             htmlelement('div', 'domino-room-content__table-image'), [
               this.tableparts[0] = htmlelement('div', 'domino-room-table-half domino-room-table-part'),
@@ -149,14 +99,17 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
             ])
         ]
       )
+      element.addEventListener('click', onclick.bind(null, GameID));
     }
     html() { return this.content; }
   }
   init() {
     this.RoomsMap = [];
     const container = htmlelement('div', ["main__container","header__padding","footer__padding"]);
+    const mutobserverCode = `backgsLobby${getRandomInt(-65341, 65341)}`;
+    const swipers = [];
     container.replaceChildren(htmlcontainer(
-        htmlelement('div', 'domino-games games'), [
+        htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode}), [
           ...range(1,2).map(betId=>(this.RoomsMap[betId] = [],
               htmlcontainer(
                 htmlelement(
@@ -168,17 +121,17 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                     htmlelement('div', 'domino-room-header'), [
                       htmlelement('img', 'domino-room-header__img', {src:'./img/loto-room-card-logo.png', alt:' '}),
                       htmltext('p', 'domino-room-header__title', ' Классическая '),
-                      htmltext('div', 'domino-room-domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="">'),
+                      htmltext('div', 'domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="">'),
                     ]
                   ),
                   htmlcontainer(
                     htmlelement('div', 'domino-room-content'),[
                       htmlcontainer(
-                        htmlelement('div', 'swiper domino-room-content__tables-swiper swiper-initialized swiper-horizontal swiper-backface-hidden'), [
+                        htmlelement('div', 'swiper domino-room-content__tables-swiper', null, null, null, [AddSwiperBehaviour]), [
                           htmlcontainer(
                             htmlelement('div', 'swiper-wrapper domino-room-content__tables'), [
                               ...range(1,7).map(roomId=>(
-                                this.RoomsMap[betId][roomId] = new __T0BackgammonsLobbyHub.TableElT()).html()
+                                this.RoomsMap[betId][roomId] = new __T0BackgammonsLobbyHub.TableElT([betId, roomId])).html()
                               )
                             ]
                           )
@@ -201,33 +154,45 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
           ))
         ]
       ));
-      
-        // создаем сладеры для елементов
-    var swiper = setTimeout(new Swiper(".domino-room-content__tables-swiper", {
-            slidesPerView: 4,
-            // centeredSlides: true,
-            spaceBetween: 20,
-            grabCursor: true,
-            slidesPerView: 3,
-            allowTouchMove: true,
-            scrollbar: {
-            el: ".swiper-scrollbar",
-            hide: false,
-            draggable: true,
-        },
-        breakpoints: {
-            // когда ширина экрана >= 320px
-            320: {
-                spaceBetween: 10,
-                slidesPerView: 3,
-            },
-            // когда ширина экрана >= 480px
-            480: {
-                spaceBetween: 20,
-                slidesPerView: 3,
-            },
-        },
-    }), 1000);
+      /** @type {import('./../../../json/localize.json')['ru']} */
+      const siteLanguage = window.siteLanguage
+    // const onMainDOMupdate = new MutationObserver(mutrecs=>{
+    //   console.log(mutrecs)
+    //   // if(mutrecs[0].addedNodes[0]?.name === mutobserverCode) {
+    //     console.log('swiper inits!');
+    //     onMainDOMupdate.disconnect()
+    //     setTimeout(initSwiper, 100);
+    //   // }
+    // })
+    // onMainDOMupdate.observe(document.getElementsByTagName('main')[0], { childList: true, characterData:false })
+    // создаем сладеры для елементов
+      // return new Swiper(".domino-room-content__tables-swiper", {
+    function  AddSwiperBehaviour (swiperEl) { return swipers.push(swiperEl) };
+    swipers.map(swiper=>new Swiper(swiper, {
+              slidesPerView: 4,
+              // centeredSlides: true,
+              spaceBetween: 20,
+              grabCursor: true,
+              slidesPerView: 3,
+              allowTouchMove: true,
+              scrollbar: {
+              el: ".swiper-scrollbar",
+              hide: false,
+              draggable: true,
+          },
+          breakpoints: {
+              // когда ширина экрана >= 320px
+              320: {
+                  spaceBetween: 10,
+                  slidesPerView: 3,
+              },
+              // когда ширина экрана >= 480px
+              480: {
+                  spaceBetween: 20,
+                  slidesPerView: 3,
+              },
+          },
+      }))
     return this.htmlview = container;
   }
 }
@@ -367,7 +332,7 @@ function formTwoPlayersMenu(main, main__container, gameMode='CLASSIC') {
         });
 }
 function onclick([dominoRoomId, tableId]) {
-    const [room, table] = this;
+    // const [room, table] = this;
     alert(dominoRoomId);
     window.ws.send(
       JSON.stringify({

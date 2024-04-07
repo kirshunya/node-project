@@ -78,8 +78,8 @@ export const ConnectionStables = {
         });
     },
     ["backgammons::lobby::connectionToRoom"](msg) {
-        const {dominoRoomId, tableId, players} = msg;
-        BackgammonMenu.setOnlineToTable(dominoRoomId, tableId, players);
+        const {GameID, players} = msg;
+        BackgammonMenu.setOnlineToTable(GameID, players);
     },
     async ['TimersTurn']({TimersTurn}){
         window.TimersTurn = TimersTurn

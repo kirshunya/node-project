@@ -417,6 +417,17 @@ export function InitGame(GameInitData, localUser, ws) {
     function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times, awaitingTeam) {
         if(localUser.userId === 2)
             localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
+        const TeamFromTeamId = {
+          [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
+          [BoardConstants.WHITE.id]: BoardConstants.WHITE,
+          [BoardConstants.BLACK.id]: BoardConstants.BLACK
+        }
+        localUser.team = TeamFromTeamId[firstPlayer.userId === localUser.userId
+                              ? +firstPlayer.team
+                              : secondPlayer.userId === localUser.userId
+                                      ? +secondPlayer.team
+                                      : 0];
+
         gp.eventHandlers.start({ActiveTeam, Dices, awaitingTeam}, [firstPlayer, secondPlayer]);
         const cplayer = firstPlayer.userId === localUser.userId?firstPlayer:secondPlayer;
         autostep.setdice(cplayer.autodice)

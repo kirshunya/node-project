@@ -34,8 +34,27 @@ const GamesLobby = new class extends WSListeners {
     constructor() {
         super('likey');
         this.Games = this.Games.map(betId=>{
-            return range(1,7).map(roomId=>new TGame([betId, roomId], '', this));
+            return range(1,7).map(roomId=>this.createGame([betId, roomId]));
         })
+    }
+    createGame(GameID) {
+        const Game = new TGame(GameID);
+        Game.events.onconnect(()=>this.event('backgammons::lobby::connectionToRoom', {
+            GameID, players:Game.Players.json()
+        }))
+        Game.events.onexit(()=>this.event('backgammons::lobby::connectionToRoom', {
+            GameID, players:Game.Players.json()
+        }))
+        Game.events.onstart(()=>this.event('backgammons::lobby::roomStart', {
+            GameID, players:Game.Players.json()
+        }))
+        Game.events.onfinish(()=>{
+            this.event('backgammons::lobby::roomEnd', {
+                GameID, players:Game.Players.json()
+            })
+            setTimeout(this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
+        })
+        return Game;
     }
     /**
      * @param {[int, int]} GameID 
@@ -55,7 +74,7 @@ const WSPipelineCommands = {
      * @param {ConnectionContext} ctx 
      * @param {*} msg 
      */
-    ['backgammons/auth'](ctx, msg) {
+    ['connectGeneral'](ctx, msg) {
         const {clientId, userId, username} = msg
         ctx.user = {clientId, userId, username}
     },
@@ -189,6 +208,7 @@ const WSPipelineCommands = {
 }
 
 var fs = require('fs');
+const { connect } = require('http2');
 /**
  * 
  * @param {WebSocket} ws 
@@ -198,11 +218,6 @@ module.exports = function(ws, req) {
     console.log('new Connection', new Date())
     ws._socket.setKeepAlive(true);
     const ctx = new ConnectionContext(ws);
-    ctx.user = {
-        clientID: ws.clientId,
-        username: ws.loginUsername,
-        userId: ws.userId
-    }
 
     ws.on('message', function(_msgblob) {
         const msg = JSON.parse(_msgblob);

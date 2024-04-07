@@ -1,5 +1,5 @@
-const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider } = require("./Generals");
-const { getRandomInt } = require("./Utility");
+const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider, nextTeamDict } = require("./Generals");
+const { getRandomInt, FCPromise } = require("./Utility");
 
 const timestamp = ()=>Date.now();
 module.exports.timestamp = timestamp;
@@ -185,6 +185,14 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         whiteover: 0,
         blackover: 0
     };
+    events = new class {
+        //Lobby
+        onconnect = FCPromise()
+        onexit = FCPromise()
+        //inGame
+        onstart = FCPromise()
+        onfinish = FCPromise()
+    }
     /**
      * 
      * @param {[Number, Number]} GameID 
@@ -219,6 +227,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     connect(user, ctx, ws) {
         // const __u = {user.}
         super.connect(user, ctx, ws);
+        this.events.onconnect.fire();
         console.log('TimersTurn', Debug.TimersTurn);
         ctx.event('backgammons::connection::self', {
             GameID: this.GameID, GAMESCOUNT:Debug.GAMESCOUNT, 
@@ -242,7 +251,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
 
                     debug: Object.keys(this.Connections),//TODO: disconnections.. //TODO: Lobby anons of GamesEnd
         });
-        if(this.Players.isalready())
+        if(this.Players.isalready()&&!this.Players.getPlayerByID(user.userId))
             this.Players.appendVisitor(user);
         else {
             this.Players.appendPlayer(user);
@@ -268,14 +277,14 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         // }
     }
     startGame() {
-        // const cc = this.Players[0].team = getRandomInt(1,2);
-        // this.Players[1].team = 1+!(cc-1);
+        this.Players.rollTeam()
         this.info = {
             ActiveTeam: CONSTANTS.WHITEID,
             Dices: randdice()
         }
         this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players.json()});
         this.RoomState = CONSTANTS.RoomStates.Started;
+        this.events.onstart.fire()
     }
     /**
      * 
@@ -327,15 +336,10 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         this.RoomState = CONSTANTS.RoomStates.end;
         this.event('end', {winner: WinnerTeam, msg, code});
         this.Timers.off();
-        Debug.GAMESCOUNT++;
+        this.events.onfinish.fire();
     }
     nextState() {
-        const {ActiveTeam} = this.info;
-        const nextTeamDict = {
-            [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
-            [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
-        }
-        const nextTeam = nextTeamDict[ActiveTeam];
+        const nextTeam = nextTeamDict[this.info.ActiveTeam];
         this.Timers.curTimer = nextTeam;
         return this.info = {
             ActiveTeam: nextTeam,
