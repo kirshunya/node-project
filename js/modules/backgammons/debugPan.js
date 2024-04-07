@@ -14,6 +14,7 @@ const debugPanHTML = `<div class="debugPan">debug:
         background-color: yellow;
       }
       .debugPan {
+        display: none !important
         max-width: 100vw;
         position: fixed;
         bottom: 0;
@@ -66,6 +67,7 @@ const debugPanHTML = `<div class="debugPan">debug:
         </div>
         <style>
           .closer {
+            display: none !important;
             position: absolute;
             width: 100%;
             height: 100%;
