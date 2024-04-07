@@ -30,11 +30,11 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // const BETsList = [0.5, 1, /*3, 5, 10*/];
 const GamesLobby = new class extends WSListeners {
     /** @type {[TGame]} */
-    Games = [[], []]
+    Games = [[], [], [], [], []]
     constructor() {
         super('likey');
-        this.Games = this.Games.map(betId=>{
-            return range(1,7).map(roomId=>this.createGame([betId, roomId]));
+        this.Games = this.Games.map((_,betId)=>{
+            return range(1,10).map(roomId=>this.createGame([betId, roomId]));
         })
     }
     createGame(GameID) {

@@ -2,7 +2,7 @@ import { getRandomInt, range } from "./Utilities.js";
 import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { html } from "./prophtml.js";
 
-export function setOnlineToTable(roomId, tableId, players) {
+export function setOnlineToTable([roomId, tableId], players) {
     // const playerMode = getPlayerMode();
   
     // const hash = window.location.hash.split("/");
@@ -29,7 +29,7 @@ export function setOnlineToTable(roomId, tableId, players) {
     // }
 
     const tableBlock = document.querySelector(
-        `.domino-room[dominoRoomId="${roomId}"] .domino-room-content__table[tableId="${tableId}"]`
+        `.domino-room[betId="${roomId}"] .domino-room-content__table[tableId="${tableId}"]`
     );
     if (!tableBlock) return;
     const playersOnline = tableBlock.querySelector(
@@ -115,7 +115,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                 htmlelement(
                     'div', 
                     'domino-room domino-room-players-2 domino-room-mode-classic',
-                    [], { betId }, []
+                    { betId }, { betId }, []
                 ), [
                   htmlcontainer(
                     htmlelement('div', 'domino-room-header'), [

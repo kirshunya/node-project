@@ -187,11 +187,11 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     };
     events = new class {
         //Lobby
-        onconnect = FCPromise()
-        onexit = FCPromise()
+        onconnect = new EventProvider()
+        onexit = new EventProvider()
         //inGame
-        onstart = FCPromise()
-        onfinish = FCPromise()
+        onstart = new EventProvider()
+        onfinish = new EventProvider()
     }
     /**
      * 
@@ -227,7 +227,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     connect(user, ctx, ws) {
         // const __u = {user.}
         super.connect(user, ctx, ws);
-        this.events.onconnect.fire();
+        this.events.onconnect.send();
         console.log('TimersTurn', Debug.TimersTurn);
         ctx.event('backgammons::connection::self', {
             GameID: this.GameID, GAMESCOUNT:Debug.GAMESCOUNT, 
@@ -284,7 +284,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         }
         this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players.json()});
         this.RoomState = CONSTANTS.RoomStates.Started;
-        this.events.onstart.fire()
+        this.events.onstart.send()
     }
     /**
      * 
@@ -336,7 +336,7 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         this.RoomState = CONSTANTS.RoomStates.end;
         this.event('end', {winner: WinnerTeam, msg, code});
         this.Timers.off();
-        this.events.onfinish.fire();
+        this.events.onfinish.send();
     }
     nextState() {
         const nextTeam = nextTeamDict[this.info.ActiveTeam];
