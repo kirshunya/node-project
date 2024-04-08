@@ -155,7 +155,8 @@ class SharedRoom0 { // deprec // TODO: extends from WSListeners
         console.log(rikey, user);
     }
     disconnect(user, ctx, ws) {
-        delete this.Connections[ctx.rikey];
+        if(ctx.rikey)
+            delete this.Connections[ctx.rikey];
     }
     event(event, obj) {
         const msg = Object.assign(obj, {event, method:'backgammons::event'});
@@ -165,7 +166,7 @@ class SharedRoom0 { // deprec // TODO: extends from WSListeners
 }
 const Debugger = new TPlayer(2, 'Debby', -1);
 module.exports.TGame = class TGame extends SharedRoom0 {
-    /** @type {TPlayer[]} */
+    // /** @type {TPlayer.PlayersContainer} */
     Players = new TPlayer.PlayersContainer(this)
     // [
     //     new TPlayer(0, 'Jimmy', CONSTANTS.BLACKID),
@@ -227,7 +228,6 @@ module.exports.TGame = class TGame extends SharedRoom0 {
     connect(user, ctx, ws) {
         // const __u = {user.}
         super.connect(user, ctx, ws);
-        this.events.onconnect.send();
         console.log('TimersTurn', Debug.TimersTurn);
         ctx.event('backgammons::connection::self', {
             GameID: this.GameID, GAMESCOUNT:Debug.GAMESCOUNT, 
@@ -254,7 +254,8 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         if(this.Players.isalready()&&!this.Players.getPlayerByID(user.userId))
             this.Players.appendVisitor(user);
         else {
-            this.Players.appendPlayer(user);
+            const res = this.Players.appendPlayer(user);
+            if(res >= 10) this.events.onconnect.send();
             if(this.Players.isalready())
                 if(this.RoomState === CONSTANTS.RoomStates.Waiting)//__0?
                     this.startGame()
@@ -275,6 +276,14 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         //         this.startGame();
         //     }
         // }
+    }
+    disconnect(user, ctx, ws) {
+        super.disconnect(...arguments);
+        if(this.RoomState === CONSTANTS.RoomStates.Waiting) {
+            this.Players.disconnect(user, ctx, ws);
+            this.events.onexit.send();
+            return true;
+        } else false;
     }
     startGame() {
         this.Players.rollTeam()

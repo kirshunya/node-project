@@ -1,10 +1,13 @@
-import { ondom, getRandomInt, EventProvider, sleep } from './Utilities.js';
+import { ondom, getRandomInt, EventProvider, sleep, range } from './Utilities.js';
 import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from './debugPan.js';
 import { html } from './prophtml.js';
+import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
+import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
+import { NowClientTime } from '../time.js';
 export const timestamp = ()=>Date.now();
 var GameInitData = null;
 export function setGameInitData(data) {
@@ -20,7 +23,7 @@ export function lightstepbutton(active=true) {
   StepCompletor.classList.toggle('active', active);
   PermStepCompletor.classList.toggle('active');
 }
-export function ShowGameTable(localUser) {
+export function ShowGameTable(localUser, GameID) {
     debugPan.install()
     const main = document.getElementsByTagName('main')[0];
     // let localUser = JSON.parse(localStorage.getItem("user"));
@@ -330,9 +333,10 @@ export function ShowGameTable(localUser) {
         
     </div>
   `;
+    const elcaPopup = openBackgammonsWaitingPopup(GameID, localUser);
     (async()=>{
         while(!ConnectionStables.Room) await sleep(100);
-        InitGame(ConnectionStables.Room.GameInitData, localUser, ws);
+        InitGame(ConnectionStables.Room.GameInitData, localUser, ws, elcaPopup);
     })()
 }
 // const User = {userId: 0, username: 'debug'};
@@ -385,7 +389,7 @@ class Timer {
 }
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
-export function InitGame(GameInitData, localUser, ws) {
+export function InitGame(GameInitData, localUser, ws, elcaPopup) {
     const {slots, dropped, players, state} = GameInitData;
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
@@ -412,6 +416,7 @@ export function InitGame(GameInitData, localUser, ws) {
     ConnectionStables.Room.onGameStarted
           .then(({players, state, slots, awaitingTeam})=>
               GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, awaitingTeam)) 
+    ConnectionStables.Room.onGameStarted.then(()=>elcaPopup.then(popup=>popup.remove()))
     // if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
     // if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices, GameInitData.times);//debug----TODO
     function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times, awaitingTeam) {
@@ -501,45 +506,232 @@ export function InitGame(GameInitData, localUser, ws) {
     // });
 }
 
-// WSEventPool.fon('board').then(
-//     event=>{
-        // const dropped = [];
-        // const {slots} = event;
-//         
-//         
-        // gc._set(event.state.ActiveTeam, event.state.Dices);
+const isPopupOpened = () => {
+  return document.querySelector(".popup") ? true : false;
+};
+export const openBackgammonsWaitingPopup = async ([betId, roomId], player,
+  startTime,
+) => {
+  if (isPopupOpened()) {
+    return;
+  }
+  const siteLanguage = window.siteLanguage;
 
-//         WSEventPool.on('restart', ()=>window.location.reload());
-//         
-//         //Tabulations
-//         const [mobile, pc] = Array(2).keys();
-//         let state = mobile;
-//         //initials..
-//         const vg = document.getElementsByClassName('domino-game-page__body-wrapper')[0];
-//         const TopPan = document.getElementById(`TopPan`);
-//         const BottomPan = document.getElementById(`BottomPan`);
-//         const righcol = document.getElementsByClassName('rightcol')[0];
-//         const ddt = document.getElementsByClassName('ddt')[0];
-//         const canvas = document.getElementsByClassName('canvas-container')[0];
-//         const space = document.getElementsByClassName('tabspaces')[0];
-    
-//         function PaginationValidate() {
-//             const width = vg.clientWidth;
-//             if(width < 950 && state !== mobile) {
-//                 state = mobile;
-//                 ddt.classList.toggle('horize', state);
-//                 ddt.replaceChildren(...[
-//                     TopPan, canvas, BottomPan, righcol
-//                 ])
-//             } else if(width >= 950 && state !== pc) {
-//                 state = pc;
-//                 ddt.classList.toggle('horize', state);
-//                 righcol.replaceChildren(...[
-//                     TopPan, space, BottomPan
-//                 ])
-//             }
-//         }
-//         PaginationValidate();
-//         window.addEventListener('resize', PaginationValidate);
-//     }
-// );
+  const { bet } = getDominoRoomBetInfo(+betId);
+
+  const body = document.querySelector("body");
+  let popupElement = document.createElement("div");
+  popupElement.classList.add("popup", "domino-waiting-popup-wrapper");
+  popupElement.innerHTML = `
+  <div class="popup__body">
+  <div
+    class="popup__content domino-waiting-popup"
+  >
+    <div class="popup__header">
+      <div class="popup__timer">
+        <img src="img/timer-icon.png" alt="timer" />
+        <span class="domino-waiting-popup__timer">00:00</span>
+      </div>
+      <p class="domino-waiting-popup-bet">${bet.toFixed(2)} ₼</p>
+    </div>
+    <div class="popup__text domino-waiting-popup__text">
+      <div class="domino-waiting-popup-avatars"></div>
+      <p>${siteLanguage.popups.findingPlayers}</p>
+      <div class="game-mode-banner">
+        <p>
+          ${siteLanguage.popups.gameLable}: <span class="game">Нарды</span> <span class="players">${2}</span> ${
+    siteLanguage.popups.playersLable
+  }
+        </p>
+      </div>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      "
+    >
+      <button
+        class="domino-waiting-popup__button domino-waiting-popup__button-room"
+      >
+        ${siteLanguage.popups.leaveRoom}
+      </button>
+      <button
+        class="domino-waiting-popup__button domino-waiting-popup__button-games"
+      >
+        ${siteLanguage.popups.leaveToGameMenu}
+      </button>
+    </div>
+  </div>
+</div>
+  `;
+
+  const avatarsBlock = popupElement.querySelector(
+    ".domino-waiting-popup-avatars"
+  );
+
+  avatarsBlock.innerHTML = range(1,2).map(i=>`
+        <div class="domino-waiting-popup-avatar-wrapper"> 
+          <div class="domino-waiting-popup-avatar loading" slot="${i}">
+        </div>
+        <p class="domino-waiting-popup-avatar__text">Search..
+      </div>
+      `).join('<div class="domino-waiting-popup-vs">VS</div>');
+
+  // // sort players by connectionDate
+  // players = players.sort((a, b) => a.connectionDate - b.connectionDate);
+
+  // // for each player remove loader in slot, add avatar
+  // players.forEach((player, index) => {
+  //   // const avatarBlock = avatarsBlock.children[index * 2];
+  //   const avatarBlock = avatarsBlock.querySelector(`[slot="${index + 1}"]`);
+  //   avatarBlock.classList.remove("loading");
+  //   avatarBlock.innerHTML = `
+  //     <img src="http${API_URL_PART}${
+  //     (IS_HOSTED_STATIC ? "/static/avatars/" : "/") + player.avatar
+  //   }" alt="">
+  //   `;
+  // });
+  const avatarBlock = avatarsBlock.querySelector(`[slot="${1}"]`);
+    avatarBlock.classList.remove("loading");
+    avatarBlock.innerHTML = `
+      <img src="http${API_URL_PART}${
+        (IS_HOSTED_STATIC ? "/static/avatars/" : "/") + player.avatar
+      }" alt="">
+    `;
+
+  body.appendChild(popupElement);
+
+  let timerTimeout = null;
+  // таймер
+  const timerBlock = document.querySelector(".domino-waiting-popup__timer");
+  // считаем время которое прошло, startTime - время начала ожидания
+
+  const targetTime = new Date(startTime).getTime();
+  let nowClientTime = await NowClientTime();
+
+  let distance = nowClientTime - targetTime;
+
+  timerTimeout = setInterval(async () => {
+    distance += 200;
+
+    const minutes = Math.floor(distance / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Add leading zeros for formatting
+    const formattedMinutes = String(minutes).padStart(2, "0");
+    const formattedSeconds = String(seconds).padStart(2, "0");
+    if (timerBlock) {
+      timerBlock.innerHTML = `${formattedMinutes}:${formattedSeconds}`;
+    }
+  }, 200);
+
+  // кнопки выхода
+  const quitWainingButton = popupElement.querySelector(
+    ".domino-waiting-popup__button-room"
+  );
+
+  const quitWaitingToGamesButton = popupElement.querySelector(
+    ".domino-waiting-popup__button-games"
+  );
+
+  quitWainingButton.addEventListener("click", function () {
+    let websocket = window.ws;
+
+    try {
+      websocket.send(
+        JSON.stringify({
+          method: "backgammons/disconnt",
+          GameID: [betId, roomId],
+        })
+      );
+      // websocket.send(
+      //   JSON.stringify({
+      //     method: "leaveDominoTable",
+      //     dominoRoomId,
+      //     tableId,
+      //     playerMode,
+      //     gameMode,
+      //     userId: +JSON.parse(localStorage.getItem("user")).userId,
+      //   })
+      // );
+    } catch {
+      impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
+      setTimeout(() => location.reload(), 3000);
+    }
+    let localUser = localStorage.getItem("user");
+    localUser = JSON.parse(localUser);
+    location.hash = '#backgammons-menu';
+
+    if (websocket && websocket.readyState == 1) {
+      // // console.log("close ws");
+      clearInterval(timerTimeout);
+      // websocket.close(
+      //   3001,
+      //   JSON.stringify({
+      //     userId: localUser.userId,
+      //     username: localUser.username,
+      //     method: "disconnectGame",
+      //     page: `backgammons`,
+      //   })
+      // );
+      // websocket.close(
+      //   3001,
+      //   JSON.stringify({
+      //     userId: localUser.userId,
+      //     username: localUser.username,
+      //     method: "disconnectGame",
+      //     page: `domino${gameMode}Page${playerMode == 4 ? "4" : ""}`,
+      //   })
+      // );
+    }
+    popupElement.remove();
+  });
+
+  quitWaitingToGamesButton.addEventListener("click", function () {
+    let websocket = window.ws;
+    try {
+      websocket.send(
+        JSON.stringify({
+          method: "backgammons/disconnt",
+          // GameID: [betId, roomId],
+        })
+      );
+      // websocket.send(
+      //   JSON.stringify({
+      //     method: "leaveDominoTable",
+      //     dominoRoomId,
+      //     tableId,
+      //     playerMode,
+      //     gameMode,
+      //     userId: +JSON.parse(localStorage.getItem("user")).userId,
+      //   })
+      // );
+    } catch {
+      impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
+      setTimeout(() => location.reload(), 3000);
+    }
+    let localUser = localStorage.getItem("user");
+    localUser = JSON.parse(localUser);
+
+    if (websocket && websocket.readyState == 1) {
+      // // console.log("close ws");
+      clearInterval(timerTimeout);
+
+      // websocket.close(
+      //   3001,
+      //   JSON.stringify({
+      //     userId: localUser.userId,
+      //     username: localUser.username,
+      //     method: "disconnectGame",
+      //     page: "mainPage",
+      //   })
+      // );
+    }
+
+    popupElement.remove();
+  });
+  return popupElement;
+};

@@ -1,12 +1,25 @@
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-const range = (from, len) => [...Array(len).keys()].map(x => x + from);
+const range = (from, len) => {
+    const ret = [...Array(len).keys()].map(x => x + from);
+    return ret;
+}
+const rangebyvals = (from, len, CB) => {
+    const ret = []
+    for(const i of range(from, len)) ret[i] = CB(i);
+    return ret;
+}
+const mapByIndexToVals = (obj, CB) => {
+    const ret = []
+    for(const i of Object.keys(obj)) ret[i] = CB(i);
+    return ret;
+}
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 module.exports = {
-    getRandomInt, range, sleep
+    getRandomInt, range, rangebyvals, mapByIndexToVals, sleep
 };
 /** 
  * @template T

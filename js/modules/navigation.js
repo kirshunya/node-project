@@ -344,9 +344,10 @@ export async function hashNavigation() {
     }, 50);
   } else if (hash.includes("#backgammon-room-table")) {
     hideNavigation();
-    const [hashName, dominoRoomId, tableId] = hash.split("/");
-    if (dominoRoomId || tableId) {
-      BackgammonGameTable.ShowGameTable(localUser);
+    const [hashName, betId, roomId] = hash.split("/");
+    WSEP.ConnectionStables.connectToRoom([betId, roomId])
+    if (betId || roomId) {
+      BackgammonGameTable.ShowGameTable(localUser, [betId, roomId]);
       // try {
       //   ws.send(
       //     JSON.stringify({

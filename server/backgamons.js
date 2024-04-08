@@ -1,6 +1,6 @@
-const { range, WSListeners } = require('./backgammons/Utility.js');
+const { range, WSListeners, rangebyvals, mapByIndexToVals } = require('./backgammons/Utility.js');
 const { TGame, timestamp } = require('./backgammons/GameRoom.js');
-const { ConnectionContext, Debug } = require('./backgammons/Generals.js');
+const { ConnectionContext, Debug, makeEvent } = require('./backgammons/Generals.js');
 
 console.log(TGame)
 // const timestamp = ()=>Date.now();
@@ -28,14 +28,24 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // }
 
 // const BETsList = [0.5, 1, /*3, 5, 10*/];
+const BETsList = {
+    1:0.5, 
+    2:0.5
+}
 const GamesLobby = new class extends WSListeners {
-    /** @type {[TGame]} */
-    Games = [[], [], [], [], []]
+    /** @type {TGame[][]} */
+    Games = []
     constructor() {
         super('likey');
-        this.Games = this.Games.map((_,betId)=>{
-            return range(1,10).map(roomId=>this.createGame([betId, roomId]));
+        this.Games = mapByIndexToVals(BETsList, ([betId,bet])=>{
+            return rangebyvals(1, 7, (roomId=>this.createGame([betId, roomId])));
         })
+        console.log('Backgammons Rooms Initied:', 
+                Object.entries(this.Games)
+                        .map(([betId, betRooms])=>({
+                            betId, betRooms:Object.entries(betRooms)
+                                        .map(([roomId, room])=>roomId)
+                        })));
     }
     createGame(GameID) {
         const Game = new TGame(GameID);
@@ -52,10 +62,21 @@ const GamesLobby = new class extends WSListeners {
             this.event('backgammons::lobby::roomEnd', {
                 GameID, players:Game.Players.json()
             })
-            setTimeout(this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
+            setTimeout(()=>this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
         })
         return Game;
     }
+    connect(user, ctx) {
+        super.connect(...arguments)
+        const rooms = [];
+        for(const [betId, betRooms] of Object.entries(this.Games)){
+            rooms[betId] = []
+            for(const [roomId, room] of Object.entries(betRooms))
+                rooms[betId][roomId] = [room?.Players?.json(), room?.RoomState];
+            }
+        return makeEvent('backgammons::lobbyInit', {rooms})
+    }
+    disconnect(user, ctx) {}
     /**
      * @param {[int, int]} GameID 
      * @returns {TGame}
@@ -79,7 +100,7 @@ const WSPipelineCommands = {
         ctx.user = {clientId, userId, username}
     },
     ['backgammons/openLobby'](ctx, msg) {
-        GamesLobby.connect(ctx.user, ctx, this);
+        return GamesLobby.connect(ctx.user, ctx, this);
         // console.log("Games", Games);
         // return {
         //     event:  'backgammons::lobbyInit', 
@@ -108,6 +129,9 @@ const WSPipelineCommands = {
 
         Game.connect(ctx.user, ctx, this);
         //'backgammons::connection'
+    },
+    ['backgammons/disconnt'](ctx, msg) {
+        GamesLobby.getGameByID(ctx.GameID).disconnect(ctx.user, ctx, this);
     },
     ['chat'](ctx, msg) {
         GamesLobby.getGameByID(ctx.GameID).chat(msg);
@@ -230,6 +254,9 @@ module.exports = function(ws, req) {
         }
     });
     ws.on('close', function() {
-
+        GamesLobby.disconnect();
+        if(ctx.GameID) {
+            GamesLobby.getGameByID(ctx.GameID).disconnect(ctx.user, ctx, ws)
+        }
     });
 }

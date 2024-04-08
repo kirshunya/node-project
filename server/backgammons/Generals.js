@@ -74,7 +74,6 @@ module.exports.TPlayer = class TPlayer {
     static PlayersContainer = class TPlayers extends RoomComponent {
         /** @type {TPlayer[]} */
         list = []
-        
         rollTeam() {
             const [fpm, sp] = this.list;
             const acto = [WHITEID, BLACKID][getRandomInt(0,1)];
@@ -84,12 +83,18 @@ module.exports.TPlayer = class TPlayer {
         appendPlayer(User) {
             if(this.isalready()) return 0;
             if(this.getPlayerByID(User.userId)) return 1;
-            return this.list.push(TPlayer.fromUser(User));
+            return 10+this.list.push(TPlayer.fromUser(User));
+        }
+        disconnect(user) {
+            //disconnect only if this user is this player
+            if(this.list.length === 1 && this.list[0].userId === user.userId) {
+                this.list.length = 0;
+            }
         }
         getPlayerByID(userId) {
-            /*Debug*/
-            if(userId === 2) 
-                return Debugger;
+            // /*Debug*/
+            // if(userId === 2) 
+            //     return Debugger;
             for(const player of this.list) 
                 if(player.userId === userId) return player
             return null;
@@ -111,6 +116,10 @@ module.exports.TState = class TState {
     /** @type {[Number, Number]} */
     Dices
 }
+function makeEvent(event, response){
+    return Object.assign(response, {event, method:'backgammons::event'})
+}
+module.exports.makeEvent = makeEvent
 module.exports.ConnectionContext = class ConnectionContext {
     /** @type {TUser} */
     user
@@ -126,7 +135,7 @@ module.exports.ConnectionContext = class ConnectionContext {
     }
     /** @param {string} event $eventname @param {object} response  */
     event(event, response){
-        return this.send(Object.assign(response, {event, method:'backgammons::event'}))
+        return this.send(makeEvent(event, response))
     }
 }
 module.exports.EventProvider = class EventProvider {
