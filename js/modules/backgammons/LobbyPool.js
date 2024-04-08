@@ -1,4 +1,4 @@
-import { getRandomInt, range } from "./Utilities.js";
+import { getRandomInt, localThisProvideComponent, range } from "./Utilities.js";
 import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { html } from "./prophtml.js";
 
@@ -68,6 +68,9 @@ export function setOnlineToTable([roomId, tableId], players) {
 export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
   /** @type {HTMLElement} */
   htmlview
+  /** @type {Array.<Array.<__T0BackgammonsLobbyHub.TableElT>>} */
+  RoomsMap = [];
+
   constructor() {}
 
   show() {
@@ -103,8 +106,22 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     }
     html() { return this.content; }
   }
+  WSEventsRoute = new class extends localThisProvideComponent('hub') {
+    ["backgammons::lobbyInit"]({room}){
+      BackgammonsLobbyHub.resetLobbyTable(rooms);
+    }
+    ["backgammons::lobby::connectionToRoom"]({GameID, players}) {
+        BackgammonsLobbyHub.setOnlineToTable(GameID, players);
+    }
+    ["backgammons::lobby::GameStart"]({GameID}) {
+        BackgammonsLobbyHub.visitEnableToggle(GameID, true);
+    }
+    ["backgammons::lobby::GameEnd"](msg) {
+        BackgammonsLobbyHub.setOnlineToTable(GameID, []);
+        BackgammonsLobbyHub.visitEnableToggle(GameID, false);
+    }
+  }
   init() {
-    this.RoomsMap = [];
     const container = htmlelement('div', ["main__container","header__padding","footer__padding"]);
     const mutobserverCode = `backgsLobby${getRandomInt(-65341, 65341)}`;
     const swipers = [];
@@ -154,19 +171,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
           ))
         ]
       ));
-      /** @type {import('./../../../json/localize.json')['ru']} */
-      const siteLanguage = window.siteLanguage
-    // const onMainDOMupdate = new MutationObserver(mutrecs=>{
-    //   console.log(mutrecs)
-    //   // if(mutrecs[0].addedNodes[0]?.name === mutobserverCode) {
-    //     console.log('swiper inits!');
-    //     onMainDOMupdate.disconnect()
-    //     setTimeout(initSwiper, 100);
-    //   // }
-    // })
-    // onMainDOMupdate.observe(document.getElementsByTagName('main')[0], { childList: true, characterData:false })
-    // создаем сладеры для елементов
-      // return new Swiper(".domino-room-content__tables-swiper", {
+    this.htmlview = container;
     function  AddSwiperBehaviour (swiperEl) { return swipers.push(swiperEl) };
     swipers.map(swiper=>new Swiper(swiper, {
               slidesPerView: 4,
@@ -192,8 +197,51 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                   slidesPerView: 3,
               },
           },
-      }))
-    return this.htmlview = container;
+      }));
+    this.__initvals&&this.resetLobbyTable(this.__initvals);
+    this.updalist.map(([...args])=>setOnlineToTable(...args));
+    return container
+  }
+  __initvals;
+  resetLobbyTable(rooms) {
+    if(!this.htmlview) return this.__initvals = rooms
+    rooms.map((tables, betId)=>{
+      // betId+=1;
+      tables.map((table, roomId)=>{
+          roomId+=1;
+          BackgammonsLobbyHub.setOnlineToTable([betId, roomId], table.players);
+      })
+    });
+  }
+  updalist = []
+  setOnlineToTable([betId, roomId], players) {
+    if(!this.htmlview) return this.updalist.push([...arguments])
+    const table = this.RoomsMap[betId][roomId];
+  
+    table.playersinfo.innerHTML += `
+        <div class="domino-room-table-info__players-item">
+        <img src="./img/domino-online-icon.png" alt="" />
+        </div>
+    `;
+
+    table.tableparts.map((part, ind)=>
+        part.classList.toggle("filled", ind < players.length)
+    )
+    // for (let i = 0; i < players.length; i++) {
+    //     const roomHalf = table.tableparts[i];
+    //     if (roomHalf) {
+    //         roomHalf.classList.add("filled");
+    //         if (window.isAdmin == true && i == peopleItems.length - 1) {
+    //           roomHalf.innerHTML = `<div class="table-admin__userid-item">${/*players[i].userId//msg.userId*/1}</div>`;
+    //         }
+    //     }
+    // }
+  }
+  visitEnableToggle([betId, roomId], enable) {
+    const table = this.RoomsMap[betId][roomId];
+    table.eyelabel.firstChild.src = enable
+                                        ? 'img/backgammons/eyeh.png'
+                                        : 'img/backgammons/eyek.png'
   }
 }
 export function openBackgammonsMenuPage() {

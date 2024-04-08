@@ -27,7 +27,10 @@ export const range = (from, len) => [...Array(len).keys()].map(x => x + from);
 
 const __getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 export const getRandomInt = (min, max) => __getRandomInt(Math.ceil(min), Math.floor(max));
-
+/** 
+ * @template T
+ * @returns {[Promise.<T>, (value: T | PromiseLike<T>) => void, (value: T | PromiseLike<T>) => void]}
+ */
 export const OEPromise = ()=>{
     let resolve, reject;
     const promise = new Promise((r,e)=>(resolve=r)&&(reject=e));
@@ -105,6 +108,11 @@ export class JustEnoughEvents {
     }
 }
 export const ondom = FCPromise();  window.addEventListener('DOMContentLoaded', ondom.resolve);
+export function localThisProvideComponent(keyword) {
+  return class localThisProvideComponent {
+    constructor(_this) { this[keyword] = _this; }
+  }
+}
 //GameConstants..
 export const [white, black] = ['white', 'black'];
 export const [steping, completed] = ['steping', 'completed'];

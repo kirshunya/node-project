@@ -4,6 +4,7 @@ export const WSEventPool = new JustEnoughEvents();
 import { BoardConstants, GameInitData, TGameStartedData, slotinfo } from './BoardConstants.js';
 import * as BackgammonMenu from "./LobbyPool.js";
 import * as GamePool from "./GamePool.js";
+import { getLocalUser } from '../authinterface.js';
 // import { localUser } from './EntryPoint.js';
 //TODO: продумать мессаджинг
 export const WSEvents = {
@@ -68,25 +69,12 @@ export const ConnectionStables = {
         window.TimersTurn = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
         (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
     },
-    ["backgammons::lobbyInit"](msg){
-        msg.rooms.map((tables, roomId)=>{
-            roomId+=1;
-            tables.map((table, tableid)=>{
-                tableid+=1;
-                BackgammonMenu.setOnlineToTable(roomId, tableid, table.players);
-            })
-        });
-    },
-    ["backgammons::lobby::connectionToRoom"](msg) {
-        const {GameID, players} = msg;
-        BackgammonMenu.setOnlineToTable(GameID, players);
-    },
     async ['TimersTurn']({TimersTurn}){
         window.TimersTurn = TimersTurn
         TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
     },
     ['autodiceset']({userId, value}) {
-        if(!userId || userId === localUser().userId) GamePool.autostep.setdice(value);
+        if(!userId || userId === getLocalUser().userId) GamePool.autostep.setdice(value);
     },
     ['message'](msg) {
         new Toast({
@@ -97,21 +85,9 @@ export const ConnectionStables = {
         })
     }
 });
-Object.entries(EventsRoutes).map(([eventname, CallBack])=>WSEventPool.on(eventname, CallBack));
-/** 
- * @typedef TlocalUser
- * @property {int} userId 
- * @property {string} username
- */
-/**
- * 
- * @param {*} CB 
- * @returns {any | {userId, username, }}
- */
-export const localUser = (CB=localUser=>localUser)=>{
-    const localUser = localStorage.getItem("user");
-    if (localUser) { return CB(JSON.parse(localUser)); }
-}
+Object.entries(EventsRoutes).map(([eventname, CallBack])=>WSEventPool.on(eventname, CallBack.bind(EventsRoutes)));
+
+
 export function onnewmsg(msg) {
     // EventsRoutes[msg.event]?.(msg);
     WSEventPool.$$send(msg.event, msg);

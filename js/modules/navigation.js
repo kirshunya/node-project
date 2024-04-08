@@ -10,6 +10,8 @@ import * as impMoveElement from "./move-element.js";
 import * as impAudio from "./audio.js";
 import * as BackgammonMenu from "./backgammons/LobbyPool.js";
 import * as BackgammonGameTable from "./backgammons/GamePool.js";
+import * as WSEP from "./backgammons/WSEP.js";
+import { getLocalUser } from "./authinterface.js";
 let preloader = document.querySelector(".page-preloader");
 let header = document.querySelector("header");
 let main = document.querySelector("main");
@@ -17,9 +19,13 @@ let footer = document.querySelector("footer");
 let mainContainer = document.querySelector(".main__container");
 mainContainer.classList.add("header__padding");
 
+export function showAuthorization() {
+  const auth = document.querySelector(".registration");
+  auth.classList.toggle("opened", true);
+}
 export function hideAuthorization() {
   const auth = document.querySelector(".registration");
-  auth.classList.remove("opened");
+  auth.classList.toggle("opened", false);
 }
 
 export function addListeners(ws) {
@@ -84,14 +90,15 @@ export async function addHashListeners(ws = null) {
 export async function hashNavigation() {
   // console.log("location changed", location.hash);
   
-  let localUser = localStorage.getItem("user");
+  const localUser = getLocalUser();
+  // localStorage.getItem("user");
 
-  if (localUser) {
-    localUser = JSON.parse(localUser);
-  }
+  // if (localUser) {
+  //   localUser = JSON.parse(localUser);
+  // }
 
-  let websocket = window.ws;
-  if (header.classList.contains("d-none")) {
+  const websocket = window.ws;
+  if (header.classList.contains("d-none")) {//?
     header.classList.remove("d-none");
     mainContainer.classList.add("header__padding");
   }
@@ -1287,27 +1294,27 @@ export async function checkUserCurrentGames() {
   }
 
   // проверка на активные игры домино
-  const dominoResponse = await impHttp.getDominoStatus();
-  if (dominoResponse.status == 200) {
-    const inDominoGameStatus = dominoResponse.data.message;
-    if (inDominoGameStatus) {
-      const { roomId, tableId, playerMode, gameMode } =
-        dominoResponse.data.roomInfo;
-      message.currGame = "domino";
-      message.roomId = roomId;
-      message.tableId = tableId;
-      message.playerMode = playerMode;
-      message.gameMode = gameMode.toUpperCase();
-      message.gameStarted = true;
-      return message;
-    } else {
-      // message.currGame = "free";
-      // return message;
-    }
-  } else {
-    // message.currGame = "free";
-    // return message;
-  }
+  // const dominoResponse = await impHttp.getDominoStatus();
+  // if (dominoResponse.status == 200) {
+  //   const inDominoGameStatus = dominoResponse.data.message;
+  //   if (inDominoGameStatus) {
+  //     const { roomId, tableId, playerMode, gameMode } =
+  //       dominoResponse.data.roomInfo;
+  //     message.currGame = "domino";
+  //     message.roomId = roomId;
+  //     message.tableId = tableId;
+  //     message.playerMode = playerMode;
+  //     message.gameMode = gameMode.toUpperCase();
+  //     message.gameStarted = true;
+  //     return message;
+  //   } else {
+  //     // message.currGame = "free";
+  //     // return message;
+  //   }
+  // } else {
+  //   // message.currGame = "free";
+  //   // return message;
+  // }
 
   if (message.currGame == null) {
     message.currGame = "free";

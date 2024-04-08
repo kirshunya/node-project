@@ -10,6 +10,7 @@ import * as impPopup from "./modules/pages/popup.js";
 import * as impDominoGame from "./modules/domino/domino-game.js";
 import * as impDominoNav from "./modules/domino/domino-navigation.js";
 import { debugPan } from "./modules/backgammons/debugPan.js";
+import { getLocalUser } from "./modules/authinterface.js";
 window.ws = null;
 
 // impDominoGame.tablePlacement();
@@ -21,6 +22,7 @@ window.siteLanguage = siteLanguage;
 impLocalization.translateAuthPage();
 impLocalization.translateGameChooseMenu();
 
+if(getLocalUser()) impNav.hideAuthorization()
 impAuth.registrationForm();
 impAuth.createLoginForm();
 
@@ -32,7 +34,7 @@ window.scrollTo(0, 0);
 
 if (await impAuth.isAuth()) {
   // preloader.classList.remove("d-none");
-  location.hash = "";
+  // location.hash = "";
   impNav.hideAuthorization();
 
   if (await impAuth.isAdmin()) {
@@ -44,12 +46,13 @@ if (await impAuth.isAuth()) {
   // }, 20000);
   impNav.pageNavigation(ws);
   impNav.addHashListeners(ws);
+  impNav.hashNavigation();
   // impNav.addHashListenersWS(ws);
 
   // надо для лото на первой странице
   // impNav.addListeners(ws);
 
-  location.hash = "#gamemode-choose";
+  // location.hash = "#gamemode-choose";
   impDominoNav.dominoChoosePageListeners();
 
   window.scrollTo(0, 0);
@@ -66,6 +69,7 @@ if (await impAuth.isAuth()) {
 
   // impDominoNav.openDominoChoosePage();
 } else {
+  impNav.showAuthorization();
   console.log("not auth");
 }
 

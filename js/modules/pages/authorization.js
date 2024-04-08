@@ -7,6 +7,7 @@ import * as impWSNavigation from "../ws-navigation.js";
 import * as impAdminNav from "./admin-navigation.js";
 import * as impPopup from "./popup.js";
 import * as impLocalization from "../localize.js";
+import { FCPromise } from "../backgammons/Utilities.js";
 
 export function registrationForm() {
   // let openFormButtons = document.querySelectorAll(".open-registration");
@@ -367,7 +368,7 @@ export async function getUser() {
     return false;
   }
 }
-
+export const onAuth = FCPromise(); // можно заменить на `new EventProvider();`
 export async function isAuth() {
   let response = await impHttpRequests.checkAuth();
 
@@ -394,6 +395,7 @@ export async function isAuth() {
     localStorage.setItem("user", JSON.stringify(user));
     window.isAdmin = response.data.isAdmin;
 
+    onAuth.resolve(user);
     return true;
   } else {
     return false;

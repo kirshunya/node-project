@@ -8,12 +8,26 @@ function getRandomInt(min, max) {
 module.exports = {
     getRandomInt, range, sleep
 };
+/** 
+ * @template T
+ * @returns {[Promise.<T>, (value: T | PromiseLike<T>) => void, (value: T | PromiseLike<T>) => void]}
+ */
 const OEPromise = ()=>{
     let resolve, reject;
+    /** @type { Promise.<T> } */
     const promise = new Promise((r,e)=>(resolve=r)&&(reject=e));
     return [promise, (...args)=>resolve(...args), (...args)=>reject(...args)];
 }
+/**
+ * @typedef {Promise.<T>& {promise: Promise<T>;resolve: (...args: any[]) => void;reject: (value: any) => void;}} FCPromiseT
+ * @template T
+ */
+/** 
+ * @template T
+ * @returns {Promise.<T>& {promise: Promise<T>;resolve: (...args: any[]) => void;reject: (value: any) => void;}}
+ */
 module.exports.FCPromise = ()=>{
+    /**  */
     const [promise, resolve, reject] = OEPromise();
     return Object.assign(promise, {promise, resolve, reject});
 }

@@ -26,3 +26,17 @@ export function updateBalance(newBalance) {
     }
   });
 }
+/** 
+ * @typedef TlocalUser
+ * @property {int} userId 
+ * @property {string} username
+ */
+/**
+ * 
+ * @param {*} CB 
+ * @returns {any | {userId, username, }}
+ */
+export function getLocalUser(CB=localUser=>localUser){
+  const localUser = localStorage.getItem("user");
+  if (localUser) { return CB(JSON.parse(localUser)); }
+}
