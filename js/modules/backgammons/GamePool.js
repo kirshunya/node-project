@@ -8,21 +8,24 @@ import { html } from './prophtml.js';
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
 import { NowClientTime } from '../time.js';
-export const timestamp = ()=>Date.now();
-var GameInitData = null;
+import { Toast} from './Utilities.js';
+
+export const timestamp = ()=>Date.now();//moveTo Utilities
+
+var GameInitData = null;//deprec
 export function setGameInitData(data) {
     GameInitData = data;
 }
-let stepComplete;
+let stepComplete;//refac
 export const autostep = {value:true, dice:true, setdice(value) {
   this.dice = value
   const autostepToggler = document.getElementsByClassName('autostep')[0]
   autostepToggler.classList.toggle('active', value)
-}};
+}};//moveTo configurations.js? + EventProvider to settlement 
 export function lightstepbutton(active=true) {
   StepCompletor.classList.toggle('active', active);
   PermStepCompletor.classList.toggle('active');
-}
+}//refac
 export function ShowGameTable(localUser, GameID) {
     debugPan.install()
     const main = document.getElementsByTagName('main')[0];
@@ -31,7 +34,7 @@ export function ShowGameTable(localUser, GameID) {
     <div class="main__container footer__padding">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
         <div class="domino-games__container">
-          <style>
+          <style>/* moveTo styles/backgammons/GameScene.css
             #TopPan, #BottomPan {
               font-size: smaller;
               max-width: 640px;
@@ -335,7 +338,7 @@ export function ShowGameTable(localUser, GameID) {
   `;
     const elcaPopup = openBackgammonsWaitingPopup(GameID, localUser);
     (async()=>{
-        while(!ConnectionStables.Room) await sleep(100);
+        while(!ConnectionStables.Room) await sleep(100);//what should to do to refac?? send to this function some promise of connection? and should create some clear functiotive..
         InitGame(ConnectionStables.Room.GameInitData, localUser, ws, elcaPopup);
     })()
 }
