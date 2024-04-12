@@ -9,7 +9,7 @@ import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
 import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
-import { } from './../pages/popup.js';
+import { openEmojisPopup, openTextPopup } from './../pages/popup.js';
 
 window.openEmojisPopup = ()=>{
 
