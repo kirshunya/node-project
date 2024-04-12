@@ -462,6 +462,10 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
     })
+    WSEventPool.on('emoji', ({userId, emojiId})=>{
+        emojiSRC = `img/emojis/${emojId}`;
+        return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}">`});
+    })
     function InitUI(user, opponent, [whiteval, blackval]) {
         const autostepToggler = document.getElementsByClassName('autostep')[0]
         // autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
