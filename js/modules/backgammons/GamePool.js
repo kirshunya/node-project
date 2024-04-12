@@ -471,7 +471,7 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
     })
     WSEventPool.on('emoji', ({userId, emojiId})=>{
         const emojiSRC = `img/emojis/${emojiId}.png`;
-        return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}">`});
+        return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}" width="5rem" height="5rem">`});
     })
     WSEventPool.on('phrase', ({userId, phraseId})=>{
         return new Toast({title:`фраза от ${userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`]});
