@@ -41,9 +41,9 @@ export const connectWebsocketFunctions = () => {
   window.ws = ws;
 
 const wssend = ws.send
-ws.send = ()=>{
-console.log("<<WS::msg::send>>", ...arguments);
-wssend.call(ws, ...arguments);
+ws.send = (...args)=>{
+console.log("<<WS::msg::send>>", ...args);
+wssend.call(ws, ...args);
 }
     
   let clientId = impLotoNav.createClientId();
