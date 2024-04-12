@@ -8,7 +8,15 @@ import { html } from './prophtml.js';
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
 import { NowClientTime } from '../time.js';
-import { Toast} from './Utilities.js';
+import { Toast } from './Utilities.js';
+import { } from './../pages/popup.js';
+
+window.openEmojisPopup = ()=>{
+
+}
+window.openPhrasesPopup = ()=>{
+
+}
 
 export const timestamp = ()=>Date.now();//moveTo Utilities
 
@@ -298,8 +306,8 @@ export function ShowGameTable(localUser, GameID) {
             <div id="BottomPan" class="TopLink">
               <div class="pcontrs">
                 <div class="buttons">
-                  <div style="background-image: url('img/icons8-smile-chat-100.png');"></div>
-                  <div style="background-image: url('img/chat50.png');"></div>
+                  <div id="smileChat" style="background-image: url('img/icons8-smile-chat-100.png');"></div>
+                  <div id="phraseChat" style="background-image: url('img/chat50.png');"></div>
                 </div>
                 <div class="line" style="position: relative;">
                   <!-- <div style="flex-grow: 1;" class="dp"></div>
