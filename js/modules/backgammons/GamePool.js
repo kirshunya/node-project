@@ -35,7 +35,7 @@ export function ShowGameTable(localUser, GameID) {
     const main = document.getElementsByTagName('main')[0];
     // let localUser = JSON.parse(localStorage.getItem("user"));
     main.innerHTML = html`
-    <div class="main__container footer__padding">
+    <div class="main__container footer__padding" style="max-width: 100vw">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
         <div class="domino-games__container">
           <style>/* moveTo styles/backgammons/GameScene.css
