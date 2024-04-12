@@ -179,7 +179,7 @@ emojiSend(ctx, msg) {
 },
 phraseSend(ctx, msg) {
    GamesLobby.getGameByID(ctx.GameID).event('phrase', msg);
-}
+},
     /**
      * Debug function, restart game
      * @param {ConnectionContext} ctx 
