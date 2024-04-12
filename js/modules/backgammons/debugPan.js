@@ -1,6 +1,6 @@
 
 
-const debugPanHTML = `<div class="debugPan">debug: 
+const debugPanHTML = `<div class="debugPan" style="display:none! important">debug: 
       <input type="button" id="TimersTurnDebugButton"></input>
       <input type="button" id="ChosePlayerDebugButton" value="player:"></input>
       <input type="button" id="PermStepCompletor" value="Принудительно завершить ход"></input>
