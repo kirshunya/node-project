@@ -342,7 +342,7 @@ export function ShowGameTable(localUser, GameID) {
   `;
     const elcaPopup = openBackgammonsWaitingPopup(GameID, localUser);
 const wssend = window.send
-window.send = ()=>{
+window.ws.send = ()=>{
 console.log("<<WS::msg::send>>", ...arguments);
 wssend.call(window.ws, ...arguments);
 }
