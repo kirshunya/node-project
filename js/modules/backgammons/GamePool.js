@@ -9,14 +9,10 @@ import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
 import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
-import { openEmojisPopup, openTextPopup } from './../pages/popup.js';
+import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 
-window.openEmojisPopup = ()=>{
-
-}
-window.openPhrasesPopup = ()=>{
-
-}
+window.openEmojiPopup = openEmojiPopup;
+window.openPhrasesPopup = openTextPopup;
 
 export const timestamp = ()=>Date.now();//moveTo Utilities
 
@@ -306,8 +302,8 @@ export function ShowGameTable(localUser, GameID) {
             <div id="BottomPan" class="TopLink">
               <div class="pcontrs">
                 <div class="buttons">
-                  <div id="smileChat" style="background-image: url('img/icons8-smile-chat-100.png');"></div>
-                  <div id="phraseChat" style="background-image: url('img/chat50.png');"></div>
+                  <div id="smileChat" onclick="window.openEmojiPopup()" style="background-image: url('img/icons8-smile-chat-100.png');"></div>
+                  <div id="phraseChat" onclick="window.openPhrasesPopup()" style="background-image: url('img/chat50.png');"></div>
                 </div>
                 <div class="line" style="position: relative;">
                   <!-- <div style="flex-grow: 1;" class="dp"></div>
