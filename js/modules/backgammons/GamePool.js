@@ -346,7 +346,7 @@ window.send = ()=>{
 console.log("<<WS::msg::send>>", ...arguments);
 wssend.call(window.ws, ...arguments);
 }
-ws.on('message', ()=>console.log("<<WS::msg::input>>", ...arguments));
+window.ws.on('message', ()=>console.log("<<WS::msg::input>>", ...arguments));
     (async()=>{
         while(!ConnectionStables.Room) await sleep(100);//what should to do to refac?? send to this function some promise of connection? and should create some clear functiotive..
         InitGame(ConnectionStables.Room.GameInitData, localUser, ws, elcaPopup);
