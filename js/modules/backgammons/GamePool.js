@@ -466,6 +466,9 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
         emojiSRC = `img/emojis/${emojId}`;
         return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}">`});
     })
+    WSEventPool.on('phrase', ({userId, phraseId})=>{
+        return new Toast({title:`фраза от ${userId}`, text:`${pharseId}`});
+    })
     function InitUI(user, opponent, [whiteval, blackval]) {
         const autostepToggler = document.getElementsByClassName('autostep')[0]
         // autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
