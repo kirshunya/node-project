@@ -174,10 +174,10 @@ const WSPipelineCommands = {
         const Game = GamesLobby.getGameByID(ctx.GameID);
         return {event, slots: Game.Slots, state: Game.info};
     },
-emojiSend(ctx, msg) {
+sendEmoji(ctx, msg) {
     GamesLobby.getGameByID(ctx.GameID).event('emoji', msg);
 },
-phraseSend(ctx, msg) {
+senPhrase(ctx, msg) {
    GamesLobby.getGameByID(ctx.GameID).event('phrase', msg);
 },
     /**
