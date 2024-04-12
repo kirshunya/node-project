@@ -176,6 +176,9 @@ const WSPipelineCommands = {
     },
 emojiSend(ctx, msg) {
     GamesLobby.getGameByID(ctx.GameID).event('emoji', msg);
+},
+phraseSend(ctx, msg) {
+   GamesLobby.getGameByID(ctx.GameID).event('phrase', msg);
 }
     /**
      * Debug function, restart game
