@@ -470,10 +470,12 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
           autostepToggler.classList.toggle('active', autostep.dice)
           window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
         })
-        document.getElementById('TopPan')
-                .getElementsByClassName('Nickname')[0].innerHTML = user.username;
-        document.getElementById('BottomPan')
-                .getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+        const userPan = document.getElementById('TopPan')
+                userPan.getElementsByTagName('img')[0]?.src = user.avatar;
+                userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
+        const oppPan = document.getElementById('BottomPan')
+                oppPan.getElementsByTagName('img')[0]?.src = opponent.avatar;
+                oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
         return [
                 new Timer(document.getElementById('TopPan'), whiteval), 
                 new Timer(document.getElementById('BottomPan'), blackval)
@@ -609,7 +611,7 @@ export const openBackgammonsWaitingPopup = async ([betId, roomId], player,
   const timerBlock = document.querySelector(".domino-waiting-popup__timer");
   // считаем время которое прошло, startTime - время начала ожидания
 
-  const targetTime = new Date(startTime).getTime();
+  const targetTime = Date.now();
   let nowClientTime = await NowClientTime();
 
   let distance = nowClientTime - targetTime;

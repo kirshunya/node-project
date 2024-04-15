@@ -1,6 +1,8 @@
 const { range, WSListeners, rangebyvals, mapByIndexToVals } = require('./backgammons/Utility.js');
 const { TGame, timestamp } = require('./backgammons/GameRoom.js');
 const { ConnectionContext, Debug, makeEvent } = require('./backgammons/Generals.js');
+// var fs = require('fs');
+const { User } = require('./models/db-models.js');
 
 console.log(TGame)
 // const timestamp = ()=>Date.now();
@@ -95,9 +97,10 @@ const WSPipelineCommands = {
      * @param {ConnectionContext} ctx 
      * @param {*} msg 
      */
-    ['connectGeneral'](ctx, msg) {
+    async ['connectGeneral'](ctx, msg) {
         const {clientId, userId, username} = msg
-        ctx.user = {clientId, userId, username}
+        let user = await User.findOne({ where: { id: userId } });
+        ctx.user = {clientId, userId, username, avatar:user.avatar}
     },
     ['backgammons/openLobby'](ctx, msg) {
         return GamesLobby.connect(ctx.user, ctx, this);
@@ -231,8 +234,6 @@ const WSPipelineCommands = {
     }
 }
 
-var fs = require('fs');
-const { connect } = require('http2');
 /**
  * 
  * @param {WebSocket} ws 

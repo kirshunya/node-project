@@ -21,6 +21,8 @@ module.exports.TUser = class TUser {
     clientId
     /** @type {string} */
     username
+    /** AvatarURL @type {string} */
+    avatar
     /**
      * 
      * @param {int} userId 
@@ -48,6 +50,8 @@ module.exports.TPlayer = class TPlayer {
     userId
     /** @type {string} */
     username
+    /** AvatarURL @type {string} */
+    avatar
     /** @type {int} */
     team
     /** @type {boolean} */
@@ -58,10 +62,11 @@ module.exports.TPlayer = class TPlayer {
      * @param {string} username 
      * @param {int} team 
      */
-    constructor(userId, username, team) {
+    constructor(userId, username, team, avatar) {
         this.userId = userId
         this.username = username
         this.team = team
+        this.avatar = avatar
     }
     /**
      * 
@@ -69,7 +74,7 @@ module.exports.TPlayer = class TPlayer {
      * @returns {TPlayer}
      */
     static fromUser(user, team=undefined) {
-        return new TPlayer(user.userId, user.username, team)
+        return new TPlayer(user.userId, user.username, team, user.avatar)
     }
     static PlayersContainer = class TPlayers extends RoomComponent {
         /** @type {TPlayer[]} */
