@@ -177,22 +177,18 @@ const WSPipelineCommands = {
         const Game = GamesLobby.getGameByID(ctx.GameID);
         return {event, slots: Game.Slots, state: Game.info};
     },
-sendEmoji(ctx, msg) {
-    GamesLobby.getGameByID(ctx.GameID).event('emoji', msg);
-},
-sendPhrase(ctx, msg) {
-   GamesLobby.getGameByID(ctx.GameID).event('phrase', msg);
-},
+    sendEmoji(ctx, msg) {
+        GamesLobby.getGameByID(ctx.GameID).event('emoji', msg);
+    },
+    sendPhrase(ctx, msg) {
+    GamesLobby.getGameByID(ctx.GameID).event('phrase', msg);
+    },
     /**
      * Debug function, restart game
      * @param {ConnectionContext} ctx 
      * @returns 
      */
     restart__(ctx) {
-        // const lastGame = ctx.Game;
-        // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
-        // Game.Listeners = lastGame.Listeners;
-        // this.Games[Debug.GAMESCOUNT];
         const Game = GamesLobby.getGameByID(ctx.GameID);
         GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
         Debug.GAMESCOUNT++;
@@ -204,10 +200,6 @@ sendPhrase(ctx, msg) {
      * @returns 
      */
     restartTest(ctx) {
-        // const lastGame = ctx.Game;
-        // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
-        // Game.Listeners = lastGame.Listeners;
-        // this.Games[Debug.GAMESCOUNT];
         const Game = GamesLobby.getGameByID(ctx.GameID)
         GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
         GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'test');
@@ -219,10 +211,6 @@ sendPhrase(ctx, msg) {
      * @returns 
      */
     restartFlud(ctx) {
-        // const lastGame = ctx.Game;
-        // const Game = ctx.Game = Games[ctx.RoomID] = new TGame();
-        // Game.Listeners = lastGame.Listeners;
-        // this.Games[Debug.GAMESCOUNT];
         const Game = GamesLobby.getGameByID(ctx.GameID)
         GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
         GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'flud');

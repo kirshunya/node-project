@@ -98,7 +98,7 @@ class UserService {
     const allUserGames = await UserGame.findAll();
 
     if (gameType == "loto") {
-      //получаем всех юзеров з лото
+      //получаем всех юзеров из лото
       let lotoStats = [];
       allStats.forEach((user) => {
         if (user.gameLotoPlayed > 0) {
@@ -159,7 +159,7 @@ class UserService {
 
       return lotoStats;
     } else if (gameType == "nards") {
-      //получаем всех юзеров з лото
+      //получаем всех юзеров из нард
       let nardsStats = [];
       allStats.forEach((user) => {
         if (user.gameNardsPlayed > 0) {
@@ -183,7 +183,7 @@ class UserService {
       });
       return nardsStats;
     } else if (gameType == "domino") {
-      //получаем всех юзеров з лото
+      //получаем всех юзеров из домино
       let dominoStats = [];
       allStats.forEach((user) => {
         if (user.gameDominoPlayed > 0) {
@@ -213,7 +213,7 @@ class UserService {
     let allStats = await BotStats.findAll();
 
     if (gameType == "loto") {
-      //получаем всех юзеров з лото
+      //получаем всех юзеров из лото
       let lotoStats = [];
       allStats.forEach((bot) => {
         let botDto = {
@@ -224,7 +224,7 @@ class UserService {
       });
       return lotoStats;
     } else if (gameType == "nards") {
-      //получаем всех юзеров з лото
+      //получаем всех юзеров из нард
       let nardsStats = [];
       allStats.forEach((bot) => {
         let botDto = {
@@ -235,7 +235,7 @@ class UserService {
       });
       return nardsStats;
     } else if (gameType == "domino") {
-      //получаем всех юзеров з лото
+      //получаем всех юзеров из домино
       let dominoStats = [];
       allStats.forEach((bot) => {
         let botDto = {

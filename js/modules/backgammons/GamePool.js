@@ -20,7 +20,6 @@ var GameInitData = null;//deprec
 export function setGameInitData(data) {
     GameInitData = data;
 }
-let stepComplete;//refac
 export const autostep = {value:true, dice:true, setdice(value) {
   this.dice = value
   const autostepToggler = document.getElementsByClassName('autostep')[0]
@@ -295,22 +294,12 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
         TimersByTeam[prevtimer]?.enable(false, isinit);
         return activetimerind;
     }
-    // WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
-    //     if(code !== ncode) step.map(({from,to})=>{
-    //             gm.Slots[to].add(gm.Slots[from].take(prevstate.ActiveTeam));
-    //             canva.moveChecker(from, to);
-    //         })
-    //     GameState._set(newstate.ActiveTeam, newstate.Dices);
-    //     canva.createDices(newstate.Dices[0], newstate.Dices[1], [white, black][newstate.ActiveTeam-1]);
-    // });
 }
 
 const isPopupOpened = () => {
   return document.querySelector(".popup") ? true : false;
 };
-export const openBackgammonsWaitingPopup = async ([betId, roomId], player,
-  startTime,
-) => {
+export const openBackgammonsWaitingPopup = async ([betId, roomId], player,) => {
   if (isPopupOpened()) {
     return;
   }

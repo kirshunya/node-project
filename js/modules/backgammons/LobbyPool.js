@@ -6,69 +6,6 @@ import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { lobbyhubReady } from "./syncronous.js";
 import { html, ranged } from "./prophtml.js";
 
-export function setOnlineToTable([roomId, tableId], players) {
-    // const playerMode = getPlayerMode();
-  
-    // const hash = window.location.hash.split("/");
-    // const gameMode = hash[0] == "#domino-menu" ? "CLASSIC" : "TELEPHONE";
-  
-    const hash = window.location.hash;
-    // let gameMode = "CLASSIC";
-    // //  hash[0] == "#domino-menu" ? "CLASSIC" : "TELEPHONE";
-  
-    // if (hash.includes("domino-menu-telephone")) {
-    //   gameMode = "TELEPHONE";
-    // } else {
-    //   gameMode = "CLASSIC";
-    // }
-  
-    // check if user is on right page
-    // if (
-    //   (!hash.includes("domino-menu") &&
-    //     !hash.includes("domino-menu-telephone")) ||
-    //   playerMode !== msg.playerMode ||
-    //   gameMode.toUpperCase() !== msg.gameMode.toUpperCase()
-    // ) {
-    //   return;
-    // }
-
-    const tableBlock = document.querySelector(
-        `.domino-room[betId="${roomId}"] .domino-room-content__table[tableId="${tableId}"]`
-    );
-    if (!tableBlock) return;
-    const playersOnline = tableBlock.querySelector(
-        ".domino-room-table-info__players"
-    );
-    if (playersOnline) {
-        let peopleItems = playersOnline.querySelectorAll(
-            ".domino-room-table-info__players-item"
-        );
-  
-        let roomHalfs = tableBlock.querySelectorAll(".domino-room-table-part");
-    
-        playersOnline.innerHTML += `
-            <div class="domino-room-table-info__players-item">
-            <img src="./img/domino-online-icon.png" alt="" />
-            </div>
-        `;
-  
-        peopleItems = playersOnline.querySelectorAll(
-            ".domino-room-table-info__players-item"
-        );
-    
-        for (let i = 0; i < players.length; i++) {
-            let roomHalf = roomHalfs[i];
-            if (roomHalf) {
-                roomHalf.classList.add("filled");
-                if (window.isAdmin == true && i == peopleItems.length - 1) {
-                roomHalf.innerHTML = `<div class="table-admin__userid-item">${/*players[i].userId//msg.userId*/1}</div>`;
-                }
-            }
-        }
-  
-      // playersOnline.innerHTML = Number(playersOnline.innerHTML) + 1;
-    }
-}
 export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
   /** @type {HTMLElement} */
   htmlview
@@ -203,7 +140,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
           },
       }));
     this.__initvals&&this.resetLobbyTable(this.__initvals);
-    this.updalist.map(([...args])=>setOnlineToTable(...args));
+    this.updalist.map(([...args])=>this.setOnlineToTable(...args));
     return container
   }
   __initvals;

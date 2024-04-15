@@ -2482,6 +2482,18 @@ class dominoGameService {
     }
     return false;
   }
+  /**
+   * 
+   * @param {*} aWss 
+   * @param {int} roomId 
+   * @param {int} tableId 
+   * @param {int} playerMode 
+   * @param {int} gameMode 
+   * @param {*} winners 
+   * @param {*} dominoGame 
+   * @param {*} scene 
+   * @param {*} usersData 
+   */
   async endClassicDominoGame(
     aWss,
     roomId,
