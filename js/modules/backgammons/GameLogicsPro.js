@@ -3,6 +3,7 @@ import { BoardConstants, refToArr, slotinfo, Slot, DropSlot } from './BoardConst
 import { BoardCanvas } from './CanvasRender.js'
 import { autostep, lightstepbutton } from "./GamePool.js";
 import { Toast } from "./Utilities.js";
+import { fabricsloaded } from "./syncronous.js";
 
 
 const SlotsIterator = (slots, CB)=>(
@@ -452,105 +453,107 @@ export class GameProvider {
         const self = this;
         this.Board = new Board(BoardInits);
         this.GameState = new GameState(GameStateInits);
-        this.GameCanvas = new BoardCanvas(
-            BoardInits.Slots, BoardInits.Drops, {
-            UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
-            move: (from, to)=>{
-                const ret = this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
-                if((this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
-                && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
-                    if(this.GameState.PTS?.length) {
-                        const [f, s] = self.GameState.Dices
-                        showToast(this.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+        // return fabricsloaded.then(()=>{
+            this.GameCanvas = new BoardCanvas(
+                BoardInits.Slots, BoardInits.Drops, {
+                UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
+                move: (from, to)=>{
+                    const ret = this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
+                    if((this.GameState.PTS?.length===0 || !this.Board.CheckersWhichCanMove(this.GameState))
+                    && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                        if(this.GameState.PTS?.length) {
+                            const [f, s] = self.GameState.Dices
+                            showToast(this.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+                        }
+                        self.Board.StepComplete(this.GameState.CurrentStepCash.MovesStack)
                     }
-                    self.Board.StepComplete(this.GameState.CurrentStepCash.MovesStack)
+                    return ret;
+                },
+                // MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState),
+                MovesByDices: (Dice)=>self.Board.UserMovesByDices(self.GameState.PermDice(Dice)),
+                AcceptStep: ()=>(self.Board.AcceptStep(self.GameState), lightstepbutton(false)),
+                rollDices: ()=>this.onRollDicesClick.send()
+            });
+            
+            this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
+            this.Board.onMovesComplete(()=>{
+                lightstepbutton(true);
+                self.GameCanvas.eventHandlers.MovesComplete(self.GameState.ActivePlayer.team.id);
+            })
+            /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
+            this.eventHandlers = new class {
+                PermStepByButton() {
+                    self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);
                 }
-                return ret;
-            },
-            // MovesByDices: ()=>self.Board.UserMovesByDices(self.GameState),
-            MovesByDices: (Dice)=>self.Board.UserMovesByDices(self.GameState.PermDice(Dice)),
-            AcceptStep: ()=>(self.Board.AcceptStep(self.GameState), lightstepbutton(false)),
-            rollDices: ()=>this.onRollDicesClick.send()
-        });
+                AcceptStep() {
+                    self.Board.AcceptStep(self.GameState);
+                }
+                start(GameStateData, players) {
+                    self.GameState.start(GameStateData, players, self.GameCanvas);
+                    if(GameStateData.awaitingTeam) {
+                        if(GameStateData.awaitingTeam === self.GameState.ActivePlayer.team.id)
+                            self.GameCanvas.showAcceptDiceRollLabel(GameStateData.awaitingTeam);
+                    }
+                    if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                        const [f, s] = self.GameState.Dices
+                        showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+                        self.Board.StepComplete([]);
+                    }
+                }
+                /**
+                 * @param {{from, to, points:number[]}[]} Step 
+                 * @param {{ActiveTeam, Dice}} newGameStateData 
+                 */
+                step(Step, newGameStateData, prevstate) {
+                    self.Board.PermStep(self.GameState, Step);
+                    Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
+                    jad()
+                    function jad() {
+                        const [f,s] = prevstate.Dices;
+                        const spendedPoints = Step.map(({points})=>points).flat(10);
+                        if(f===s && spendedPoints.length!==4) 
+                            showToast(range(0, 4 - spendedPoints.length).map(()=>f),
+                                        self.GameState.players[prevstate.ActiveTeam].username,
+                                        [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
+                        else if(spendedPoints.length !== 2) 
+                            showToast([f,s].filter(x=>spendedPoints[0]!==x),
+                                        self.GameState.players[prevstate.ActiveTeam].username,
+                                        [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
+                    }
+                    const nextTeamDict = {
+                        [WHITE.id]: BLACK.id,
+                        [BLACK.id]: WHITE.id
+                    }
+                    if(!autostep.dice)
+                        self.GameCanvas.showAcceptDiceRollLabel(nextTeamDict[prevstate.ActiveTeam]);
+                    return true;
+                }
+                state(newGameStateData) {
+                    self.GameState.state(newGameStateData, self.GameCanvas);
+                    if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                        showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+                        self.Board.StepComplete([]);
+                    }
+                    return true;
+                }
+                ustep(Step, newGameStateData, oldGameData) {
+                    // self.GameState.state(newGameStateData, self.GameCanvas);
+                    // if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                    //     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
+                    //     self.Board.StepComplete([]);
+                    // }
+                    // return true;
+                }
+                end() {
+    
+                }
+            };
+            this.eventProviders = [ 'UserStep' ];
+            this.InstantActions = {
+                UserStep() {
+    
+                }
+            }
         
-        this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
-        this.Board.onMovesComplete(()=>{
-            lightstepbutton(true);
-            self.GameCanvas.eventHandlers.MovesComplete(self.GameState.ActivePlayer.team.id);
-        })
-        /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
-        this.eventHandlers = new class {
-            PermStepByButton() {
-                self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);
-            }
-            AcceptStep() {
-                self.Board.AcceptStep(self.GameState);
-            }
-            start(GameStateData, players) {
-                self.GameState.start(GameStateData, players, self.GameCanvas);
-                if(GameStateData.awaitingTeam) {
-                    if(GameStateData.awaitingTeam === self.GameState.ActivePlayer.team.id)
-                        self.GameCanvas.showAcceptDiceRollLabel(GameStateData.awaitingTeam);
-                }
-                if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
-                    const [f, s] = self.GameState.Dices
-                    showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
-                    self.Board.StepComplete([]);
-                }
-            }
-            /**
-             * @param {{from, to, points:number[]}[]} Step 
-             * @param {{ActiveTeam, Dice}} newGameStateData 
-             */
-            step(Step, newGameStateData, prevstate) {
-                self.Board.PermStep(self.GameState, Step);
-                Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
-                jad()
-                function jad() {
-                    const [f,s] = prevstate.Dices;
-                    const spendedPoints = Step.map(({points})=>points).flat(10);
-                    if(f===s && spendedPoints.length!==4) 
-                        showToast(range(0, 4 - spendedPoints.length).map(()=>f),
-                                    self.GameState.players[prevstate.ActiveTeam].username,
-                                    [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
-                    else if(spendedPoints.length !== 2) 
-                        showToast([f,s].filter(x=>spendedPoints[0]!==x),
-                                    self.GameState.players[prevstate.ActiveTeam].username,
-                                    [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
-                }
-                const nextTeamDict = {
-                    [WHITE.id]: BLACK.id,
-                    [BLACK.id]: WHITE.id
-                }
-                if(!autostep.dice)
-                    self.GameCanvas.showAcceptDiceRollLabel(nextTeamDict[prevstate.ActiveTeam]);
-                return true;
-            }
-            state(newGameStateData) {
-                self.GameState.state(newGameStateData, self.GameCanvas);
-                if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
-                    showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
-                    self.Board.StepComplete([]);
-                }
-                return true;
-            }
-            ustep(Step, newGameStateData, oldGameData) {
-                // self.GameState.state(newGameStateData, self.GameCanvas);
-                // if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
-                //     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
-                //     self.Board.StepComplete([]);
-                // }
-                // return true;
-            }
-            end() {
-
-            }
-        };
-        this.eventProviders = [ 'UserStep' ];
-        this.InstantActions = {
-            UserStep() {
-
-            }
-        }
     }
 }
