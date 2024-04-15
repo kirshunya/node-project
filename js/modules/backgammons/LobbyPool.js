@@ -256,6 +256,6 @@ export function openBackgammonsMenuPage() {
 }
 function onclick([dominoRoomId, tableId]) {
     // const [room, table] = this;
-    alert([dominoRoomId, tableId].join(', '));
+    // alert([dominoRoomId, tableId].join(', '));
     ConnectionStables.connectToRoom([dominoRoomId, tableId]);
 }
