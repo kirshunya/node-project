@@ -40,6 +40,12 @@ export const connectWebsocketFunctions = () => {
   // const ws = new WebSocket(`wss://lotogame.onrender.com/game`);
   window.ws = ws;
 
+const wssend = ws.send
+ws.send = (...args)=>{
+console.log("<<WS::msg::send>>", ...args);
+wssend.call(ws, ...args);
+}
+    
   let clientId = impLotoNav.createClientId();
 
   let localUser = localStorage.getItem("user");
@@ -77,6 +83,7 @@ export const connectWebsocketFunctions = () => {
 
   ws.onmessage = async (event) => {
     let msg = JSON.parse(event.data);
+    console.log("<<WS::msg::input>>", msg)
     localUser = JSON.parse(localStorage.getItem("user"));
     let dominoRoomLoader = document.querySelector(".domino-game-loader");
 
