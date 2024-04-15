@@ -1,6 +1,7 @@
 import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./Utilities.js";
 import { BoardConstants, refToArr, slotinfo, TState } from "./BoardConstants.js";
 import { CONFIGS } from "./Configurations.js";
+import * as audios from './../audio.js'
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
 var scaleFactor = 1.3;
@@ -733,6 +734,7 @@ export class BoardCanvas extends CanvasFunctions {
                              new Dice(secondDice, firstDicePos+2*(space+dicesize/2)), 
                              new Dice(secondDice, firstDicePos+3*(space+dicesize/2)))
         }
+        audios.playDices();
     }
     setPTS(pts) {
         const _dices = this._dices;
@@ -832,6 +834,7 @@ export class BoardCanvas extends CanvasFunctions {
                         onChange: canvas.renderAll.bind(canvas),
                         abort: ()=>abort
                     })
+                    audios.playStep();
                 })();
             }
             checker.abortanim = ()=>abort=true;
