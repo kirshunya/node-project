@@ -133,3 +133,30 @@ export const playPlaceTile = () => {
   placeTile.volume = gameVolume;
   placeTile.play();
 }
+
+/* ======== BACKGAMMONS ======== */
+export const playLose = () => {
+  const placeTile = new Audio(`${path}/backgammonss/lose.mp3`);
+  placeTile.volume = gameVolume;
+  placeTile.play();
+}
+export const playWin = () => {
+  const placeTile = new Audio(`${path}/backgammons/win.mp3`);
+  placeTile.volume = gameVolume;
+  placeTile.play();
+}
+export const playDices = () => {
+  const placeTile = new Audio(`${path}/backgammons/dices.mp3`);
+  placeTile.volume = gameVolume;
+  placeTile.play();
+}
+export const playStep = () => {
+  const placeTile = new Audio(`${path}/backgammons/xodba.mp3`);
+  placeTile.volume = gameVolume;
+  placeTile.play();
+}
+export const playUndefined = () => {
+  const placeTile = new Audio(`${path}/backgammons/nacalo-igri.mp3`);
+  placeTile.volume = gameVolume;
+  placeTile.play();
+}
