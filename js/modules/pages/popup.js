@@ -8,6 +8,7 @@ import * as forgotPass from "../../../changePassword/forgotPasswordReq.js";
 import * as time from "../time.js";
 import { API_URL_PART, IS_HOSTED_STATIC } from "../config.js";
 import { getDominoRoomBetInfo } from "../domino/domino-navigation.js";
+import { popupsinited } from "../backgammons/syncronous.js";
 
 // 100 предупреждения
 // 200 выиграш
@@ -1811,3 +1812,4 @@ export function updateEnemyTilesPopup(playersTiles) {
     });
   }
 }
+popupsinited.resolve();

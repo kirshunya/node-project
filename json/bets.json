@@ -1,0 +1,25 @@
+{
+    "BackgammonsBETS": [null,
+        {
+            "bet": 1,
+            "comission": 0.1
+        },
+        {
+            "bet": 3,
+            "comission": 0.1
+        },
+        {
+            "bet": 5,
+            "comission": 0.1
+        },
+        {
+            "bet": 10,
+            "comission": 0.1
+        },
+        {
+            "bet": 20,
+            "comission": 0.1
+        }
+    ],
+    "DominoBETS": []
+}

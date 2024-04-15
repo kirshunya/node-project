@@ -10,9 +10,12 @@ import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
 import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
+import { fabricsloaded, popupsinited } from './syncronous.js';
 
-window.openEmojiPopup = openEmojiPopup;
-window.openPhrasesPopup = openTextPopup;
+popupsinited.then(()=>{
+  window.openEmojiPopup = openEmojiPopup;
+  window.openPhrasesPopup = openTextPopup;
+})
 
 export const timestamp = ()=>Date.now();//moveTo Utilities
 
@@ -178,17 +181,18 @@ class Timer {
 }
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
-export function InitGame(GameInitData, localUser, ws, elcaPopup) {
+export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
     const {slots, dropped, players, state} = GameInitData;
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
 
     const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
             .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
+    await fabricsloaded;
     /** @type {GameProvider} */
     const gp = new GameProvider({ User:localUser, Slots:slots, sendstep, Drops });
-    PermStepCompletor.addEventListener('click', ()=>(gp.eventHandlers.PermStepByButton(), lightstepbutton(false)))
-    StepCompletor.addEventListener('click', ()=>(gp.eventHandlers.AcceptStep(), lightstepbutton(false)))
+    // PermStepCompletor&&PermStepCompletor.addEventListener('click', ()=>(gp.eventHandlers.PermStepByButton(), lightstepbutton(false)))
+    // StepCompletor&&StepCompletor.addEventListener('click', ()=>(gp.eventHandlers.AcceptStep(), lightstepbutton(false)))
     gp.onRollDicesClick(()=>req({method:'rollDice'}));
     /** @type {Timer[]} */
     let TimersByTeam
@@ -267,10 +271,10 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
           window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
         })
         const userPan = document.getElementById('TopPan')
-                userPan.getElementsByTagName('img')[0].src = user.avatar;
+                userPan.getElementsByTagName('img')[0].src = user.avatar?user.avatar:'static/avatar/undefined.jpeg';
                 userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
         const oppPan = document.getElementById('BottomPan')
-                oppPan.getElementsByTagName('img')[0].src = opponent.avatar;
+                oppPan.getElementsByTagName('img')[0].src = opponent.avatar?opponent.avatar:'static/avatar/undefined.jpeg';
                 oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
         return [
                 new Timer(document.getElementById('TopPan'), whiteval), 
@@ -386,7 +390,7 @@ export const openBackgammonsWaitingPopup = async ([betId, roomId], player,) => {
     avatarBlock.classList.remove("loading");
     avatarBlock.innerHTML = `
       <img src="http${API_URL_PART}${
-        (IS_HOSTED_STATIC ? "/static/avatars/" : "/") + player.avatar
+        [IS_HOSTED_STATIC ? "/static/avatars/":"/", player.avatar?player.avatar:'undefined.jpeg'].join('')
       }" alt="">
     `;
 

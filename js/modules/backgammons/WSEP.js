@@ -82,7 +82,7 @@ export const ConnectionStables = {
         // GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
 
         window.TimersTurn = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
-        (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
+        // (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
     },
     async ['TimersTurn']({TimersTurn}){
         window.TimersTurn = TimersTurn

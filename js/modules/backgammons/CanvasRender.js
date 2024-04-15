@@ -5,7 +5,6 @@ const { WHITE, BLACK, EMPTY } = BoardConstants;
 
 var scaleFactor = 1.3;
 var indent = 14;
-fabric.isWebglSupported(fabric.textureSize);
 class Checker {
     /**@type {fabricImage} */ 
     img

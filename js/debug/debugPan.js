@@ -131,57 +131,57 @@ const debugPanHTML = `<div class="debugPan" style="display:none! important">debu
     </div>`;
 export const debugPan = new class {
   install(){
-    if(document.getElementsByClassName('debugPan')[0]) return;
-    document.body.insertAdjacentHTML('beforeend', debugPanHTML)
+    // if(document.getElementsByClassName('debugPan')[0]) return;
+    // document.body.insertAdjacentHTML('beforeend', debugPanHTML)
 
-    window.addEventListener('DOMContentLoaded', 
-              ()=>TimersTurnDebugButton.addEventListener('click', settimer))
-    function settimer() {
-        if(typeof window.TimersTurn !== 'boolean') return;
-        window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
-    }
-    LateGameRestartButton.addEventListener('click', ()=>{
-        if(confirm('Вы действительно хотите >перезапустить< игру?'))
-            window.ws.send(JSON.stringify({method:'restartTest'}))
-    })
-    FludGameRestartButton.addEventListener('click', ()=>{
-        if(confirm('Вы действительно хотите >перезапустить< игру?'))
-            window.ws.send(JSON.stringify({method:'restartFlud'}))
-    })
-    MessageBtn.addEventListener('click', ()=>{
-        const text = prompt('Какое сообщение отправить: ')
-        if(text)
-        window.ws.send(JSON.stringify({method:'chat', text}))
-    })
-    const Utilities = import('/js/modules/backgammons/Utilities.js')
-    let Toast;
-    Utilities.then(M=>Toast = M.Toast)
+    // window.addEventListener('DOMContentLoaded', 
+    //           ()=>TimersTurnDebugButton.addEventListener('click', settimer))
+    // function settimer() {
+    //     if(typeof window.TimersTurn !== 'boolean') return;
+    //     window.ws.send(JSON.stringify({method:'TimersTurnSet', TimersTurn:!window.TimersTurn}));
+    // }
+    // LateGameRestartButton.addEventListener('click', ()=>{
+    //     if(confirm('Вы действительно хотите >перезапустить< игру?'))
+    //         window.ws.send(JSON.stringify({method:'restartTest'}))
+    // })
+    // FludGameRestartButton.addEventListener('click', ()=>{
+    //     if(confirm('Вы действительно хотите >перезапустить< игру?'))
+    //         window.ws.send(JSON.stringify({method:'restartFlud'}))
+    // })
+    // MessageBtn.addEventListener('click', ()=>{
+    //     const text = prompt('Какое сообщение отправить: ')
+    //     if(text)
+    //     window.ws.send(JSON.stringify({method:'chat', text}))
+    // })
+    // const Utilities = import('/js/modules/backgammons/Utilities.js')
+    // let Toast;
+    // Utilities.then(M=>Toast = M.Toast)
 
 
-    const EntryPoint = import('/js/modules/backgammons/EntryPoint.js')
-    const playerId = localStorage.getItem('playerId');
-    /**
-     * @return {HTMLElement}
-     */
-    const pl = name=>document.getElementsByClassName(name)[0];
-    if(playerId)
-        chosePlayer(playerId)
-    function chosePlayer(index) {
-        EntryPoint.then(({onplayerchosen})=>{
-        onplayerchosen.resolve(+index);
-        })
-        ChosePlayerDebugButton.value = `player:${['Jimmy', 'Missi', 'Debby'][index]}`
-        if(cash.checked)
-        localStorage.setItem('playerId', index);
-        pl('closer').style.display = 'none'
-    }
-    ChosePlayerDebugButton.addEventListener('click', ()=>{
-        localStorage.removeItem('playerId');
-        window.location.reload();
-    })
-    window.addEventListener('DOMContentLoaded', ()=>{
-        Object.entries(['Jimmy', 'Missi', 'Debby'])
-            .map(([index, name])=>pl(name).addEventListener('click', ()=>chosePlayer(index)))
-    })
+    // const EntryPoint = import('/js/modules/backgammons/EntryPoint.js')
+    // const playerId = localStorage.getItem('playerId');
+    // /**
+    //  * @return {HTMLElement}
+    //  */
+    // const pl = name=>document.getElementsByClassName(name)[0];
+    // if(playerId)
+    //     chosePlayer(playerId)
+    // function chosePlayer(index) {
+    //     EntryPoint.then(({onplayerchosen})=>{
+    //     onplayerchosen.resolve(+index);
+    //     })
+    //     ChosePlayerDebugButton.value = `player:${['Jimmy', 'Missi', 'Debby'][index]}`
+    //     if(cash.checked)
+    //     localStorage.setItem('playerId', index);
+    //     pl('closer').style.display = 'none'
+    // }
+    // ChosePlayerDebugButton.addEventListener('click', ()=>{
+    //     localStorage.removeItem('playerId');
+    //     window.location.reload();
+    // })
+    // window.addEventListener('DOMContentLoaded', ()=>{
+    //     Object.entries(['Jimmy', 'Missi', 'Debby'])
+    //         .map(([index, name])=>pl(name).addEventListener('click', ()=>chosePlayer(index)))
+    // })
   }
 }

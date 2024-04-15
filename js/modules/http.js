@@ -1,9 +1,11 @@
 // export const API_URL = "https://app.24loto.com/api";
 // export const API_URL = "https://lotogame.onrender.com/api";
 // export const API_URL = "https://loto-server-new.onrender.com/api";
+import { axiosloaded } from "./backgammons/syncronous.js";
 import { API_URL_PART } from "./config.js";
 export const API_URL = `http${API_URL_PART}/api`;
 
+await axiosloaded;
 const $api = axios.create({
   withCredentials: false,
   baseURL: API_URL,

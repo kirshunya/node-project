@@ -38,7 +38,7 @@ export const OEPromise = ()=>{
 }
 export const FCPromise = ()=>{
     const [promise, resolve, reject] = OEPromise();
-    return Object.assign(promise, {promise, resolve, reject});
+    return Object.assign(promise, {promise, resolve, reject, fire:resolve});
 }
 export class EventProvider {
     constructor() {
