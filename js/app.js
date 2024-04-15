@@ -9,7 +9,7 @@ import * as impLocalization from "./modules/localize.js";
 import * as impPopup from "./modules/pages/popup.js";
 import * as impDominoGame from "./modules/domino/domino-game.js";
 import * as impDominoNav from "./modules/domino/domino-navigation.js";
-import { debugPan } from "./modules/backgammons/debugPan.js";
+import { debugPan } from "./debug/debugPan.js";
 import { getLocalUser } from "./modules/authinterface.js";
 window.ws = null;
 

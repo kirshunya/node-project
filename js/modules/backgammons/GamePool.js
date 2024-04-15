@@ -3,7 +3,7 @@ import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
-import { debugPan }  from './debugPan.js';
+import { debugPan }  from '../../debug/debugPan.js';
 import { html } from './prophtml.js';
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
@@ -268,10 +268,10 @@ export function InitGame(GameInitData, localUser, ws, elcaPopup) {
           window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
         })
         const userPan = document.getElementById('TopPan')
-                userPan.getElementsByTagName('img')[0]?.src = user.avatar;
+                userPan.getElementsByTagName('img')[0].src = user.avatar;
                 userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
         const oppPan = document.getElementById('BottomPan')
-                oppPan.getElementsByTagName('img')[0]?.src = opponent.avatar;
+                oppPan.getElementsByTagName('img')[0].src = opponent.avatar;
                 oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
         return [
                 new Timer(document.getElementById('TopPan'), whiteval), 
