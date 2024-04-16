@@ -7,26 +7,15 @@ const { User } = require('./models/db-models.js');
 
 console.log(TGame)
 
-
-// const BETsList = [0.5, 1, /*3, 5, 10*/];
-const BETsList = {
-    1:0.5, 
-    2:0.5
-}
+const BETsList = require('./../json/bets.json').BackgammonsBETS;
 const GamesLobby = new class extends WSListeners  {
     /** @type {TGame[][]} */
     Games = []
     constructor() {
         super('likey');
-        this.Games = mapByIndexToVals(BETsList, ([betId,bet])=>{
+        this.Games = mapByIndexToVals(BETsList, ([betId,betData])=>{
             return rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId])));
         })
-        console.log('Backgammons Rooms Initied:', 
-                Object.entries(this.Games)
-                        .map(([betId, betRooms])=>({
-                            betId, betRooms:Object.entries(betRooms)
-                                        .map(([roomId, room])=>roomId)
-                        })));
     }
     createGame(GameID) {
         const Game = new TGame(GameID);

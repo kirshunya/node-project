@@ -1,4 +1,4 @@
-import { FCPromise } from "./Utilities.js";
+import { FCPromise, RewritablePromiseEmit } from "./Utilities.js";
 
 
 
@@ -9,6 +9,12 @@ export const WSEventPoolReady = FCPromise();
 WSEventPoolReady.then(log('WSEventPool'));
 export const popupsinited = FCPromise();
 popupsinited.then(log('popups'));
+export const siteLanguageInited = new RewritablePromiseEmit();
+siteLanguageInited.then(log('siteLanguage'));
+/** @returns {Promise.<import("./../../../json/bets.json")>} */
+const loadBetsInfo = ()=>fetch("./json/bets.json").then(localize=>localize.json())
+export const BetsLoaded = loadBetsInfo();
+BetsLoaded.then(bets=>console.log('bets'));
 
 function whileundefined(nameCallBack, oncomplete) {
     const periodicChecker = setInterval(()=>{

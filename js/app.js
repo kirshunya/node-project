@@ -11,13 +11,14 @@ import * as impDominoGame from "./modules/domino/domino-game.js";
 import * as impDominoNav from "./modules/domino/domino-navigation.js";
 import { debugPan } from "./debug/debugPan.js";
 import { getLocalUser } from "./modules/authinterface.js";
+import { siteLanguageInited } from "./modules/backgammons/syncronous.js";
 window.ws = null;
 
 // impDominoGame.tablePlacement();
 debugPan.install();
 let preloader = document.querySelector(".page-preloader");
-let siteLanguage = await impLocalization.getCurrentSiteLang();
-window.siteLanguage = siteLanguage;
+window.siteLanguage = await impLocalization.getCurrentSiteLang();
+siteLanguageInited.resolve(window.siteLanguage);
 // impLocalization.translateMainPage();
 impLocalization.translateAuthPage();
 impLocalization.translateGameChooseMenu();

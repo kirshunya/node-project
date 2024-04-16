@@ -449,12 +449,19 @@ export class GameProvider {
      * @param {{User:{userId,username}, Slots:int[], sendstep:Function, Drops:[Number, Number]}} BoardInits 
      * @param {*} GameStateInits 
      */
-    constructor(BoardInits) {
+    constructor(BoardInits, promisesInitList) {
         const self = this;
-        this.Board = new Board(BoardInits);
+        promisesInitList.SlotsNDropsComplete.then(()=>{
+            this.Board = new Board(BoardInits);
+                
+            this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
+            this.Board.onMovesComplete(()=>{
+                lightstepbutton(true);
+                self.GameCanvas.eventHandlers.MovesComplete(self.GameState.ActivePlayer.team.id);
+            })
+        });
         this.GameState = new GameState();
-        this.GameCanvas = new BoardCanvas(
-            BoardInits.Slots, BoardInits.Drops, {
+        this.GameCanvas = new BoardCanvas({
             UserMovesFrom:(...args)=>this.Board.UserMovesFrom(this.GameState, ...args),
             move: (from, to)=>{
                 const ret = this.Board.UserMove(this.GameState, {from:+from, to:$myeval(to)})
@@ -472,13 +479,8 @@ export class GameProvider {
             MovesByDices: (Dice)=>self.Board.UserMovesByDices(self.GameState.PermDice(Dice)),
             AcceptStep: ()=>(self.Board.AcceptStep(self.GameState), lightstepbutton(false)),
             rollDices: ()=>this.onRollDicesClick.send()
-        });
+        }, promisesInitList);
         
-        this.Board.eventProviders.showPTS(pts=>this.GameCanvas.setPTS(pts));
-        this.Board.onMovesComplete(()=>{
-            lightstepbutton(true);
-            self.GameCanvas.eventHandlers.MovesComplete(self.GameState.ActivePlayer.team.id);
-        })
         /** @type {{start:Function, step:Function, ustep:Function, end:Function}} */
         this.eventHandlers = new class {
             PermStepByButton() {

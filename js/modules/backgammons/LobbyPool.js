@@ -4,7 +4,7 @@ import { ConnectionStables, WSEventPool, connectWSRoutes } from "./WSEP.js";
 import { WSEventPoolReady } from './syncronous.js';
 import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { lobbyhubReady } from "./syncronous.js";
-import { html, ranged } from "./prophtml.js";
+import { html, ranged } from "./htmlcontainer.js";
 
 export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
   /** @type {HTMLElement} */

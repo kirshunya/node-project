@@ -520,7 +520,7 @@ export class BoardCanvas extends CanvasFunctions {
      * @param {[Number, Number]} GDropped 
      * @param {{UserMovesFrom:Function, move:Function, MovesByDices:Function}} param2 
      */
-    constructor(GSlots, GDropped, gc) {
+    constructor(gc, promisesinitlist) {
         super('canvas');
         const canvas = canva = this.canvas;
 
@@ -551,48 +551,43 @@ export class BoardCanvas extends CanvasFunctions {
         }
 
         super.setbackground(gameboardpic);
-
-        this.drops = drop = {
-            [WHITE.over]: new TopDropLunk('Top', GDropped[0]),
-            [BLACK.over]: new TopDropLunk('Bottom', GDropped[1])
-        };
-        
-        const PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
-                const slot = new refToArr(slotinfo);
-                const SlotLet = self.slots[slotIndex] = new Slot(slotIndex);
-                if(slot.Count<0) new Toast({
-                    title: 'Ошибка сервера',
-                    text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможна только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
-                    theme: 'warning',
-                })
-                return range(0, Math.abs(slot.Count))
-                        .map(checkerIndex=>self.createChecker(slot.Colour, SlotLet, checkerIndex).then(
-                            ([CheckerObj, slotIndex, checkerIndex])=>{
-                                SlotLet.checkers[checkerIndex]=CheckerObj
-                                CheckerObj.img.lockMovementX = CheckerObj.img.lockMovementY = checkerIndex !== (slot.Count-1)
-                                return [CheckerObj, slotIndex, checkerIndex];
-                            }));
-            }).flat(1)).then(ValidatingCheckersLayouting);
-        // const PromiseOfCreatingDroppedPictures = Promise.all(GDropped.map((Count, teamLeft)=>{
-        //         const droppedPic = teamLeft===0?whitecheckerpicurl:blackcheckerpicurl;
-        //         const droppedTeam = teamLeft===0? WHITE.over : BLACK.over;
-        //         return range(0, Count)
-        //                 .map(checkerIndex=>self.createImg(droppedPic, droppedTeam, checkerIndex))
-        //     }).flat(1)).then(ValidatingCheckersLayouting);
-        /**
-         * 
-         * @param {[Checker, Number, Number][]} arr 
-         * @returns {[Checker, Number, Number][]}
-         */
-        function ValidatingCheckersLayouting (arr) {
-            return (arr.map(([CheckerObj, slotIndex, checkerIndex])=>{
-                /** @type {fabricImage} */
-                const CheckerIMG = CheckerObj.img;
-                CheckerIMG.moveTo(checkerIndex);
-                CheckerIMG.set("top", posY(slotIndex, checkerIndex, 0, 0));
-                CheckerIMG.setCoords();
-            }), arr)
-        }
+        promisesinitlist.SlotsNDropsComplete.then(([GSlots, GDropped])=>{
+            this.drops = drop = {
+                [WHITE.over]: new TopDropLunk('Top', GDropped[0]),
+                [BLACK.over]: new TopDropLunk('Bottom', GDropped[1])
+            };
+            
+            this.PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
+                    const slot = new refToArr(slotinfo);
+                    const SlotLet = self.slots[slotIndex] = new Slot(slotIndex);
+                    if(slot.Count<0) new Toast({
+                        title: 'Ошибка сервера',
+                        text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможна только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
+                        theme: 'warning',
+                    })
+                    return range(0, Math.abs(slot.Count))
+                            .map(checkerIndex=>self.createChecker(slot.Colour, SlotLet, checkerIndex).then(
+                                ([CheckerObj, slotIndex, checkerIndex])=>{
+                                    SlotLet.checkers[checkerIndex]=CheckerObj
+                                    CheckerObj.img.lockMovementX = CheckerObj.img.lockMovementY = checkerIndex !== (slot.Count-1)
+                                    return [CheckerObj, slotIndex, checkerIndex];
+                                }));
+                }).flat(1)).then(ValidatingCheckersLayouting);
+            /**
+             * 
+             * @param {[Checker, Number, Number][]} arr 
+             * @returns {[Checker, Number, Number][]}
+             */
+            function ValidatingCheckersLayouting (arr) {
+                return (arr.map(([CheckerObj, slotIndex, checkerIndex])=>{
+                    /** @type {fabricImage} */
+                    const CheckerIMG = CheckerObj.img;
+                    CheckerIMG.moveTo(checkerIndex);
+                    CheckerIMG.set("top", posY(slotIndex, checkerIndex, 0, 0));
+                    CheckerIMG.setCoords();
+                }), arr)
+            }
+        })
 
         // function CanvasValidate() {
         //     const width = containerOfBoard.clientWidth;

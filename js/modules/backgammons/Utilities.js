@@ -43,11 +43,29 @@ export const FCPromise = ()=>{
 export class EventProvider {
     constructor() {
         const EventListeners = []
-        const subsrcibe = (CB)=>EventListeners.push(CB);
+        const subsrcibe = (CB)=>(EventListeners.push(CB), subsrcibe);
         subsrcibe.subsrcibe = subsrcibe
         subsrcibe.send = (...args)=>EventListeners.map(CB=>CB?.(...args));
         return subsrcibe;
     }
+}
+export class RewritablePromiseEmit {
+  value = null
+  CallBacks = [];
+  ReCalls = [];
+  resolve(value) {
+    this.value = value;
+    while(this.CallBacks.length) 
+      this.CallBacks.pop()(value)
+    this.ReCalls.map(CB=>CB(value));
+  }
+  /** принять значение один раз, если `next`=true, то принять следующее обновление. */
+  async then(CB, next=false) {
+    if(!this.value||next) return new Promise(resolve=>this.CallBacks.push((...args)=>resolve(CB(...args))))
+    return CB(this.value);
+  }
+  /** Слушать обновления на постоянке @returns {Number} listenerId */
+  listen(CB) { return this.ReCalls.push(CB)-1; }
 }
 export class JustEnoughEvents {
     EventListeners = {}

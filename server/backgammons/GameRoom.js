@@ -218,7 +218,7 @@ class TGame extends SharedRoom0 {
     /** @param {TeXRoomState} newState */
     upgradeState(newState) {
         this.RoomState = newState;
-        this.event('RoomStateChanged', {newStateId: newState.RoomState, stateData:newState.updata()});
+        this.event('RoomStateChanged', {newStateId: newState.RoomState, stateData:newState.json()});
     }
     // startGame() {
     //     this.Players.rollTeam()

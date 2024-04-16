@@ -4,7 +4,7 @@ import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
-import { html } from './prophtml.js';
+import { BackgammonsLaunchingPopup, html, waitingPopup } from "./htmlcontainer.js";
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
 import { NowClientTime } from '../time.js';
@@ -45,9 +45,6 @@ export function ShowGameTable(localUser, GameID) {
     <div class="main__container footer__padding" style="max-width: 100vw">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
         <div class="domino-games__container">
-          <style>/* moveTo styles/backgammons/GameScene.css
-           
-          </style>
           <div class="domino-game-page__body-wrapper ddt">
             <div id="TopPan" class="BottomLink">
               <div class="ProfCol">
@@ -130,7 +127,7 @@ export function ShowGameTable(localUser, GameID) {
         
     </div>
   `;
-    const elcaPopup = openBackgammonsWaitingPopup(GameID, localUser);
+    const elcaPopup = (new waitingPopup(1, [localUser])).showOnReady();//openBackgammonsWaitingPopup(GameID, localUser);
     (async()=>{
         while(!ConnectionStables.Room) await sleep(100);//what should to do to refac?? send to this function some promise of connection? and should create some clear functiotive..
         InitGame(ConnectionStables.Room.GameInitData, localUser, ws, elcaPopup);
@@ -185,6 +182,8 @@ class Timer {
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
 export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
+    let TimersIntervals = null; const resetTimersIntervals =(interval)=>{ TimersIntervals&&clearInterval(TimersIntervals); return TimersIntervals = interval; }
+    let onChange = ()=>{};
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
     // GameInitData in Waiting = [waiter, waiter], visiters
@@ -197,6 +196,7 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
     // const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
     //         .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
     await fabricsloaded;
+    
     /** @type {GameProvider} */
     const promisableinitables = {
       playersComplete : FCPromise(),
@@ -227,11 +227,10 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
               .getElementsByClassName('buttons')[0]
                   .children[0]
                       .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
-    let TimersIntervals = null; const resetTimersIntervals =(interval)=>{ TimersIntervals&&clearInterval(TimersIntervals); return TimersIntervals = interval; }
-    let onChange = ()=>{};
     const RoomStatesInitRouter = {
       [0](initData) {//Waiting
       }, [1](initData) { // Launching
+        elcaPopup.swapPopupToNewPopup(new BackgammonsLaunchingPopup(1, initData.players, initData.timeval));
       }, [2](initData) { // DiceTeamRolling
         const {players, timeval} = initData;
         UsersPanUI.initAvatars(players[0], players[1]);
@@ -260,10 +259,11 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
       }, [4](initData) { // Win
       },
     }
-    ConnectionStables.onRoomConnection.then(()=>{
-      const initData = ConnectionStables.Room.GameInitData;
-      RoomStatesInitRouter[0](initData);
-    })
+    RoomStatesInitRouter[GameInitData.RoomState](GameInitData);
+    // ConnectionStables.onRoomConnection.then(()=>{
+    //   const initData = ConnectionStables.Room.GameInitData;
+    //   RoomStatesInitRouter[0](initData);
+    // })
     // ConnectionStables.Room.onGameStarted
     //       .then(({players, state, slots})=>
     //           GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, slots)) 
@@ -286,7 +286,7 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
         startTimer(ActiveTeam)
     }
     const WSEventRoutes = {
-      ['RoomStateChanged']:(newStateId, stateData)=>{ onChange?.(); RoomStatesInitRouter[newStateId] (stateData); }, 
+      ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId] (stateData); }, 
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)
         //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
@@ -423,20 +423,6 @@ export const openBackgammonsWaitingPopup = async ([betId, roomId], player,) => {
       </div>
       `).join('<div class="domino-waiting-popup-vs">VS</div>');
 
-  // // sort players by connectionDate
-  // players = players.sort((a, b) => a.connectionDate - b.connectionDate);
-
-  // // for each player remove loader in slot, add avatar
-  // players.forEach((player, index) => {
-  //   // const avatarBlock = avatarsBlock.children[index * 2];
-  //   const avatarBlock = avatarsBlock.querySelector(`[slot="${index + 1}"]`);
-  //   avatarBlock.classList.remove("loading");
-  //   avatarBlock.innerHTML = `
-  //     <img src="http${API_URL_PART}${
-  //     (IS_HOSTED_STATIC ? "/static/avatars/" : "/") + player.avatar
-  //   }" alt="">
-  //   `;
-  // });
   const avatarBlock = avatarsBlock.querySelector(`[slot="${1}"]`);
     avatarBlock.classList.remove("loading");
     avatarBlock.innerHTML = `

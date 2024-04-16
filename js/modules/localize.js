@@ -1,3 +1,5 @@
+export function getSiteLanguage() { return window.siteLanguage(); }
+
 const loadLocalizationFile = async () => {
   const localize = await fetch("./json/localize.json");
   let localizationFile = await localize.json();
