@@ -26,7 +26,7 @@ export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 export const range = (from, len) => [...Array(len).keys()].map(x => x + from);
 
 const __getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-export const getRandomInt = (min, max) => __getRandomInt(Math.ceil(min), Math.floor(max));
+export const getRandomInt = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => __getRandomInt(Math.ceil(min), Math.floor(max));
 /** 
  * @template T
  * @returns {[Promise.<T>, (value: T | PromiseLike<T>) => void, (value: T | PromiseLike<T>) => void]}

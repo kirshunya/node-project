@@ -13,6 +13,12 @@ const mapByIndexToVals = (obj, CB) => {
     for(const i of Object.keys(obj)) ret[i] = CB(i);
     return ret;
 }
+/**
+ * 
+ * @param {Number} min 
+ * @param {Number} max 
+ * @returns {Number}
+ */
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -88,6 +94,9 @@ module.exports.WSListeners = class WSListeners {
     disconnect(user, ctx, ws) {
         delete this.Connections[ctx.rikey];
     }
+    /** 
+     * @param {string} event
+     */
     event(event, obj) {
         const msg = Object.assign(obj, {event, method:'backgammons::event'});
         // console.log(`sending`, msg, Object.values(this.Connections))

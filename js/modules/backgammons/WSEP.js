@@ -41,16 +41,25 @@ export class WSRoom {
     constructor(GameID, GameInitData) {
         this.GameID = GameID;
         this.GameInitData = GameInitData;
-        if(GameInitData.RoomState === 1)
+        if(GameInitData.RoomState === 3)
             this.onGameStarted.resolve(new TGameStartedData(GameInitData.slots, GameInitData.state, GameInitData.players, GameInitData.awaitingTeam))
     }
 }
 export const ConnectionStables = {
     /** @type {WSRoom} */
-    Room: null,
+    _Room: null,
+    get Room() { return this._Room; },
+    set Room(value) { this._Room = value; this.onRoomConnection.resolve(value); return true; },
+    onRoomConnection: {
+        value: null,
+        CBlist: [],
+        then(CB) { if(this.value) CB(); else this.CBlist.push(CB); },
+        resolve(value) { this.value = value; value&&this.CBlist.map(CB=>CB(value)); }
+    },
     /** @type {Promise.<int>} info about timestamps differentations in client and server*/
     diffsProm: FCPromise(),
     debmess: [],
+
     connectsended: null,
     connectToRoom([betId, roomId]) {
         location.hash = `#backgammon-room-table/${betId}/${roomId}`;
@@ -68,6 +77,8 @@ export const ConnectionStables = {
     ["backgammons::GameStarted"]({players, slots, state}){
         ConnectionStables.Room.onGameStarted.resolve({players, slots, state})
     },
+    ['RoomStateChanged']({newStateId, stateData}){ 
+        if(newStateId === 3) ConnectionStables.Room.onGameStarted.resolve(stateData) },
     ["backgammons::timediffs"]({diff}) {
         ConnectionStables.diffsProm.resolve(diff);
         console.log('diffs', diff)
@@ -102,6 +113,11 @@ export const ConnectionStables = {
 });
 connectWSRoutes(EventsRoutes);
 syncronous.lobbyhubReady.then(()=>connectWSRoutes(BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute))
+/**
+ * 
+ * @param  {{[eventname:string]:Function}} routes 
+ * @returns 
+ */
 export function connectWSRoutes(...routes) {
     return routes.map(route=>
         Object.entries(route)

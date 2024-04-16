@@ -1,46 +1,25 @@
+const { serializable } = require('./backgammons/serializablewtf.js');
+module.exports.A0 = class A0 extends serializable {};
 const { range, WSListeners, rangebyvals, mapByIndexToVals } = require('./backgammons/Utility.js');
 const { TGame, timestamp } = require('./backgammons/GameRoom.js');
 const { ConnectionContext, Debug, makeEvent } = require('./backgammons/Generals.js');
-// var fs = require('fs');
 const { User } = require('./models/db-models.js');
 
 console.log(TGame)
-// const timestamp = ()=>Date.now();
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-// const range = (from, len) => [...Array(len).keys()].map(x => x + from);//make iterator with Array methods?
-// const adv0_range = (from, len, vals) => range(from,len).map((i)=>vals[i]||vals?.null());
 
-
-// const LobbyListeners = {};
-// const Lobby = {
-//     ListenLobby(ctx, ws) {
-//         const {user} = ctx;
-//         const likey = ctx.likey = `${user.clientID}-${user.userId}-${getRandomInt(-10,100)}`;
-//         // console.log(JSON.stringify(ctx), JSON.stringify(LobbyListeners));
-//         LobbyListeners[likey] = ctx;//is safety?
-//     },
-//     UnlistenLobby(ctx) {
-//         delete LobbyListeners[ctx.likey];
-//     },
-//     event(event, _msg) {
-//         const msg = Object.assign(_msg, {event, method:'backgammons::event'});
-//         console.log('lobbyevent..', JSON.stringify(LobbyListeners), JSON.stringify(msg));
-//         Object.values(LobbyListeners).map(({send})=>send(msg));
-//     }
-// }
 
 // const BETsList = [0.5, 1, /*3, 5, 10*/];
 const BETsList = {
     1:0.5, 
     2:0.5
 }
-const GamesLobby = new class extends WSListeners {
+const GamesLobby = new class extends WSListeners  {
     /** @type {TGame[][]} */
     Games = []
     constructor() {
         super('likey');
         this.Games = mapByIndexToVals(BETsList, ([betId,bet])=>{
-            return rangebyvals(1, 7, (roomId=>this.createGame([betId, roomId])));
+            return rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId])));
         })
         console.log('Backgammons Rooms Initied:', 
                 Object.entries(this.Games)
@@ -71,11 +50,13 @@ const GamesLobby = new class extends WSListeners {
     connect(user, ctx) {
         super.connect(...arguments)
         const rooms = [];
-        for(const [betId, betRooms] of Object.entries(this.Games)){
+        for(const [betId, betRooms] of Object.entries(this.Games)) {
             rooms[betId] = []
-            for(const [roomId, room] of Object.entries(betRooms))
-                rooms[betId][roomId] = [room?.Players?.json(), room?.RoomState];
+            for(const [_roomId, room] of Object.entries(betRooms)) {
+                // console.log(betId, _roomId, room);
+                rooms[betId][_roomId] = room?.minjson?.();
             }
+        }
         return makeEvent('backgammons::lobbyInit', {rooms})
     }
     disconnect(user, ctx) {}
@@ -129,12 +110,21 @@ const WSPipelineCommands = {
 
         ctx.GameID = msg.GameID;
         const Game = GamesLobby.getGameByID(ctx.GameID);
-
-        Game.connect(ctx.user, ctx, this);
+        const connres = Game.connect(ctx, this);
+        console.log('connres', connres);
+        if(connres)
+            GamesLobby.event('backgammons::lobby::connectionToRoom', {
+                GameID: ctx.GameID, players: Game.RoomState.players
+            });
         //'backgammons::connection'
     },
     ['backgammons/disconnt'](ctx, msg) {
-        GamesLobby.getGameByID(ctx.GameID).disconnect(ctx.user, ctx, this);
+        const Game = GamesLobby.getGameByID(ctx.GameID);
+        if(Game.disconnect(ctx)) {
+            GamesLobby.event('backgammons::lobby::connectionToRoom', {
+                GameID:ctx.GameID, players: Game.RoomState.players
+            });
+        }
     },
     ['chat'](ctx, msg) {
         GamesLobby.getGameByID(ctx.GameID).chat(msg);
@@ -251,7 +241,7 @@ module.exports = function(ws, req) {
     ws.on('close', function() {
         GamesLobby.disconnect();
         if(ctx.GameID) {
-            GamesLobby.getGameByID(ctx.GameID).disconnect(ctx.user, ctx, ws)
+            GamesLobby.getGameByID(ctx.GameID).disconnect(ctx)
         }
     });
 }

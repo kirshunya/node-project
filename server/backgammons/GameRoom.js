@@ -1,5 +1,7 @@
-const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider, nextTeamDict } = require("./Generals");
+const { serializable } = require("./serializablewtf.js");
 const { getRandomInt, FCPromise } = require("./Utility");
+const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider, nextTeamDict, makeEvent } = require("./Generals");
+const { WHITEID, BLACKID } = CONSTANTS;
 
 const timestamp = ()=>Date.now();
 module.exports.timestamp = timestamp;
@@ -103,7 +105,7 @@ const Timer = class {
         return [this.userTime, this.snap?this.snap.timestamp:0 ];
     }
 }
-class Timers {
+class Timers extends serializable {
     /** @type {Number} */
     activetimer = 0;
     /** @type {[Timer, Timer]} */
@@ -126,21 +128,16 @@ class Timers {
     }
     // get success() {return this.curTimer.success.bind(this.curTimer)}
 
-    off() {
-        this.timers.map(timer=>timer.off());
-    }
-
-    json() {
-        return this.timers.map(timer=>timer.json())
-    }
+    off() { this.timers.map(timer=>timer.off()); }
+    json() { return this.timers.map(timer=>timer.json()); }
 }
 
-class SharedRoom0 { // deprec // TODO: extends from WSListeners
+class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListeners
     Connections = {};
-    RoomState = CONSTANTS.RoomStates.Waiting;
 
     constructor(GameID=[-1,-1]) {
-        this.GameID = GameID;
+        super();
+        this.GameID = GameID; 
     }
     /**
      * 
@@ -163,29 +160,14 @@ class SharedRoom0 { // deprec // TODO: extends from WSListeners
         // console.log(`sending`, msg, Object.values(this.Connections))
         Object.values(this.Connections).map(async(ctx)=>ctx.send(msg));
     }
-}
-const Debugger = new TPlayer(2, 'Debby', -1);
-module.exports.TGame = class TGame extends SharedRoom0 {
-    // /** @type {TPlayer.PlayersContainer} */
-    Players = new TPlayer.PlayersContainer(this)
-    // [
-    //     new TPlayer(0, 'Jimmy', CONSTANTS.BLACKID),
-    //     new TPlayer(1, 'Missy', CONSTANTS.WHITEID)
-    // ];
-    Timers = new Timers;
-    /** @type {TState} */
-    info = {
-        ActiveTeam: CONSTANTS.WHITEID,
-        Dices: [1, 1]
+    chat(msg) {
+        this.event('message', {text:msg.text})
     }
-    /** @type {[Number, Number][]} */
-    Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
-    // this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
-    /** @type {{whiteover:Number, blackover:Number}} */
-    Drops = {
-        whiteover: 0,
-        blackover: 0
-    };
+}
+class TGame extends SharedRoom0 {
+    // /** @type {TPlayer.PlayersContainer} */
+    // Players = new TPlayer.PlayersContainer(this)
+    RoomState = new WaitingState(this);
     events = new class {
         //Lobby
         onconnect = new EventProvider()
@@ -201,15 +183,15 @@ module.exports.TGame = class TGame extends SharedRoom0 {
      */
     constructor(GameID, test) {
         super(GameID);
-        const nextTeamDict = {
-            [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
-            [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
-        }
-        if(test==='test')
-            this.Slots = adv0_range(0, 24, { 18:[15,1], 6:[15,2], null:()=>[0,0] });
-        if(test==='flud')
-            this.Slots = adv0_range(0, 24, { 0:[9,1], 12:[14,2], 11:[1,2], 18:[1,1],13:[1,1],14:[1,1],15:[1,1],16:[1,1],17:[1,1],null:()=>[0,0] });
-        this.Timers.onfinish(Team=>this.endGame(nextTeamDict[Team], 'time end', 'timer'))
+        // const nextTeamDict = {
+        //     [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
+        //     [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
+        // }
+        // if(test==='test')
+        //     this.Slots = adv0_range(0, 24, { 18:[15,1], 6:[15,2], null:()=>[0,0] });
+        // if(test==='flud')
+        //     this.Slots = adv0_range(0, 24, { 0:[9,1], 12:[14,2], 11:[1,2], 18:[1,1],13:[1,1],14:[1,1],15:[1,1],16:[1,1],17:[1,1],null:()=>[0,0] });
+        // this.Timers.onfinish(Team=>this.endGame(nextTeamDict[Team], 'time end', 'timer'))
     }
     /**
      * 
@@ -217,126 +199,272 @@ module.exports.TGame = class TGame extends SharedRoom0 {
      * @param {boolean} value 
      */
     setAutostep(userId, value) {
-        const player = this.Players.getPlayerByID(userId)
-        if(!player) return;
+        const player = this.RoomState?.getPlayerByID?.(userId);
+        if(!player) return {result:'nope'};
         player.autodice = value;
         this.event('autodiceset', {userId, value})
     }
-    chat(msg) {
-        this.event('message', {text:msg.text})
+    connect(ctx, ws) {
+        super.connect(ctx.user, ctx, ws);
+        const res = this.RoomState.connect?.(ctx);
+        ctx.event('backgammons::connection::self', this[serializable.prioritetSerial]());
+        return res;
     }
-    connect(user, ctx, ws) {
-        // const __u = {user.}
-        super.connect(user, ctx, ws);
-        console.log('TimersTurn', Debug.TimersTurn);
-        ctx.event('backgammons::connection::self', {
-            GameID: this.GameID, GAMESCOUNT:Debug.GAMESCOUNT, 
-                    
-                    state: this.info, 
-                        awaitingTeam:this.awaitingTeam,
-                        awaitingTeamstr:`${this.awaitingTeam}`,
-                    //TODO: moveTo TableRecord.
-                    slots: this.Slots, 
-                    dropped: this.Drops,
-
-                    // moveTo state record
-                    RoomState:this.RoomState,
-                    GameState:this.RoomState,
-
-                    players:this.Players.json(),
-                    // moveTo debug record
-                    ['TimersTurn']:(Debug.TimersTurn?'on':'off'),
-                    // moveTo state record
-                    times: this.Timers.json(),
-
-                    debug: Object.keys(this.Connections),//TODO: disconnections.. //TODO: Lobby anons of GamesEnd
-        });
-        if(this.Players.isalready()&&!this.Players.getPlayerByID(user.userId))
-            this.Players.appendVisitor(user);
-        else {
-            const res = this.Players.appendPlayer(user);
-            if(res >= 10) this.events.onconnect.send();
-            if(this.Players.isalready())
-                if(this.RoomState === CONSTANTS.RoomStates.Waiting)//__0?
-                    this.startGame()
-        }
-
-        
-        // let rec = this.Players.filter(({userId})=>userId===user.userId)[0];
-        // if(rec) {
-        //     user.team = rec.team;
-        //     return;
-        // }
-        // if(this.Players.length<2) {
-        //     this.Players.push(user);
-        //     // Lobby.event('backgammons::lobby::connectionToRoom', {
-        //     //     GameID: this.GameID, Players: this.Players.length
-        //     // });
-        //     if(this.Players.length===2) {//
-        //         this.startGame();
-        //     }
-        // }
+    /** @type {ctxHandlerT<void|true>} */
+    disconnect(ctx) {
+        super.disconnect(ctx.user, ctx, ctx.ws);
+        if(this.RoomState.disconnect?.(ctx)) return (this.event('backgammons::room::disconnect', ctx.user.userId), true);
     }
-    disconnect(user, ctx, ws) {
-        super.disconnect(...arguments);
-        if(this.RoomState === CONSTANTS.RoomStates.Waiting) {
-            this.Players.disconnect(user, ctx, ws);
-            this.events.onexit.send();
-            return true;
-        } else false;
+    /** @param {TeXRoomState} newState */
+    upgradeState(newState) {
+        this.RoomState = newState;
+        this.event('RoomStateChanged', {newStateId: newState.RoomState, stateData:newState.updata()});
     }
-    startGame() {
-        this.Players.rollTeam()
-        this.info = {
-            ActiveTeam: CONSTANTS.WHITEID,
-            Dices: randdice()
-        }
-        this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players.json()});
-        this.RoomState = CONSTANTS.RoomStates.Started;
-        this.events.onstart.send()
-    }
-    /**
-     * 
-     * @param {TUser} user 
-     * @param {[{from,to,points}]} step 
-     * @param {int} code 
-     */
-    stepIfValid(user, step, code) {
-        const {ActiveTeam, Dices} = this.info;
-        this.Timers.curTimer.pause();
-        const ret = ret=>(this.Timers.curTimer.resume(), ret);
-        // this.curTimer.await();//time to check step to success 
-        
-        const player = this.Players.getPlayerByID(user.userId);
-        if(!player) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
-        if(!(player.userId === 2 || player.team === ActiveTeam)) return ret((console.log('nope', this.Players), {result:'nope', user, player}))
-        //implement GameLogistics here
-        step.map(({from, to, points})=>{
-            this.slot(from).take(ActiveTeam);
-            this.slot(to).add(ActiveTeam);
-            // typeof to === 'string' && to = 
-        });
-        this.Timers.curTimer.success();//if succes step
-        const prevstate = this.info;
-        this.event('step', {step, prevstate, code});//if success step
-        console.log('dicerolling by ', this.Players.opponent())
-        if(this.Players.opponent().autodice) {
-            this.event('state', {newstate: this.nextState()});
-        } else {
-            const nextTeamDict = {
-                [CONSTANTS.WHITEID]: CONSTANTS.BLACKID,
-                [CONSTANTS.BLACKID]: CONSTANTS.WHITEID
-            }
-            this.awaitingTeam = this.info.awaitingTeam = nextTeamDict[ActiveTeam]
-        }
-
-        if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
-            this.endGame(ActiveTeam, 'Players dropped all checkers', 'win')
-        } 
-        return ret({result:'success'});
-    }
+    // startGame() {
+    //     this.Players.rollTeam()
+    //     this.info = {
+    //         ActiveTeam: CONSTANTS.WHITEID,
+    //         Dices: randdice()
+    //     }
+    //     this.event('backgammons::GameStarted', {slots: this.Slots, state: this.info, players:this.Players.json()});
+    //     this.RoomState = CONSTANTS.RoomStates.Started;
+    //     this.events.onstart.send()
+    // }
     rollDice() {
-        this.awaitingTeam = this.info.awaitingTeam = 0;
+        return this.RoomState.rollDice(...arguments);
+    }
+    stepIfValid(user, step, code) {
+        return this.RoomState.stepIfValid?.(...arguments);
+    }
+    json() {
+        return Object.assign(this.RoomState.json(), {GameID:this.GameID, RoomState:this.RoomState.RoomState})
+    }
+    minjson() {
+        return [this.RoomState.players, this.RoomState.RoomState]
+    }
+    // nextState() {
+    //     const nextTeam = nextTeamDict[this.info.ActiveTeam];
+    //     this.Timers.curTimer = nextTeam;
+    //     return this.info = {
+    //         ActiveTeam: nextTeam,
+    //         Dices: randdice()
+    //     }
+    // }
+    // slot(index) {
+    //     if(index === 'blackover' || index === 'whiteover') {
+    //         const Drop = this.Drops;
+    //         return {
+    //             add(ColourID) {
+    //                 Drop[index] = 1 + (Drop[index]?Drop[index]:0);
+    //             },
+    //             take() {console.log('error: tried to access to Drop.take()')}
+    //         }
+    //     }
+    //     const Slot = this.Slots[index];
+    //     const refToArr = new (class {
+    //         ref
+    //         constructor(ref) { this.ref = ref; }
+    //         get Colour() {
+    //             return this.ref[1]
+    //         }
+    //         set Colour(value) {
+    //             return this.ref[1] = value;
+    //         }
+    //         get Count() {
+    //             return this.ref[0]
+    //         }
+    //         set Count(value) {
+    //             return this.ref[0] = value;
+    //         }
+    //     })(Slot)
+    //     return {
+    //         add(ColourID) {
+    //             if(refToArr.Count++===0)
+    //                 refToArr.Colour = ColourID;
+    //         },
+    //         take(ColourID) {
+    //             refToArr.Colour = (--refToArr.Count===0)?0:ColourID;
+    //         }
+    //     }
+    // }
+}
+module.exports.TGame = TGame;
+class TeXRoomState extends serializable { 
+    /** @type {TGame}*/ 
+    Room; 
+    /** @param {TGame | TeXRoomState} input */
+    constructor(input) {
+        super();
+        console.log('TeXRoomState init', input);
+        if(input instanceof TGame) this.Room = input
+        else if(input instanceof TeXRoomState) this.Room = input.Room; 
+        else if(input.Room) this.Room = input.Room;
+        else this.Room = input;
+    }
+    /** @param {TeXRoomState} RoomState  */
+    upgrade(RoomState) { console.log('upgradeState to ', RoomState); return this.Room.upgradeState(RoomState); }
+}
+/** @typedef {(ctx:ConnectionContext)=>any} ctxHandler */
+/** @template T @typedef {(ctx:ConnectionContext)=>T} ctxHandlerT */
+/** @param {int} rsid */
+function RoomState(rsid) { return class RoomState extends TeXRoomState { RoomState = rsid }; };
+class WaitingState extends RoomState(0) {
+    players = [];
+    /** @type {ctxHandlerT<void|true>} */
+    connect(ctx) {
+        const connres = this.players.push(ctx.user)<=2;
+        if(this.players.length >= 2) 
+            ((this.players.length = 2), this.upgrade(LaunchingState.fromWaitingState(this)), true);
+        return connres;
+    }
+    /** @type {ctxHandlerT<void|true>} */
+    disconnect(ctx) {
+        if(this.players.length === 1 && this.players[0].userId === ctx.user.userId) return ((this.players.length = 0), true);
+        else console.log('Гонка запросов, сначала апгрейд комнаты до лаунча, а потом дисконнет, это при двух егроках');
+    }
+    json() { return { RoomState: this.RoomState, players: this.players} }
+    updata() { return this.json(); }
+}
+class TimeVal { // TimeValTiro
+    /** @type {Number}  */
+    timeval
+    /** @param {Number} ms  */
+    constructor(ms) { 
+        this.timeval = ms;
+    }
+    /** @param {Number} secs  */
+    static SECONDS(secs) { return new TimeVal(secs*1000); }
+
+    start(CB) { // start properties distance ...
+        const Timer = this;
+        Timer._timestamp = timestamp();//for distance function
+        // setTimeout(CB, this.timeval);
+        const StopableDecorator = (CB)=>()=>Timer._stopped?null:CB();
+        const PausableDecorator = (CB)=>()=>Timer._pause?(Timer._CB = CB):CB();
+        setTimeout(StopableDecorator(CB), this.timeval);
+    }
+    stop() { return this._stopped = true; }
+    pauseWhile(CB) {
+        const Timer = this;
+        Timer._pause = true;
+        res = CB();
+        Timer._pause = false;
+        if(Timer._CB) Timer._CB();
+        return res;
+    }
+
+    value() { return this.timeval; }
+    json() { return this; }
+    distance() { return this.timeval - (timestamp() - this.timestamp); }
+}
+class LaunchingState extends RoomState(1) {
+    players = [];
+    timeval = TimeVal.SECONDS(5);
+    getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
+
+    constructor(upgradable, players) { super(upgradable); this.players = players; this.timeval.start(()=>this.upgrade(DiceTeamRollState.fromLaunchingState(this))); }
+    /** @param {WaitingState} wstate  */
+    static fromWaitingState(wstate) {
+        return new LaunchingState(wstate, wstate.players);
+    }
+    json() { return {
+        RoomState: this.RoomState,
+        players: this.players,
+        timeval: this.timeval.json()
+    }}
+    updata() { return { RoomState: this.RoomState, players: this.players, timeval: this.timeval.json() }; }
+}
+class DiceTeamRollState extends RoomState(2) {
+    players = [];
+    /** Если кубики брошены, будут записаны здесь @type {[int, int]}*/
+    Dices = [0, 0];
+    timeval = TimeVal.SECONDS(30);
+    getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
+    
+    constructor(upgradable, players) { super(upgradable); this.players = players; this.timeval.start(this.timerlose()); }
+    /** @param {LaunchingState} wstate  */
+    static fromLaunchingState(lstate) {
+        return new LaunchingState(lstate, lstate.players);
+    }
+
+    timerlose() {
+        return ()=>{
+            //what to do? close room?
+        }
+    }
+    roolDice(ctx) {
+        for(const [index, player] of Object.entries(this.players)) 
+            if(+player.userId===+ctx.user.userId&&this.Dices[index]) 
+                this.Room.event('diceTeamRoll', {value:this.Dices[index] = getRandomInt(1,6)});
+        if(this.Dices.reduce((acc,val)=>acc===val)) 
+            (this.upgrade(this), this.timeval.stop(), this.timeval = TimeVal.SECONDS(30).start(this.timerlose()));
+        if(this.Dices.reduce((acc,val)=>!!acc&&!!val))
+            (this.upgrade(GameStarted.fromDiceTeamRollState(this)), this.timeval.stop());
+        return {result:'nope'};
+    }
+
+    json() { return this.updata(); }
+    updata() { return { RoomState: this.RoomState, players: this.players, Dices:this.Dices, timeval: this.timeval.json() }; }
+}
+class GameStarted extends RoomState(3) {
+    players;
+    Timers = new Timers;
+    Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
+    Drops = { whiteover: 0, blackover: 0 };
+    Dices = GameStarted._rollDices();
+    ActiveTeam = WHITEID;
+
+    getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
+    get opponent() { return this.players.filter(({team})=>team !== this.ActiveTeam)[0]; }
+
+    constructor(upgradable, players) { super(upgradable); this.players = players; this.Timers.curTimer = this.ActiveTeam; }
+    /** @param {DiceTeamRollState} wstate  */
+    static fromDiceTeamRollState({Room, players, Dices}) {
+        const [d1, d2] = Dices;
+        [players[0].team, players[1].team] = d1 > d2?[WHITEID, BLACKID]:[BLACKID, WHITEID];
+        return new GameStarted(Room, players);
+    }
+
+    static _rollDices() { return [getRandomInt(1, 6), getRandomInt(1, 6)]; }
+    stepIfValid(user, step, code) {
+        const result = this.Timers.curTimer.pauseWhile(()=>{//at the end ifn stopped/successed timer, this will be resumed;
+            const {ActiveTeam, Dices} = this;
+            
+            const player = this.getPlayerByID(user.userId);
+            if(!player) return ((console.log('nope', this.Players), {result:'nope', user, player}))
+            if(!(player.debugger || player.team === ActiveTeam)) return ((console.log('nope', this.Players), {result:'nope', user, player}))
+
+            //implement GameLogistics here
+            step.map(({from, to, points})=>{
+                this.slot(from).take(ActiveTeam);
+                this.slot(to).add(ActiveTeam);
+                // typeof to === 'string' && to = 
+            });
+            this.Timers.curTimer.success();//if succes step
+            return true;
+        });
+        
+        if(result===true) {
+            const prevstate = { ActiveTeam:this.ActiveTeam, Dices:this.Dices };
+            this.event('step', {step, prevstate, code})
+            if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) 
+                this.endGame(this.ActiveTeam, 'Player dropped all chekers', 'win');
+            else this.nextStep();
+            return {result:'success'};
+        } else {
+
+            return {result:'nope'};
+        }
+    }
+    nextStep() {
+        const Dices = this.Dices = this.opponent().autodice?GameStarted._rollDices():[0, 0];
+        const ActiveTeam = this.ActiveTeam = nextTeamDict[this.ActiveTeam];
+        this.event('state', { Dices, ActiveTeam })
+        this.Timers.curTimer = ActiveTeam;
+    }
+    rollDice(ctx) {
+        if(this.getPlayerByID(ctx.userId)?.team !== this.ActiveTeam) return {result:'nope'};
+        this.Dices = GameStarted._rollDices();
         this.event('state', {newstate: this.nextState()});
     }
     endGame(WinnerTeam, msg, code) {
@@ -345,51 +473,18 @@ module.exports.TGame = class TGame extends SharedRoom0 {
         this.RoomState = CONSTANTS.RoomStates.end;
         this.event('end', {winner: WinnerTeam, msg, code});
         this.Timers.off();
-        this.events.onfinish.send();
+        this.Room.events.onfinish.send();
     }
-    nextState() {
-        const nextTeam = nextTeamDict[this.info.ActiveTeam];
-        this.Timers.curTimer = nextTeam;
-        return this.info = {
-            ActiveTeam: nextTeam,
-            Dices: randdice()
-        }
-    }
-    slot(index) {
-        if(index === 'blackover' || index === 'whiteover') {
-            const Drop = this.Drops;
-            return {
-                add(ColourID) {
-                    Drop[index] = 1 + (Drop[index]?Drop[index]:0);
-                },
-                take() {console.log('error: tried to access to Drop.take()')}
-            }
-        }
-        const Slot = this.Slots[index];
-        const refToArr = new (class {
-            ref
-            constructor(ref) { this.ref = ref; }
-            get Colour() {
-                return this.ref[1]
-            }
-            set Colour(value) {
-                return this.ref[1] = value;
-            }
-            get Count() {
-                return this.ref[0]
-            }
-            set Count(value) {
-                return this.ref[0] = value;
-            }
-        })(Slot)
-        return {
-            add(ColourID) {
-                if(refToArr.Count++===0)
-                    refToArr.Colour = ColourID;
-            },
-            take(ColourID) {
-                refToArr.Colour = (--refToArr.Count===0)?0:ColourID;
-            }
-        }
-    }
+
+
+    json() { return {
+        RoomState: this.RoomState,
+        ActiveTeam: this.ActiveTeam,
+        players: this.players,
+        Timers: this.Timers.json(),
+        Slots: this.Slots,
+        Drops: this.Drops,
+        Dices: this.Dices,
+    }}
+    updata() { return this.json(); }
 }

@@ -38,6 +38,7 @@ module.exports.TUser = class TUser {
     //     return new TPlayer
     // }
 }
+
 class RoomComponent {
     /** @param {TGame} Game  */
     constructor(Game) { 

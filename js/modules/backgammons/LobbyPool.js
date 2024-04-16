@@ -157,7 +157,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
           if(!rinfo) return;
           const [players, state] = rinfo;
           BackgammonsLobbyHub.setOnlineToTable([betId, roomId], players);
-          BackgammonsLobbyHub.visitEnableToggle([betId, roomId], state!==0 && state !== 2);
+          BackgammonsLobbyHub.visitEnableToggle([betId, roomId], state === 3); // if GameStarted visitors eyes red
       })
     });
   }

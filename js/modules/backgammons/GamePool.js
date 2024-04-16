@@ -1,17 +1,22 @@
-import { ondom, getRandomInt, EventProvider, sleep, range } from './Utilities.js';
-import { WSEventPool, ConnectionStables, WSRoom } from './WSEP.js'
+import { ondom, getRandomInt, EventProvider, sleep, range, FCPromise } from './Utilities.js';
+import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.js'
 // import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
 import { html } from './prophtml.js';
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
-import { API_URL_PART, IS_HOSTED_STATIC } from '../config.js';
+import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
 import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { fabricsloaded, popupsinited } from './syncronous.js';
 
+const TeamFromTeamId = {
+  [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
+  [BoardConstants.WHITE.id]: BoardConstants.WHITE,
+  [BoardConstants.BLACK.id]: BoardConstants.BLACK
+}
 popupsinited.then(()=>{
   window.openEmojiPopup = openEmojiPopup;
   window.openPhrasesPopup = openTextPopup;
@@ -143,7 +148,7 @@ export function ShowGameTable(localUser, GameID) {
 /** @type {Number} in seconds*/
 const STEPTIME = 25;
 class Timer {
-  constructor(Element, value) {
+  constructor(Element, value, _STEPTIME = STEPTIME) {
       const TLabel = Element.getElementsByClassName('timer')[0];
       const TIcon = Element.getElementsByClassName('stimer')[0];
       let [userTime, tsamp] = value;
@@ -169,10 +174,8 @@ class Timer {
       this.label = (newval=undefined)=>{
           if(typeof newval === 'number') tsamp = newval;
           const seconds = tsamp?Math.floor((timestamp()-tsamp)/1000):0;
-          const secs = STEPTIME-seconds;
-          const _diff = diff = secs<0?secs:0;
-          // if(_diff&&!loadstamp) loadstamp = timestamp();
-          // if(loadstamp) diff = Math.floor((timestamp() - loadstamp+2500)/1000);
+          const secs = _STEPTIME-seconds;
+                diff = secs<0?secs:0;
           labelTIcon(secs)
           labelTlabel()
       }
@@ -182,44 +185,92 @@ class Timer {
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
 export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
-    const {slots, dropped, players, state} = GameInitData;
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
+    // GameInitData in Waiting = [waiter, waiter], visiters
+    // GameInitData in Launching = [player, player], visiters, timeval = 5
+    // GameInitData in DiceTeamRoll = [player, player], visiters, timeval = 20 -> sets Teams
+    // GameInitData in GameStarted = [player, player], visiters, Slots, Drops, [timeval = 60, timestamp = 0][2], Dices, ActiveTeam
+    // GameInitData in WIN = [player, player], visiters, Slots, Drops, [timeval = 60, timestamp = 0][2], Dices, WinnerTeam
+    // const {slots, dropped, players, state} = GameInitData;
 
-    const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
-            .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
+    // const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
+    //         .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
     await fabricsloaded;
     /** @type {GameProvider} */
-    const gp = new GameProvider({ User:localUser, Slots:slots, sendstep, Drops });
-    // PermStepCompletor&&PermStepCompletor.addEventListener('click', ()=>(gp.eventHandlers.PermStepByButton(), lightstepbutton(false)))
-    // StepCompletor&&StepCompletor.addEventListener('click', ()=>(gp.eventHandlers.AcceptStep(), lightstepbutton(false)))
+    const promisableinitables = {
+      playersComplete : FCPromise(),
+      SlotsNDropsComplete : FCPromise(),
+      DicesComplete : FCPromise(),
+      DicesProvider : FCPromise()
+    }
+    const gp = new GameProvider({ User:localUser, sendstep }, promisableinitables);
+    
     gp.onRollDicesClick(()=>req({method:'rollDice'}));
     /** @type {Timer[]} */
     let TimersByTeam
     /** @type {int} */
     let activetimerind;
+    const UsersPanUI = {
+      get userPan() { return document.getElementById('TopPan'); },
+      get oppPan() { document.getElementById('BottomPan') },
+      initAvatars(user, opponent) {
+          const {userPan, oppPan} = this;
+          userPan.getElementsByTagName('img')[0].src = user.avatar?user.avatar:'static/avatar/undefined.jpeg';
+          userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
+          oppPan.getElementsByTagName('img')[0].src = opponent.avatar?opponent.avatar:'static/avatar/undefined.jpeg';
+          oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+      }
+    }
 
-    
     document.getElementById('TopPan')
               .getElementsByClassName('buttons')[0]
                   .children[0]
                       .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
+    let TimersIntervals = null; const resetTimersIntervals =(interval)=>{ TimersIntervals&&clearInterval(TimersIntervals); return TimersIntervals = interval; }
+    let onChange = ()=>{};
+    const RoomStatesInitRouter = {
+      [0](initData) {//Waiting
+      }, [1](initData) { // Launching
+      }, [2](initData) { // DiceTeamRolling
+        const {players, timeval} = initData;
+        UsersPanUI.initAvatars(players[0], players[1]);
+        const Timers = [
+          new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval),
+          new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval)
+        ];
+        Timers.map(timer=>timer.enable(true));
+        resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
+        gp.eventHandlers.diceTeamRollsState();
+        onChange = ()=>{Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
+      }, [3](initData) { // GameStarted
+        const [firstPlayer, secondPlayer] = initData.players;
+        const playerById = {[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer};
+        localUser.team = TeamFromTeamId[+(playerById[localUser.userId]?.team||0)];
+        autostep.setdice(localUser.autodice = playerById[localUser.userId].autodice)
+        const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
+        initAvatars(whiteplayer, blackplayer);
 
-    // WSEventPool.on('backgammons::GameStarted', ({players, state})=>GameStart(players, state.ActiveTeam, state.Dices, [0, 0]))
-    ConnectionStables.Room.onGameStarted
-          .then(({players, state, slots, awaitingTeam})=>
-              GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, awaitingTeam)) 
-    ConnectionStables.Room.onGameStarted.then(()=>elcaPopup.then(popup=>popup.remove()))
-    // if(ef) GameStart(ef.players, ef.state.ActiveTeam, ef.state.Dices);
-    // if(ef) GameStart(ef.players, GameInitData.state.ActiveTeam, GameInitData.state.Dices, GameInitData.times);//debug----TODO
+        gp.eventHandlers.start(initData, initData.players);
+
+        TimersByTeam = [
+          new Timer(document.getElementById('TopPan'), whiteval), 
+          new Timer(document.getElementById('BottomPan'), blackval)
+        ]; startTimer(initData.ActiveTeam)
+      }, [4](initData) { // Win
+      },
+    }
+    ConnectionStables.onRoomConnection.then(()=>{
+      const initData = ConnectionStables.Room.GameInitData;
+      RoomStatesInitRouter[0](initData);
+    })
+    // ConnectionStables.Room.onGameStarted
+    //       .then(({players, state, slots})=>
+    //           GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, slots)) 
+    // ConnectionStables.Room.onGameStarted.then(()=>elcaPopup.then(popup=>popup.remove()))
     function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times, awaitingTeam) {
-        if(localUser.userId === 2)
-            localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
-        const TeamFromTeamId = {
-          [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
-          [BoardConstants.WHITE.id]: BoardConstants.WHITE,
-          [BoardConstants.BLACK.id]: BoardConstants.BLACK
-        }
+        // if(localUser.userId === 2)
+        //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
         localUser.team = TeamFromTeamId[firstPlayer.userId === localUser.userId
                               ? +firstPlayer.team
                               : secondPlayer.userId === localUser.userId
@@ -234,34 +285,34 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
         TimersByTeam = InitUI(whiteplayer, blackplayer, times);
         startTimer(ActiveTeam)
     }
-    WSEventPool.on('step', ({step, prevstate, newstate, code})=>{
-            // if(localUser.userId === 2)
-            //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
-            // setActiveTimer(newstate.ActiveTeam);
-            code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
-                           || gp.eventHandlers.ustep(step, newstate, prevstate)
-        });
-    WSEventPool.on('state', ({newstate})=>{
-            if(localUser.userId === 2)
-                localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
-            setActiveTimer(newstate.ActiveTeam);
-            gp.eventHandlers.state(newstate)
-        });
-    WSEventPool.on('end', ({winner})=>{
+    const WSEventRoutes = {
+      ['RoomStateChanged']:(newStateId, stateData)=>{ onChange?.(); RoomStatesInitRouter[newStateId] (stateData); }, 
+      ['step']:({step, prevstate, newstate, code})=>{
+        // if(localUser.userId === 2)
+        //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+        // setActiveTimer(newstate.ActiveTeam);
+        code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
+                       || gp.eventHandlers.ustep(step, newstate, prevstate)
+      }, ['state']:({newstate})=>{
+        if(localUser.userId === 2)
+            localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+        setActiveTimer(newstate.ActiveTeam);
+        gp.eventHandlers.state(newstate)
+      }, ['end']:({winner})=>{
         alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
-        window.location.reload();
-    })
-    WSEventPool.on('restart__', ({})=>{
+        alert('popup Win');
+        window.hash = '#backgammons-menu';
+      }, ['restart__']:()=>{
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
-    })
-    WSEventPool.on('emoji', ({userId, emojiId})=>{
+      }, ['emoji']:({userId, emojiId})=>{
         const emojiSRC = `img/emojis/${emojiId}.png`;
         return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}" width="5rem" height="5rem">`});
-    })
-    WSEventPool.on('phrase', ({userId, phraseId})=>{
+      }, ['phrase']:({userId, phraseId})=>{
         return new Toast({title:`фраза от ${userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`]});
-    })
+      }
+    }
+    connectWSRoutes(WSEventRoutes)
     function InitUI(user, opponent, [whiteval, blackval]) {
         const autostepToggler = document.getElementsByClassName('autostep')[0]
         // autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
@@ -395,6 +446,22 @@ export const openBackgammonsWaitingPopup = async ([betId, roomId], player,) => {
     `;
 
   body.appendChild(popupElement);
+  // const popupid = popupElement.dataset.popupid = getRandomInt();
+  const popupType = popupElement.dataset.popupType = 'WaitingPopup';
+  window.addEventListener('popstate', function() {
+    const popup = document.getElementsByClassName('popup')[0];
+    // if(popup?.dataset?.popupid === `${popupid}`){
+    if(popup?.dataset?.popupType === `${popupType}`){
+        window.ws.send(
+        JSON.stringify({
+          method: "backgammons/disconnt",
+          GameID: [betId, roomId],
+        })
+      );
+      popupElement.remove();
+      location.hash = '#backgammons-menu';
+    }
+  })
 
   let timerTimeout = null;
   // таймер
@@ -402,7 +469,12 @@ export const openBackgammonsWaitingPopup = async ([betId, roomId], player,) => {
   // считаем время которое прошло, startTime - время начала ожидания
 
   const targetTime = Date.now();
-  let nowClientTime = await NowClientTime();
+  let nowClientTime 
+  try{
+    nowClientTime = await NowClientTime();
+  } catch(e) {
+    nowClientTime = targetTime;
+  }
 
   let distance = nowClientTime - targetTime;
 
