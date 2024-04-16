@@ -230,8 +230,8 @@ class TGame extends SharedRoom0 {
     //     this.RoomState = CONSTANTS.RoomStates.Started;
     //     this.events.onstart.send()
     // }
-    rollDice() {
-        return this.RoomState.rollDice(...arguments);
+    rollDice(ctx) {
+        return this.RoomState.rollDice(ctx);
     }
     stepIfValid(user, step, code) {
         return this.RoomState.stepIfValid?.(...arguments);
@@ -384,19 +384,22 @@ class DiceTeamRollState extends RoomState(2) {
     constructor(upgradable, players) { super(upgradable); this.players = players; this.timeval.start(this.timerlose()); }
     /** @param {LaunchingState} wstate  */
     static fromLaunchingState(lstate) {
-        return new LaunchingState(lstate, lstate.players);
+        return new DiceTeamRollState(lstate, lstate.players);
     }
 
     timerlose() {
         return ()=>{
-            //what to do? close room?
+            // this.upgrade(new WaitingState(this));
         }
     }
-    roolDice(ctx) {
-        for(const [index, player] of Object.entries(this.players)) 
-            if(+player.userId===+ctx.user.userId&&this.Dices[index]) 
-                this.Room.event('diceTeamRoll', {value:this.Dices[index] = getRandomInt(1,6)});
-        if(this.Dices.reduce((acc,val)=>acc===val)) 
+    rollDice(ctx) {
+        for(const [index, player] of Object.entries(this.players)) {
+            console.log('rollDice', index, player);
+            console.log('log:', player.userId, ctx.user.userId, this.Dices[index]);
+            if(+player.userId===+ctx.user.userId&&!this.Dices[index]) 
+                this.Room.event('diceTeamRoll', {index, value:(this.Dices[index] = getRandomInt(1,6))});
+        }
+        if(this.Dices.reduce((acc,val)=>acc===val&&acc!==0)) 
             (this.upgrade(this), this.timeval.stop(), this.timeval = TimeVal.SECONDS(30).start(this.timerlose()));
         if(this.Dices.reduce((acc,val)=>!!acc&&!!val))
             (this.upgrade(GameStarted.fromDiceTeamRollState(this)), this.timeval.stop());

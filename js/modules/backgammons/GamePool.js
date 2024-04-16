@@ -4,7 +4,7 @@ import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
-import { BackgammonsLaunchingPopup, html, waitingPopup } from "./htmlcontainer.js";
+import { BackgammonsLaunchingPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
 import { NowClientTime } from '../time.js';
@@ -127,10 +127,10 @@ export function ShowGameTable(localUser, GameID) {
         
     </div>
   `;
-    const elcaPopup = (new waitingPopup(1, [localUser])).showOnReady();//openBackgammonsWaitingPopup(GameID, localUser);
+    //openBackgammonsWaitingPopup(GameID, localUser);
     (async()=>{
         while(!ConnectionStables.Room) await sleep(100);//what should to do to refac?? send to this function some promise of connection? and should create some clear functiotive..
-        InitGame(ConnectionStables.Room.GameInitData, localUser, ws, elcaPopup);
+        InitGame(ConnectionStables.Room.GameInitData, localUser, ws);
     })()
 }
 // const User = {userId: 0, username: 'debug'};
@@ -181,7 +181,7 @@ class Timer {
 }
 let ncode = 'np';
 const gencode = ()=>ncode = getRandomInt(-65000, 65000);
-export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
+export async function InitGame(GameInitData, localUser, ws) {
     let TimersIntervals = null; const resetTimersIntervals =(interval)=>{ TimersIntervals&&clearInterval(TimersIntervals); return TimersIntervals = interval; }
     let onChange = ()=>{};
     const req = msg=>ws.send(JSON.stringify(msg));
@@ -201,8 +201,6 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
     const promisableinitables = {
       playersComplete : FCPromise(),
       SlotsNDropsComplete : FCPromise(),
-      DicesComplete : FCPromise(),
-      DicesProvider : FCPromise()
     }
     const gp = new GameProvider({ User:localUser, sendstep }, promisableinitables);
     
@@ -213,12 +211,12 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
     let activetimerind;
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
-      get oppPan() { document.getElementById('BottomPan') },
+      get oppPan() { return document.getElementById('BottomPan') },
       initAvatars(user, opponent) {
           const {userPan, oppPan} = this;
-          userPan.getElementsByTagName('img')[0].src = user.avatar?user.avatar:'static/avatar/undefined.jpeg';
+          userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
           userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
-          oppPan.getElementsByTagName('img')[0].src = opponent.avatar?opponent.avatar:'static/avatar/undefined.jpeg';
+          oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
           oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
       }
     }
@@ -227,36 +225,51 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
               .getElementsByClassName('buttons')[0]
                   .children[0]
                       .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
+    const __playerById = ([firstPlayer, secondPlayer])=>({[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer});
+    /** @type {showablePopup} */
+    let elcaPopup = null;
+    function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
+    function hidePopups() { elcaPopup&&elcaPopup.close(true); }
     const RoomStatesInitRouter = {
       [0](initData) {//Waiting
+          //? maybe room closed.
+          // location.hash = '#gamemode-choose';
+          if(initData.msg === 'restart') return location.hash = '#gamemode-choose';
+          showNewPopup(new waitingPopup(1, [localUser]));
       }, [1](initData) { // Launching
-        elcaPopup.swapPopupToNewPopup(new BackgammonsLaunchingPopup(1, initData.players, initData.timeval));
+          showNewPopup(new BackgammonsLaunchingPopup(1, initData.players, initData.timeval));
       }, [2](initData) { // DiceTeamRolling
-        const {players, timeval} = initData;
-        UsersPanUI.initAvatars(players[0], players[1]);
-        const Timers = [
-          new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval),
-          new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval)
-        ];
-        Timers.map(timer=>timer.enable(true));
-        resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
-        gp.eventHandlers.diceTeamRollsState();
-        onChange = ()=>{Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
+          /** @type {{players:[]}} */
+          const {players, timeval} = initData;
+          UsersPanUI.initAvatars(players[0], players[1]);
+          const Timers = [
+            new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval),
+            new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval)
+          ];
+          hidePopups();
+          Timers.map(timer=>timer.enable(true));
+          resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
+          const PlayerTempTeam = players.reduce((p1,p2)=>p1.userId===localUser.userId?BoardConstants.BLACK:p2.userId===localUser.userId?BoardConstants.WHITE:0);
+          gp.eventHandlers.diceTeamRollsState(PlayerTempTeam, ()=>req());
+          initData.Dices.map((value, index)=>gp.eventHandlers.diceTeamRoll(1+index, +value))
+          onChange = ()=>{Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
-        const [firstPlayer, secondPlayer] = initData.players;
-        const playerById = {[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer};
-        localUser.team = TeamFromTeamId[+(playerById[localUser.userId]?.team||0)];
-        autostep.setdice(localUser.autodice = playerById[localUser.userId].autodice)
-        const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
-        initAvatars(whiteplayer, blackplayer);
+          const [firstPlayer, secondPlayer] = initData.players;
+          const playerById = __playerById(initData.players)
+          localUser.team = TeamFromTeamId[+(playerById[localUser.userId]?.team||0)];
+          autostep.setdice(localUser.autodice = playerById[localUser.userId].autodice)
+          const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
+          UsersPanUI.initAvatars(whiteplayer, blackplayer);
 
-        gp.eventHandlers.start(initData, initData.players);
+          gp.eventHandlers.start(initData, initData.players);
+          promisableinitables.SlotsNDropsComplete.resolve([initData.Slots, initData.Drops]);
 
-        TimersByTeam = [
-          new Timer(document.getElementById('TopPan'), whiteval), 
-          new Timer(document.getElementById('BottomPan'), blackval)
-        ]; startTimer(initData.ActiveTeam)
-      }, [4](initData) { // Win
+          // TimersByTeam = [
+          //   new Timer(document.getElementById('TopPan'), whiteval), 
+          //   new Timer(document.getElementById('BottomPan'), blackval)
+          // ]; startTimer(initData.ActiveTeam)
+      }, [4](initData) { // Win // here's started timer to emojis send on Win
+
       },
     }
     RoomStatesInitRouter[GameInitData.RoomState](GameInitData);
@@ -287,6 +300,7 @@ export async function InitGame(GameInitData, localUser, ws, elcaPopup) {
     }
     const WSEventRoutes = {
       ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId] (stateData); }, 
+      ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(1+index, value),
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)
         //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug

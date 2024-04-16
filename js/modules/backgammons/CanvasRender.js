@@ -617,6 +617,9 @@ export class BoardCanvas extends CanvasFunctions {
         window.addEventListener('load', ()=>sleep(300).then(CanvasValidate(),CanvasValidate()));
         CanvasValidate(); CanvasValidate();
     }
+    diceTeamRollsState(UserTeam, clickcallback) {
+        this.showAcceptDiceRollLabel(UserTeam, clickcallback);
+    }
     showAcceptStepLabel(ActiveTeam) {
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
@@ -639,7 +642,7 @@ export class BoardCanvas extends CanvasFunctions {
         })
         this.canvas.add(text);
     }
-    showAcceptDiceRollLabel(ActiveTeam) {
+    showAcceptDiceRollLabel(ActiveTeam, clickcallback) {
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
         const left = sideleft + currentSideSize/2;
@@ -655,7 +658,7 @@ export class BoardCanvas extends CanvasFunctions {
             // originY: 'top',
         })
         text.left -= text.width/2
-        text.on('mousedown', ()=>{
+        text.on('mousedown', clickcallback? clickcallback :()=>{
             this.gc.rollDices()
             this.canvas.remove(text);
         })

@@ -144,7 +144,7 @@ const WSPipelineCommands = {
      * @returns 
      */
     rollDice(ctx) {
-        GamesLobby.getGameByID(ctx.GameID).rollDice(ctx.user)
+        GamesLobby.getGameByID(ctx.GameID).rollDice(ctx)
     },
     /**
      * deprec

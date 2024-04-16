@@ -2,7 +2,7 @@ import { API_URL_PART, IS_HOSTED_STATIC } from "../config.js";
 import { range, EventProvider } from "./Utilities.js";
 import { BetsLoaded, siteLanguageInited } from "./syncronous.js";
 
-
+export const getPlayerAvatarImg = ({avatar})=>`http${API_URL_PART}${[IS_HOSTED_STATIC ? "/static/avatars/":"/", avatar?avatar:'undefined.jpeg'].join('')}`;
 /** @typedef {Array.<string> & { raw:string[] }} stringLiteralArgs */
 /**
  * @callback stringToStringLiteral
@@ -19,7 +19,7 @@ export const html = (htmls) => htmls.join('');
 /** @type {rangedFooLit} */
 export const ranged = len => (htmls) => range(1, typeof len === 'number' ? len : len.length).map(x => htmls.join('')).join(' ');
 /**
- *
+ * create Element with this Data
  * @param {string} tag
  * @param {string[]} classList
  * @param {{$attrname:string}[]} attributes
@@ -114,9 +114,7 @@ export class waitingPopup extends showablePopup {
                   range(1,2).map((si, ei)=>/* html */`
                     <div class="domino-waiting-popup-avatar-wrapper"> 
                       <div class="domino-waiting-popup-avatar ${players[ei]?``:`loading`}" slot="${si}">
-                        ${players[ei]&&/*html*/`<img src="http${API_URL_PART}${
-                            [IS_HOSTED_STATIC ? "/static/avatars/":"/", players[ei]?.avatar?players[ei]?.avatar:'undefined.jpeg'].join('')
-                          }" alt="">`}
+                        ${players[ei]&&/*html*/`<img src="${getPlayerAvatarImg(players[ei])}" alt="">`}
                       </div>
                       <p class="domino-waiting-popup-avatar__text">Search..
                     </div>
@@ -147,11 +145,11 @@ export class waitingPopup extends showablePopup {
       return popupElement;
     });
     this.onclose.subsrcibe(()=>this.exitBackgammons());
-    window.addEventListener('popstate', ()=>{ if(this.isOpened()) this.close(); })
+    window.addEventListener('popstate', ()=>{ if(this.isOpened) this.close(); })
     this.ready = Promise.all([
       this.firstready.then(()=>this.initTimer()),
-      this.firstready.then(()=>this.initTimer()),
-      this.firstready.then(()=>this.initTimer())
+      this.firstready.then(()=>this.initQuitToMainMenuControl()),
+      this.firstready.then(()=>this.initQuitToMenuControl())
     ])
   }
   async initTimer() {
@@ -195,7 +193,6 @@ export class waitingPopup extends showablePopup {
       window.ws.send(
         JSON.stringify({
           method: "backgammons/disconnt",
-          GameID: [betId, roomId],
         })
       );
       location.hash = '#backgammons-menu';
@@ -212,7 +209,6 @@ export class waitingPopup extends showablePopup {
       window.ws.send(
         JSON.stringify({
           method: "backgammons/disconnt",
-          GameID: [betId, roomId],
         })
       );
       location.hash = '#gamemode-choose';
@@ -228,9 +224,7 @@ export class waitingPopup extends showablePopup {
     const avatarBlock = this.avatarsBlock.querySelector(`[slot="${1}"]`);
     avatarBlock.classList.remove("loading");
     avatarBlock.innerHTML = /* html */`
-      <img src="http${API_URL_PART}${
-        [IS_HOSTED_STATIC ? "/static/avatars/":"/", player.avatar?player.avatar:'undefined.jpeg'].join('')
-      }" alt="">
+      <img src="${getPlayerAvatarImg(player)}" alt="">
     `;
   }
 }
@@ -261,10 +255,6 @@ export class BackgammonsLaunchingPopup extends showablePopup {
           </div>
       `;
   
-      const timerElement = popupElement.querySelector(
-        ".domino-starting-popup__timer"
-      );
-  
       const avatarsBlock = popupElement.querySelector(
         ".domino-waiting-popup-avatars"
       );
@@ -273,7 +263,7 @@ export class BackgammonsLaunchingPopup extends showablePopup {
       //                                     .join('<div class="domino-waiting-popup-vs">VS</div>')
       avatarsBlock.innerHTML = players.map((player, i)=>`
                                                   <div class="domino-waiting-popup-avatar" slot="${i+1}">
-                                                    <img src="http${API_URL_PART}${[IS_HOSTED_STATIC ? "/static/avatars/":"/", player?.avatar?player?.avatar:'undefined.jpeg'].join('')}" alt="">
+                                                    <img src="${getPlayerAvatarImg(player)}" alt="">
                                                   </div>
                                             `).join('<div class="domino-waiting-popup-vs">VS</div>')
     })

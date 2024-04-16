@@ -153,7 +153,7 @@ export class DropSlot {
     index
     count = BoardConstants.CHECKERS.empty
     isover=true
-    constructor(index) {
+    constructor(index, count) {
         this.index = index;
     }
 
