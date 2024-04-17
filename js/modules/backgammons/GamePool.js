@@ -145,9 +145,10 @@ export function ShowGameTable(localUser, GameID) {
 /** @type {Number} in seconds*/
 const STEPTIME = 25;
 class Timer {
-  constructor(Element, value, _STEPTIME = STEPTIME) {
+  constructor(Element, value, _STEPTIME = STEPTIME, red=false) {
       const TLabel = Element.getElementsByClassName('timer')[0];
       const TIcon = Element.getElementsByClassName('stimer')[0];
+      TIcon.classList.toggle('red', red);
       let [userTime, tsamp] = value;
       if(tsamp) ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
       let diff = 0;
@@ -230,6 +231,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     let elcaPopup = null;
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
+    let curState = GameInitData.RoomState;
     const RoomStatesInitRouter = {
       [0](initData) {//Waiting
           //? maybe room closed.
@@ -239,12 +241,13 @@ export async function InitGame(GameInitData, localUser, ws) {
       }, [1](initData) { // Launching
           showNewPopup(new BackgammonsLaunchingPopup(1, initData.players, initData.timeval));
       }, [2](initData) { // DiceTeamRolling
+          if(curState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
           /** @type {{players:[]}} */
           const {players, timeval} = initData;
           UsersPanUI.initAvatars(players[0], players[1]);
           const Timers = [
-            new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000),
-            new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000)
+            new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, initData.red),
+            new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, initData.red)
           ];
           hidePopups();
           Timers.map(timer=>timer.enable(true));
@@ -259,9 +262,9 @@ export async function InitGame(GameInitData, localUser, ws) {
           onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
           const [firstPlayer, secondPlayer] = initData.players;
-          const playerById = __playerById(initData.players)
-          localUser.team = TeamFromTeamId[+(playerById[localUser.userId]?.team||0)];
-          autostep.setdice(localUser.autodice = playerById[localUser.userId].autodice)
+          const localPlayer = __playerById(initData.players)[localUser.userId];
+          localUser.team = TeamFromTeamId[+(localPlayer?.team||0)];
+          autostep.setdice(((localUser.autodice = localPlayer.autodice), localPlayer.autodice))
           const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
           UsersPanUI.initAvatars(whiteplayer, blackplayer);
 
@@ -269,42 +272,31 @@ export async function InitGame(GameInitData, localUser, ws) {
           promisableinitables.SlotsNDropsComplete.resolve([initData.Slots, initData.Drops]);
 
           TimersByTeam = [
-            new Timer(document.getElementById('TopPan'), initData.Timers[0]), 
-            new Timer(document.getElementById('BottomPan'), initData.Timers[1])
-          ]; startTimer(initData.ActiveTeam)
+            new Timer(UsersPanUI.userPan, initData.Timers[0]), 
+            new Timer(UsersPanUI.oppPan, initData.Timers[1])
+          ]; startTimer(initData.ActiveTeam);
+
+          const autostepToggler = document.getElementsByClassName('autostep')[0]
+          autostepToggler.addEventListener('click', ()=>{
+            autostep.dice=!autostep.dice
+            autostepToggler.classList.toggle('active', autostep.dice)
+            window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
+          })
       }, [4](initData) { // Win // here's started timer to emojis send on Win
           // showNewPopup(new BackgammonsWinPopup())
       },
     }
-    RoomStatesInitRouter[GameInitData.RoomState](GameInitData);
-    // ConnectionStables.onRoomConnection.then(()=>{
-    //   const initData = ConnectionStables.Room.GameInitData;
-    //   RoomStatesInitRouter[0](initData);
-    // })
-    // ConnectionStables.Room.onGameStarted
-    //       .then(({players, state, slots})=>
-    //           GameStart(players, state.ActiveTeam, state.Dices, GameInitData.times, slots)) 
-    // ConnectionStables.Room.onGameStarted.then(()=>elcaPopup.then(popup=>popup.remove()))
-    function GameStart([firstPlayer, secondPlayer], ActiveTeam, Dices, times, awaitingTeam) {
-        // if(localUser.userId === 2)
-        //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1];
-        localUser.team = TeamFromTeamId[firstPlayer.userId === localUser.userId
-                              ? +firstPlayer.team
-                              : secondPlayer.userId === localUser.userId
-                                      ? +secondPlayer.team
-                                      : 0];
-
-        gp.eventHandlers.start({ActiveTeam, Dices, awaitingTeam}, [firstPlayer, secondPlayer]);
-        const cplayer = firstPlayer.userId === localUser.userId?firstPlayer:secondPlayer;
-        autostep.setdice(cplayer.autodice)
-        
-        const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
-        TimersByTeam = InitUI(whiteplayer, blackplayer, times);
-        startTimer(ActiveTeam)
-    }
+    RoomStatesInitRouter[curState](GameInitData);
     const WSEventRoutes = {
-      ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId] (stateData); }, 
+      ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId](stateData); curState = newStateId; }, 
       ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(1+(+index), +value),
+      ['diceTeamRollCompletesLaunching']:({dices, timeval})=>{
+        const Timers = [
+          new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, 'red'),
+          new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, 'red')
+        ];
+        resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
+      },
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)
         //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
@@ -331,25 +323,6 @@ export async function InitGame(GameInitData, localUser, ws) {
       }
     }
     connectWSRoutes(WSEventRoutes)
-    function InitUI(user, opponent, [whiteval, blackval]) {
-        const autostepToggler = document.getElementsByClassName('autostep')[0]
-        // autostepToggler.addEventListener('click', ()=>(autostep.value=!autostep.value, autostepToggler.classList.toggle('active', autostep.value)))
-        autostepToggler.addEventListener('click', ()=>{
-          autostep.dice=!autostep.dice
-          autostepToggler.classList.toggle('active', autostep.dice)
-          window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
-        })
-        const userPan = document.getElementById('TopPan')
-                userPan.getElementsByTagName('img')[0].src = user.avatar?user.avatar:'static/avatar/undefined.jpeg';
-                userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
-        const oppPan = document.getElementById('BottomPan')
-                oppPan.getElementsByTagName('img')[0].src = opponent.avatar?opponent.avatar:'static/avatar/undefined.jpeg';
-                oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
-        return [
-                new Timer(document.getElementById('TopPan'), whiteval), 
-                new Timer(document.getElementById('BottomPan'), blackval)
-            ]
-    }
     function startTimer(ActiveTeam) {
         setActiveTimer(ActiveTeam, true);
         setInterval(()=>TimersByTeam[activetimerind].label(), 250);

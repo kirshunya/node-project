@@ -399,6 +399,24 @@ class DiceTeamRollState extends RoomState(2) {
             // this.upgrade(new WaitingState(this));
         }
     }
+    startNextState() {
+        this.timeval.stop();
+        this.timeval = TimeVal.SECONDS(5).start(()=>this.upgrade(GameStarted.fromDiceTeamRollState(this)))
+        this.red = 'red';
+        this.Room.event('diceTeamRollCompletesLaunching', this.json());
+    }
+    restartState() {
+        this.Dices = [0, 0]
+        this.timeval.stop()
+        this.timeval = TimeVal.SECONDS(5).start(()=>{
+            this.timeval = TimeVal.SECONDS(30).start(this.timerlose())
+            this.red = undefined;
+            this.upgrade(this);
+        })
+        this.red = 'red';
+        this.Room.event('diceTeamRollCompletesLaunching', this.json());
+        
+    }
     rollDice(ctx) {
         for(const [index, player] of Object.entries(this.players)) {
             console.log('rollDice', index, player);
@@ -407,16 +425,17 @@ class DiceTeamRollState extends RoomState(2) {
                 this.Room.event('diceTeamRoll', {index, value:(this.Dices[index] = getRandomInt(1,6))});
         }
         if(this.Dices.reduce((acc,val)=>acc===val&&!!acc)) 
-            ((this.Dices = [0, 0]), this.timeval.stop(), (this.timeval = TimeVal.SECONDS(30).start(this.timerlose())), this.upgrade(this));
+            this.restartState();
         if(this.Dices.reduce((acc,val)=>acc!==val&&!!acc&&!!val))
-            (setTimeout(()=>this.upgrade(GameStarted.fromDiceTeamRollState(this)), 5000), this.timeval.stop());
+            this.startNextState();
         return {result:'nope'};
     }
 
     json() { return this.updata(); }
-    updata() { return { RoomState: this.RoomState, players: this.players, Dices:this.Dices, timeval: this.timeval.json() }; }
+    updata() { return { RoomState: this.RoomState, players: this.players, Dices:this.Dices, timeval: this.timeval.json(), red:this.red }; }
 }
 class GameStarted extends RoomState(3) {
+    /** @type {[TPlayer, TPlayer]} */
     players;
     Timers = new Timers;
     Slots = adv0_range(0, 24, { 0:[15,1], 12:[15,2], null:()=>[0,0] });
@@ -425,6 +444,7 @@ class GameStarted extends RoomState(3) {
     ActiveTeam = WHITEID;
 
     getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
+    get activeplayer() { return this.players.filter(({team})=>team === this.ActiveTeam)[0]; }
     get opponent() { return this.players.filter(({team})=>team !== this.ActiveTeam)[0]; }
 
     constructor(upgradable, players) { super(upgradable); this.players = players; this.Timers.curTimer = this.ActiveTeam; }
@@ -456,26 +476,30 @@ class GameStarted extends RoomState(3) {
         
         if(result===true) {
             const prevstate = { ActiveTeam:this.ActiveTeam, Dices:this.Dices };
-            this.Room.event('step', {step, prevstate, code})
+            this.Room.event('step', {step, prevstate, newstate:this.nextState(), code})
             if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) 
                 this.endGame(this.ActiveTeam, 'Player dropped all chekers', 'win');
-            else this.nextStep();
             return {result:'success'};
         } else {
 
             return {result:'nope'};
         }
     }
-    nextStep() {
-        const Dices = this.Dices = this.opponent().autodice?GameStarted._rollDices():[0, 0];
-        const ActiveTeam = this.ActiveTeam = nextTeamDict[this.ActiveTeam];
-        this.Room.event('state', { Dices, ActiveTeam })
+    nextState(rollDice=false) {
+        const Dices = this.Dices = this.opponent.autodice||rollDice?GameStarted._rollDices():[0, 0];
+        const ActiveTeam = this.ActiveTeam = rollDice?this.ActiveTeam:nextTeamDict[this.ActiveTeam];
+        // this.Room.event('state', { Dices, ActiveTeam })
         this.Timers.curTimer = ActiveTeam;
+        return { Dices, ActiveTeam };
     }
+    /** @param {ConnectionContext} ctx  */
     rollDice(ctx) {
-        if(this.getPlayerByID(ctx.userId)?.team !== this.ActiveTeam) return {result:'nope'};
+        console.log('rollDice');
+        if(this.activeplayer.userId !== ctx.user.userId && this.Dices[0]) return {result:'nope'};
         this.Dices = GameStarted._rollDices();
-        this.Room.event('state', {newstate: this.nextState()});
+        console.log('rollDice', this.Dices);
+        this.Room.event('state', {newstate: this.nextState(true)});
+        console.log('rollDice event');
     }
     endGame(WinnerTeam, msg, code) {
         if(!Debug.TimersTurn&&code === 'timer') return; //debig

@@ -1,7 +1,7 @@
 // import {  } from "../../../server/backgammons/Utility.js";
 import { getRandomInt, localThisProvideComponent, range } from "./Utilities.js";
 import { ConnectionStables, WSEventPool, connectWSRoutes } from "./WSEP.js";
-import { WSEventPoolReady } from './syncronous.js';
+import { BetsLoaded, WSEventPoolReady } from './syncronous.js';
 import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { lobbyhubReady } from "./syncronous.js";
 import { html, ranged } from "./htmlcontainer.js";
@@ -66,55 +66,55 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     const container = htmlelement('div', ["main__container","header__padding","footer__padding"]);
     const mutobserverCode = `backgsLobby${getRandomInt(-65341, 65341)}`;
     const swipers = [];
-    container.replaceChildren(htmlcontainer(
-        htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode}), [
-          ...range(1,2).map(betId=>(this.RoomsMap[betId] = [],
-              htmlcontainer(
-                htmlelement(
-                    'div', 
-                    'domino-room domino-room-players-2 domino-room-mode-classic',
-                    { betId }, { betId }, []
-                ), [
-                  htmlcontainer(
-                    htmlelement('div', 'domino-room-header'), [
-                      htmlelement('img', 'domino-room-header__img', {src:'./img/loto-room-card-logo.png', alt:' '}),
-                      htmltext('p', 'domino-room-header__title', ' Классическая '),
-                      htmltext('div', 'domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="">'),
-                    ]
-                  ),
-                  htmlcontainer(
-                    htmlelement('div', 'domino-room-content'),[
-                      htmlcontainer(
-                        htmlelement('div', 'swiper domino-room-content__tables-swiper', null, null, null, [AddSwiperBehaviour]), [
-                          htmlcontainer(
-                            htmlelement('div', 'swiper-wrapper domino-room-content__tables'), [
-                              ...range(1,7).map(roomId=>(
-                                this.RoomsMap[betId][roomId] = new __T0BackgammonsLobbyHub.TableElT([betId, roomId])).html()
-                              )
-                            ]
-                          )
-                        ]
-                      ),
-                      htmltext('div', "domino-room__info", `
-                        <p class="domino-room-bet__text">
-                          Цена комнаты:
-                        </p>
-                        <p class="domino-room-bet">0.50₼</p>
-                        <p class="domino-room-duration">
-                          <span>Одна игра</span>
-                          <span>Длительность игры: 5 минут</span>
-                        </p>`
-                      )
-                    ]
-                  )
-                ]
+    const inited = BetsLoaded.then(bets=>container.replaceChildren(htmlcontainer(
+      htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode}), [
+        ...Object.entries(bets.BackgammonsBETS).filter(([,a])=>a).map(([betId, betData])=>(this.RoomsMap[betId] = [],
+            htmlcontainer(
+              htmlelement(
+                  'div', 
+                  'domino-room domino-room-players-2 domino-room-mode-classic',
+                  { betId }, { betId }, []
+              ), [
+                htmlcontainer(
+                  htmlelement('div', 'domino-room-header'), [
+                    htmlelement('img', 'domino-room-header__img', {src:'./img/loto-room-card-logo.png', alt:' '}),
+                    htmltext('p', 'domino-room-header__title', ' Классическая '),
+                    htmltext('div', 'domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="">'),
+                  ]
+                ),
+                htmlcontainer(
+                  htmlelement('div', 'domino-room-content'),[
+                    htmlcontainer(
+                      htmlelement('div', 'swiper domino-room-content__tables-swiper', null, null, null, [AddSwiperBehaviour]), [
+                        htmlcontainer(
+                          htmlelement('div', 'swiper-wrapper domino-room-content__tables'), [
+                            ...range(1,7).map(roomId=>(
+                              this.RoomsMap[betId][roomId] = new __T0BackgammonsLobbyHub.TableElT([betId, roomId])).html()
+                            )
+                          ]
+                        )
+                      ]
+                    ),
+                    htmltext('div', "domino-room__info", `
+                      <p class="domino-room-bet__text">
+                        Цена комнаты:
+                      </p>
+                      <p class="domino-room-bet">${betData.bet}₼</p>
+                      <p class="domino-room-duration">
+                        <span>Одна игра</span>
+                        <span>Длительность игры: 5 минут</span>
+                      </p>`
+                    )
+                  ]
+                )
+              ]
             )
-          ))
+         ))
         ]
-      ));
+      )))
     this.htmlview = container;
-    function  AddSwiperBehaviour (swiperEl) { return swipers.push(swiperEl) };
-    swipers.map(swiper=>new Swiper(swiper, {
+    function  AddSwiperBehaviour(swiperEl) { return (swipers.push(swiperEl), swiperEl) };
+    inited.then(()=>swipers.map(swiper=>new Swiper(swiper, {
               slidesPerView: 4,
               // centeredSlides: true,
               spaceBetween: 20,
@@ -138,7 +138,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                   slidesPerView: 3,
               },
           },
-      }));
+      })));
     this.__initvals&&this.resetLobbyTable(this.__initvals);
     this.updalist.map(([...args])=>this.setOnlineToTable(...args));
     return container

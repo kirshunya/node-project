@@ -42,7 +42,7 @@ export class WSRoom {
         this.GameID = GameID;
         this.GameInitData = GameInitData;
         if(GameInitData.RoomState === 3)
-            this.onGameStarted.resolve(new TGameStartedData(GameInitData.slots, GameInitData.state, GameInitData.players, GameInitData.awaitingTeam))
+            this.onGameStarted.resolve(new TGameStartedData(GameInitData.slots, GameInitData.state, GameInitData.players))
     }
 }
 export const ConnectionStables = {

@@ -1,6 +1,6 @@
 const { serializable } = require('./backgammons/serializablewtf.js');
 module.exports.A0 = class A0 extends serializable {};
-const { range, WSListeners, rangebyvals, mapByIndexToVals } = require('./backgammons/Utility.js');
+const { range, WSListeners, rangebyvals, mapByIndexToVals, sleep } = require('./backgammons/Utility.js');
 const { TGame, timestamp } = require('./backgammons/GameRoom.js');
 const { ConnectionContext, Debug, makeEvent } = require('./backgammons/Generals.js');
 const { User } = require('./models/db-models.js');
@@ -15,7 +15,8 @@ const GamesLobby = new class extends WSListeners  {
         super('likey');
         this.Games = mapByIndexToVals(BETsList, ([betId,betData])=>{
             return rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId])));
-        })
+        });
+        delete this.Games[0];
     }
     createGame(GameID) {
         const Game = new TGame(GameID);
@@ -69,7 +70,7 @@ const WSPipelineCommands = {
      */
     async ['connectGeneral'](ctx, msg) {
         const {clientId, userId, username} = msg
-        let user = await User.findOne({ where: { id: userId } });
+        const user = await User.findOne({ where: { id: userId } });
         ctx.user = {clientId, userId, username, avatar:user.avatar}
     },
     ['backgammons/openLobby'](ctx, msg) {
@@ -217,9 +218,10 @@ module.exports = function(ws, req) {
     ws._socket.setKeepAlive(true);
     const ctx = new ConnectionContext(ws);
 
-    ws.on('message', function(_msgblob) {
+    ws.on('message', async function(_msgblob) {
         const msg = JSON.parse(_msgblob);
         try{
+            while(!ctx.user&&msg.method!=='connectGeneral') await sleep(100); // кастыльное решение гонки потоков при подключении.
             const response = WSPipelineCommands[msg.method]?.call(ws, ctx, msg);
             response && ctx.send(response);//skips undeifned n' nulls..
         } catch(e) {

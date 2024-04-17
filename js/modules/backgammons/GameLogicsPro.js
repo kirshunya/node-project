@@ -102,6 +102,7 @@ class Board {
         const headSlotIndex = ActivePlayer.team.id===WHITE.id?0:12;
         const headSlotCheckersCount = this.Slots0[headSlotIndex].refToArr.Count;
         const [f, s] = Dices;
+        if(f===s&&f===0) return {};
         const fstepapplied = (f===s&&(f===3||f===4||f==6))&&(headSlotCheckersCount===14);
         const isCanToOver = _isCanToOver();
         const CashOfOiFBySlot = {}
@@ -426,8 +427,7 @@ class GameState {
         }
         this.ActivePlayer = this.players[ActiveTeam];
         this.Dices = Dices;
-        if(!state.awaitingTeam)
-            canvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].id);
+        canvas.createDices(Dices[0], Dices[1], [BoardConstants.WHITE, BoardConstants.BLACK][ActiveTeam-1].id);
     }
     finish(WinnerTeam) {
 
@@ -499,12 +499,12 @@ export class GameProvider {
             }
             start(GameStateData, players) {
                 self.GameState.start(GameStateData, players, self.GameCanvas);
-                if(GameStateData.awaitingTeam) {
-                    if(GameStateData.awaitingTeam === self.GameState.ActivePlayer.team.id)
-                        self.GameCanvas.showAcceptDiceRollLabel(GameStateData.awaitingTeam);
+                if(!GameStateData.Dices[0]&&!GameStateData.Dices[1]) {
+                    if(self.GameState.ActivePlayer.userId === BoardInits.User.userId)
+                        self.GameCanvas.showAcceptDiceRollLabel(GameStateData.ActiveTeam);
                 }
                 BoardReady.then(()=>{
-                    if(!self.Board.CheckersWhichCanMove(self.GameState)&& (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                    if(self.GameState.Dices[0]&&!self.Board.CheckersWhichCanMove(self.GameState)&&(self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                         const [f, s] = self.GameState.Dices
                         showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                         self.Board.StepComplete([]);
@@ -519,7 +519,7 @@ export class GameProvider {
                 BoardReady.then(()=>{
                     self.Board.PermStep(self.GameState, Step);
                     Step.map(({from, to})=>self.GameCanvas.moveChecker(from, to));
-                    jad()
+                    if(self.GameState.Dices[0]) jad()
                     function jad() {
                         const [f,s] = prevstate.Dices;
                         const spendedPoints = Step.map(({points})=>points).flat(10);
@@ -532,19 +532,17 @@ export class GameProvider {
                                         self.GameState.players[prevstate.ActiveTeam].username,
                                         [EMPTY, WHITE, BLACK][prevstate.ActiveTeam])
                     }
+                    self.eventHandlers.state(newGameStateData);
                 })
-                const nextTeamDict = {
-                    [WHITE.id]: BLACK.id,
-                    [BLACK.id]: WHITE.id
-                }
-                if(!autostep.dice)
-                    self.GameCanvas.showAcceptDiceRollLabel(nextTeamDict[prevstate.ActiveTeam]);
                 return true;
             }
             state(newGameStateData) {
                 self.GameState.state(newGameStateData, self.GameCanvas);
+                if(!newGameStateData.Dices[0]&&!newGameStateData.Dices[1]) // if Dices == [0, 0]: !0&&!0 -> true&&true 
+                    if(self.GameState.ActivePlayer.userId === BoardInits.User.userId)
+                        self.GameCanvas.showAcceptDiceRollLabel(newGameStateData.ActiveTeam);
                 BoardReady.then(()=>{
-                    if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
+                    if(self.GameState.Dices[0]&&!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                         showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
                         self.Board.StepComplete([]);
                     }
@@ -552,6 +550,7 @@ export class GameProvider {
                 return true;
             }
             ustep(Step, newGameStateData, oldGameData) {
+                self.eventHandlers.state(newGameStateData);
                 // self.GameState.state(newGameStateData, self.GameCanvas);
                 // if(!self.Board.CheckersWhichCanMove(self.GameState) && (self.GameState.ActivePlayer.userId===BoardInits.User.userId || BoardInits.User.userId===2)) {
                 //     showToast(self.GameState.PTS, self.GameState.ActivePlayer.username, self.GameState.ActivePlayer.team)
