@@ -80,12 +80,9 @@ export function ShowGameTable(localUser, GameID) {
                 </div>
               </div>
             </div>
-            <canvas id="canvas"></canvas>
-            <script>console.clear()</script>
-            <!-- <script src="https://cdn.jsdelivr.net/npm/fabric"></script> -->
-            <!-- <script src="js/Utilities.js"></script> -->
-            <script src="./js/fabric"></script>
-            <script src="js/modules/backgammons/EntryPoint.js" type="module" defer></script>
+            <div id="canvasEncl" style="margin: auto;">
+              <canvas id="canvas"></canvas>
+            </div>
             <div id="BottomPan" class="TopLink">
               <div class="pcontrs">
                 <div class="buttons">

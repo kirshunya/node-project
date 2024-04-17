@@ -2,22 +2,22 @@
     font-size: smaller;
     max-width: 640px;
   }
-  @media only screen and (min-width: 487px) {
-    #TopPan, #BottomPan {
-      font-size: small;
-    }
-  }
   @media only screen and (min-width: 640px) {
     #TopPan, #BottomPan {
       font-size: medium;
     }
   }
-  @media only screen and (min-width: 1010px) {
+  @media only screen and (min-width: 780px) {
     #TopPan, #BottomPan {
       font-size: smaller;
     }
   }
-  @media only screen and (min-width: 1280px) {
+  @media only screen and (min-width: 1100px) {
+    #TopPan, #BottomPan {
+      font-size: medium;
+    }
+  }
+  @media only screen and (min-width: 1220px) {
     #TopPan, #BottomPan {
       font-size: larger;
     }
@@ -192,7 +192,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    margin-left: 1rem;
+    /* margin-left: 1rem; */
     max-width: 640px;
   }
   .tabspaces {

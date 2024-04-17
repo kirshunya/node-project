@@ -186,7 +186,6 @@ class CanvasFunctions {
         if(!newHeight) 
             newHeight = newWidth/realWidth*realHeight
         
-
         canvas.setWidth(newWidth);
         canvas.setHeight(newHeight);
         canvas.setZoom(newWidth/realWidth);
@@ -227,6 +226,8 @@ class TopDropLunk extends CanvasFunctions {
         window.addEventListener('resize', resize);
         ondom.then(resize);
 
+        this.backimg = super.setbackground('./img/backgammons/boardlot.png');
+
         // this.installImg('./img/backgammons/boardlot.png',  {scaleX:2.75, scaleY:2.75, top:Prefix==="Bottom"?-13:0 });
         const pic = this.pic = {Top:whitecheckerpicurl, Bottom:blackcheckerpicurl}[Prefix];//TODO
         this.readyPromise = ondom.then(()=>{
@@ -238,9 +239,8 @@ class TopDropLunk extends CanvasFunctions {
             // this.installImg(ghostcheckerpicurl, {left: 380, top: 3}).then(img=>img.moveTo(1)).then(img=>img.setCoords())
         })
     }
-    count() {
-        return this._count
-    }
+    get count() { return this._count; }
+    set count(value) { range(this.count, value).map(()=>this.append()); }
     /**
      * 
      * @param {[int[]]|[[Number], [Number]]} points 
@@ -274,7 +274,7 @@ class TopDropLunk extends CanvasFunctions {
     }
     append() {
         const index = this._count++;
-        return this.installImg(this.pic, {left:20+index*45, top:3})
+        return this.installImg(this.pic, {left:20+index*35, top:3})
                 .then(img=>img.moveTo(index).setCoords());
     }
     createDice(diceNumber, shiftType=0) {
@@ -516,9 +516,9 @@ export class BoardCanvas extends CanvasFunctions {
     _effects
     /**
      * 
+     * @param {{UserMovesFrom:Function, move:Function, MovesByDices:Function}} param0 
      * @param {[Number, Number][]} GSlots 
      * @param {[Number, Number]} GDropped 
-     * @param {{UserMovesFrom:Function, move:Function, MovesByDices:Function}} param2 
      */
     constructor(gc, promisesinitlist) {
         super('canvas');
@@ -550,13 +550,14 @@ export class BoardCanvas extends CanvasFunctions {
             } 
         }
 
+        this.drops = drop = {
+            [WHITE.over]: new TopDropLunk('Top', 0),
+            [BLACK.over]: new TopDropLunk('Bottom', 0)
+        };
         super.setbackground(gameboardpic);
         promisesinitlist.SlotsNDropsComplete.then(([GSlots, GDropped])=>{
-            this.drops = drop = {
-                [WHITE.over]: new TopDropLunk('Top', GDropped[0]),
-                [BLACK.over]: new TopDropLunk('Bottom', GDropped[1])
-            };
-            
+            Object.entries(GDropped).map(([overname, count])=>this.drops[overname].count = count)
+            // [this.drops.whiteover.count, this.drops.blackover] = GDropped;
             this.PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
                     const slot = new refToArr(slotinfo);
                     const SlotLet = self.slots[slotIndex] = new Slot(slotIndex);
@@ -602,16 +603,57 @@ export class BoardCanvas extends CanvasFunctions {
         // }
         const containerOfBoard = ondom.then(()=>document.getElementsByClassName('domino-game-page__body-wrapper')[0])
         const CanvasValidate = async()=>{
-            const width = (await containerOfBoard).clientWidth;
-            const pageheight = document.body.clientHeight - 90 - 37;
-            const newWidth = width<950?width:width<1207?width-372:maybeHeight(width)>pageheight?widthIfHeight(pageheight):width;
-            function maybeHeight(width) {
+            const [CanvasWidth, CanvasHeight] = [this.canvas.width, this.canvas.height];
+            const mobileMaxWidth = 780;
+            // const width = (await containerOfBoard).clientWidth;
+            // const [pageheight, pagewidth] = [window.innerHeight, window.innerWidth];
+            const [pageheight, pagewidth] = [document.body.clientHeight, document.body.clientWidth];
+            const wrapper = document.getElementsByClassName('domino-game-page__body-wrapper')[0];
+            const rightcol = document.getElementsByClassName('rightcol')[0];
+            const tabspaces = rightcol.getElementsByClassName('tabspaces')[0];
+            const mainCol = [
+                TopPan,
+                canvasEncl,
+                BottomPan,
+                rightcol
+            ]
+            // const newWidth = width<950?width:width<1207?width-372:maybeHeight(width)>pageheight?widthIfHeight(pageheight):width;
+            let newWidth = pagewidth;
+            function heightIfWidth(width) {
                 return width/BoardWidth*BoardHeight
             }
             function widthIfHeight(height) {
                 return height/BoardHeight*BoardWidth
             }
-            return this.enterContentToViewBox(newWidth)
+            function heightWithProfs(_CanvaHeight=CanvasHeight) {
+                return _CanvaHeight+TopPan.clientHeight+BottomPan.clientHeight;
+            }
+            if(pagewidth > mobileMaxWidth) {
+                newWidth = pagewidth - (pagewidth>1100?pagewidth>1210?495:475:452.5);
+                wrapper.style.flexDirection = 'row'
+                rightcol.replaceChildren(BottomPan, tabspaces, TopPan);
+            } else {
+                newWidth = pagewidth;
+                wrapper.style.flexDirection = 'column'
+                wrapper.replaceChildren(...mainCol);
+            }
+            resizeLunk(self.drops.whiteover, TopPan.getElementsByClassName('pcontrs')[0])
+            resizeLunk(self.drops.blackover, BottomPan.getElementsByClassName('pcontrs')[0])
+            async function resizeLunk(Lunk, container) {
+                const backimg = await Lunk.backimg;
+                Lunk.canvas.width = container.clientWidth-4;
+
+                const trueViewWidth = Lunk.canvas.width/Lunk.canvas.getZoom();
+                const upScaleX = trueViewWidth/backimg.width;
+                backimg.scaleX = upScaleX;
+
+                const trueViewHeight = Lunk.canvas.height/Lunk.canvas.getZoom();
+                const upScaleY = trueViewHeight/backimg.height;
+                backimg.scaleY = upScaleY;
+
+                Lunk.canvas.renderAll();
+            }
+            return this.enterContentToViewBox(newWidth);
         }
         window.addEventListener('resize', ()=>(CanvasValidate(),CanvasValidate()));
         window.addEventListener('load', ()=>sleep(300).then(CanvasValidate(),CanvasValidate()));
