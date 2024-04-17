@@ -79,7 +79,7 @@ export const ConnectionStables = {
         })
       );
       location.hash = '#backgammons-menu';
-      this.Room = null;
+      this.connectsended = this.Room = null;
       resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
     }
 }
