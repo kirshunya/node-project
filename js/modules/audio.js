@@ -137,45 +137,50 @@ export const playPlaceTile = () => {
 /* ======== BACKGAMMONS ======== */
 export const playLose = () => {
   try{
-    const placeTile = new Audio(`${path}/backgammonss/lose.mp3`);
-    placeTile.volume = gameVolume;
-    placeTile.play();
+    AudioBackgammonsLose.play();
+    // const placeTile = new Audio(`${path}/backgammonss/lose.mp3`);
+    // placeTile.volume = gameVolume;
+    // placeTile.play();
   } catch(e) {
     console.log('audios.playLose()', e);
   }
 }
 export const playWin = () => {
   try{
-    const placeTile = new Audio(`${path}/backgammons/win.mp3`);
-    placeTile.volume = gameVolume;
-    placeTile.play();
+    AudioBackgammonsWin.play();
+    // const placeTile = new Audio(`${path}/backgammons/win.mp3`);
+    // placeTile.volume = gameVolume;
+    // placeTile.play();
   } catch(e) {
     console.log('audios.playWin()', e);
   }
 }
 export const playDices = () => {
   try{
-    const placeTile = new Audio(`${path}/backgammons/dices.mp3`);
-    placeTile.volume = gameVolume;
-    placeTile.play();
+    AudioBackgammonsDices.play();
+    // const placeTile = new Audio(`${path}/backgammons/dices.mp3`);
+    // placeTile.volume = gameVolume;
+    // placeTile.play();
   } catch(e) {
     console.log('audios.playDices()', e);
   }
 }
 export const playStep = () => {
   try{
-    const placeTile = new Audio(`${path}/backgammons/xodba.mp3`);
-    placeTile.volume = gameVolume;
-    placeTile.play();
+    AudioBackgammonsSteps.play();
+    // const placeTile = new Audio(`${path}/backgammons/xodba.mp3`);
+    // placeTile.volume = gameVolume;
+    // placeTile.play();
   } catch(e) {
     console.log('audios.playStep()', e);
   }
 }
-export const playUndefined = () => {
+export const playBckgGameStart = () => {
   try{
-    const placeTile = new Audio(`${path}/backgammons/nacalo-igri.mp3`);
-    placeTile.volume = gameVolume;
-    placeTile.play();
+    AudioBackgammonsGameStarted.play();
+    // const placeTile = new Audio(`${path}/backgammons/nacalo-igri.mp3`);
+    // placeTile.volume = gameVolume;
+    // placeTile.play();
   } catch(e) {
     console.log('audios.playUndefined()', e);
   }

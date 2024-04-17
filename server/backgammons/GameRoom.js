@@ -388,7 +388,14 @@ class DiceTeamRollState extends RoomState(2) {
     timeval = TimeVal.SECONDS(30);
     getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
     
-    constructor(upgradable, players) { super(upgradable); this.players = players; this.timeval.start(this.timerlose()); }
+    constructor(upgradable, players) { 
+        super(upgradable); 
+        this.players = players; 
+        this.timeval.start(this.timerlose());
+        for(const player of players) {
+            this.rollDice({user:player}, false);
+        }
+    }
     /** @param {LaunchingState} wstate  */
     static fromLaunchingState(lstate) {
         const [wp, bp] = lstate.players;
@@ -420,12 +427,14 @@ class DiceTeamRollState extends RoomState(2) {
         this.Room.event('diceTeamRollCompletesLaunching', this.json());
         
     }
-    rollDice(ctx) {
+    rollDice(ctx, event=true) {
         for(const [index, player] of Object.entries(this.players)) {
             console.log('rollDice', index, player);
             console.log('log:', player.userId, ctx.user.userId, this.Dices[index]);
-            if(+player.userId===+ctx.user.userId&&!this.Dices[index]) 
-                this.Room.event('diceTeamRoll', {index, value:(this.Dices[index] = getRandomInt(1,6))});
+            if(+player.userId===+ctx.user.userId&&!this.Dices[index]) {
+                this.Dices[index] = getRandomInt(1,6)
+                if(event) this.Room.event('diceTeamRoll', {index, value:this.Dices[index]});
+            }
         }
         if(this.Dices.reduce((acc,val)=>acc===val&&!!acc)) 
             this.restartState();
