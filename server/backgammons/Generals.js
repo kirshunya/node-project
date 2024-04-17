@@ -129,6 +129,7 @@ module.exports.makeEvent = makeEvent
 module.exports.ConnectionContext = class ConnectionContext {
     /** @type {TUser} */
     user
+    get userID() { return this.user.userID; }
     /** @type {WebSocket} */
     ws
     constructor(ws) {

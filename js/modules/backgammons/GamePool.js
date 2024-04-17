@@ -4,13 +4,13 @@ import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
-import { BackgammonsLaunchingPopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
+import { BackgammonsLaunchingPopup, BackgammonsLosePopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
 import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
-import { fabricsloaded, popupsinited } from './syncronous.js';
+import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
 
 const TeamFromTeamId = {
   [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
@@ -187,6 +187,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     let onChange = ()=>{};
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
+    const betId = GameInitData.GameID[0];
     // GameInitData in Waiting = [waiter, waiter], visiters
     // GameInitData in Launching = [player, player], visiters, timeval = 5
     // GameInitData in DiceTeamRoll = [player, player], visiters, timeval = 20 -> sets Teams
@@ -231,17 +232,17 @@ export async function InitGame(GameInitData, localUser, ws) {
     let elcaPopup = null;
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
-    let curState = GameInitData.RoomState;
+    let curState = GameInitData.RoomState, prevState = null;
     const RoomStatesInitRouter = {
       [0](initData) {//Waiting
           //? maybe room closed.
           // location.hash = '#gamemode-choose';
           if(initData.msg === 'restart') return location.hash = '#gamemode-choose';
-          showNewPopup(new waitingPopup(GameInitData.GameID[0], [localUser]));
+          showNewPopup(new waitingPopup(betId, [localUser]));
       }, [1](initData) { // Launching
-          showNewPopup(new BackgammonsLaunchingPopup(GameInitData.GameID[0], initData.players, initData.timeval));
+          showNewPopup(new BackgammonsLaunchingPopup(betId, initData.players, initData.timeval));
       }, [2](initData) { // DiceTeamRolling
-          if(curState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
+          if(prevState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
           /** @type {{players:[]}} */
           const {players, timeval} = initData;
           UsersPanUI.initAvatars(players[0], players[1]);
@@ -249,9 +250,10 @@ export async function InitGame(GameInitData, localUser, ws) {
             new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, initData.red),
             new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, initData.red)
           ];
-          hidePopups();
           Timers.map(timer=>timer.enable(true));
-          resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
+          hidePopups();
+          
+          resetTimersIntervals(startTogetherTimer(Timers));
           const PlayerTempTeam = players.reduce((p1,p2)=>p1.userId===localUser.userId?BoardConstants.WHITE:p2.userId===localUser.userId?BoardConstants.BLACK:0);
           gp.eventHandlers.diceTeamRollStateStart();
           initData.Dices.map((value, index)=>{
@@ -259,14 +261,24 @@ export async function InitGame(GameInitData, localUser, ws) {
             if(value) gp.eventHandlers.diceTeamRoll(tempteam, +value);
             else if (tempteam === PlayerTempTeam.id) gp.eventHandlers.diceTeamRollsState(PlayerTempTeam, req);
           })
+
           onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
-          const [firstPlayer, secondPlayer] = initData.players;
           const localPlayer = __playerById(initData.players)[localUser.userId];
           localUser.team = TeamFromTeamId[+(localPlayer?.team||0)];
           autostep.setdice(((localUser.autodice = localPlayer.autodice), localPlayer.autodice))
+
+          const [firstPlayer, secondPlayer] = initData.players;
           const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
           UsersPanUI.initAvatars(whiteplayer, blackplayer);
+
+          const autostepToggler = document.getElementsByClassName('autostep')[0]
+          autostepToggler.addEventListener('click', ()=>{
+            autostep.dice=!autostep.dice
+            autostepToggler.classList.toggle('active', autostep.dice)
+            window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
+          });
+          hidePopups();
 
           gp.eventHandlers.start(initData, initData.players);
           promisableinitables.SlotsNDropsComplete.resolve([initData.Slots, initData.Drops]);
@@ -274,28 +286,44 @@ export async function InitGame(GameInitData, localUser, ws) {
           TimersByTeam = [
             new Timer(UsersPanUI.userPan, initData.Timers[0]), 
             new Timer(UsersPanUI.oppPan, initData.Timers[1])
-          ]; startTimer(initData.ActiveTeam);
+          ]; resetTimersIntervals(startTimer(initData.ActiveTeam));
 
-          const autostepToggler = document.getElementsByClassName('autostep')[0]
-          autostepToggler.addEventListener('click', ()=>{
-            autostep.dice=!autostep.dice
-            autostepToggler.classList.toggle('active', autostep.dice)
-            window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
+          onChange = ()=>{ TimersByTeam.map(timer=>timer.enable(false)); resetTimersIntervals(); }
+      }, [4]({Slots, Drops, players, winner, loser, timeval}) { // Win // here's started timer to emojis send on Win
+          if(!prevState) { // если только перезагрузили или открыли страницу
+            const [firstPlayer, secondPlayer] = players;
+            const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
+            UsersPanUI.initAvatars(whiteplayer, blackplayer);
+
+            promisableinitables.SlotsNDropsComplete.resolve([Slots, Drops]);
+          }
+          BetsLoaded.then(({BackgammonsBETS})=>{
+            const bet = BackgammonsBETS[betId];
+            const comission = bet.comission*2; // comission from 2 players
+            const lose = bet.bet;
+            const prize = bet.bet - comission; // prize with comission
+
+            if(winner.userId === localUser.userId) showNewPopup(new BackgammonsWinPopup(betId, winner, prize));
+            if(loser.userId === localUser.userId) showNewPopup(new BackgammonsLosePopup(betId, winner));
           })
-      }, [4](initData) { // Win // here's started timer to emojis send on Win
-          // showNewPopup(new BackgammonsWinPopup())
+
+          const Timers = [
+            new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, 'red'),
+            new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, 'red')
+          ]; startTogetherTimer(Timers);
+          onChange = ()=>{ resetTimersIntervals(); }
       },
     }
     RoomStatesInitRouter[curState](GameInitData);
     const WSEventRoutes = {
-      ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId](stateData); curState = newStateId; }, 
+      ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); prevState = curState; curState = newStateId; RoomStatesInitRouter[newStateId](stateData); }, 
       ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(+index+1, +value),
       ['diceTeamRollCompletesLaunching']:({dices, timeval})=>{
         const Timers = [
           new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, 'red'),
           new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, 'red')
         ];
-        resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
+        resetTimersIntervals(startTogetherTimer(Timers));
       },
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)
@@ -309,9 +337,9 @@ export async function InitGame(GameInitData, localUser, ws) {
         setActiveTimer(newstate.ActiveTeam);
         gp.eventHandlers.state(newstate)
       }, ['end']:({winner})=>{
-        alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
-        alert('popup Win');
-        window.hash = '#backgammons-menu';
+        // alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
+        // alert('popup Win');
+        // window.hash = '#backgammons-menu';
       }, ['restart__']:()=>{
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
@@ -323,9 +351,13 @@ export async function InitGame(GameInitData, localUser, ws) {
       }
     }
     connectWSRoutes(WSEventRoutes)
+    function startTogetherTimer(Timers) {
+      Timers.map(timer=>timer.enable(true));
+      return setInterval(()=>Timers.map(timer=>timer.label(true)), 200)
+    }
     function startTimer(ActiveTeam) {
         setActiveTimer(ActiveTeam, true);
-        setInterval(()=>TimersByTeam[activetimerind].label(), 250);
+        return setInterval(()=>TimersByTeam[activetimerind].label(), 250);
     }
     function setActiveTimer(ActiveTeam, isinit=false) {
         const TimerIndByTeam = {

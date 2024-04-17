@@ -1,6 +1,7 @@
 const { serializable } = require("./serializablewtf.js");
 const { getRandomInt, FCPromise } = require("./Utility");
 const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider, nextTeamDict, makeEvent } = require("./Generals");
+const { balanceTravers } = require("./aaaa.js");
 const { WHITEID, BLACKID } = CONSTANTS;
 
 const timestamp = ()=>Date.now();
@@ -122,18 +123,15 @@ class Timers extends serializable {
         return this.timers[this.activetimer];
     }
     set curTimer(ActiveTeam) {
-        const timesIndex = {
-            [CONSTANTS.WHITEID]: 0,
-            [CONSTANTS.BLACKID]: 1
-        }
+        if(!ActiveTeam) return this.curTimer.reject();
         this.curTimer.reject();
-        this.activetimer = timesIndex[ActiveTeam];
+        this.activetimer = Timers.timersIndexByTeamId[ActiveTeam];
         this.curTimer.start();
-        // this.curTimer = new Timer(60*1000, ()=>
-        //         this.endGame(ActiveTeam/* in context this is OpponentTeam */, 'Time end', 'timer'));
     }
-    // get success() {return this.curTimer.success.bind(this.curTimer)}
-
+    static timersIndexByTeamId = {
+        [CONSTANTS.WHITEID]: 0,
+        [CONSTANTS.BLACKID]: 1
+    }
     off() { this.timers.map(timer=>timer.off()); }
     json() { return this.timers.map(timer=>timer.json()); }
 }
@@ -161,6 +159,9 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
         if(ctx.rikey)
             delete this.Connections[ctx.rikey];
     }
+    disconnectAll() {
+        this.Connections = {};
+    }
     event(event, obj) {
         const msg = Object.assign(obj, {event, method:'backgammons::event'});
         // console.log(`sending`, msg, Object.values(this.Connections))
@@ -173,6 +174,9 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
 class TGame extends SharedRoom0 {
     // /** @type {TPlayer.PlayersContainer} */
     // Players = new TPlayer.PlayersContainer(this)
+    get betId() { return this.GameID[0]; }
+    get players() {return this.RoomState.players; }
+
     RoomState = new WaitingState(this);
     events = new class {
         //Lobby
@@ -236,6 +240,10 @@ class TGame extends SharedRoom0 {
     //     this.RoomState = CONSTANTS.RoomStates.Started;
     //     this.events.onstart.send()
     // }
+    /** @param {ConnectionContext} ctx */
+    restart__(ctx) {
+        return this.RoomState.restart__(...arguments);
+    }
     rollDice(ctx) {
         return this.RoomState.rollDice(ctx);
     }
@@ -308,7 +316,7 @@ class TeXRoomState extends serializable {
         else this.Room = input;
     }
     /** @param {TeXRoomState} RoomState  */
-    upgrade(RoomState) { console.log('upgradeState to ', RoomState); return this.Room.upgradeState(RoomState); }
+    upgrade(RoomState) { /* console.log('upgradeState to ', RoomState); */ return this.Room.upgradeState(RoomState); }
 }
 /** @typedef {(ctx:ConnectionContext)=>any} ctxHandler */
 /** @template T @typedef {(ctx:ConnectionContext)=>T} ctxHandlerT */
@@ -316,6 +324,10 @@ class TeXRoomState extends serializable {
 function RoomState(rsid) { return class RoomState extends TeXRoomState { RoomState = rsid }; };
 class WaitingState extends RoomState(0) {
     players = [];
+    static fromRestart(lstate) {
+        lstate.Room.disconnectAll();
+        return new WaitingState(lstate);
+    } 
     /** @type {ctxHandlerT<void|true>} */
     connect(ctx) {
         const connres = this.players.push(ctx.user)<=2;
@@ -395,6 +407,7 @@ class DiceTeamRollState extends RoomState(2) {
         for(const player of players) {
             this.rollDice({user:player}, false);
         }
+        console.log('DiceTeamRollState autoroll', this.Dices);
     }
     /** @param {LaunchingState} wstate  */
     static fromLaunchingState(lstate) {
@@ -493,21 +506,31 @@ class GameStarted extends RoomState(3) {
         
         if(result===true) {
             const prevstate = { ActiveTeam:this.ActiveTeam, Dices:this.Dices };
-            this.Room.event('step', {step, prevstate, newstate:this.nextState(), code})
-            if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) 
+            if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
+                this.Room.event('step', {step, prevstate, newstate:this.nextState(false, 'stop'), code})
                 this.endGame(this.ActiveTeam, 'Player dropped all chekers', 'win');
+            } else this.Room.event('step', {step, prevstate, newstate:this.nextState(), code})
             return {result:'success'};
         } else {
-
             return {result:'nope'};
         }
     }
-    nextState(rollDice=false) {
-        const Dices = this.Dices = this.opponent.autodice||rollDice?GameStarted._rollDices():[0, 0];
-        const ActiveTeam = this.ActiveTeam = rollDice?this.ActiveTeam:nextTeamDict[this.ActiveTeam];
-        // this.Room.event('state', { Dices, ActiveTeam })
-        this.Timers.curTimer = ActiveTeam;
+    nextState(rollDice=false, stop=false) {
+        const Dices = this.Dices = !stop&&(this.opponent.autodice||rollDice)?GameStarted._rollDices():[0, 0];
+        const ActiveTeam = this.ActiveTeam = rollDice||stop?this.ActiveTeam:nextTeamDict[this.ActiveTeam];
+
+        if(!stop) this.Timers.curTimer = null;
+        else if(!rollDice) this.Timers.curTimer = ActiveTeam;
+
         return { Dices, ActiveTeam };
+    }
+    /** @param {ConnectionContext} ctx  */
+    restart__(ctx) {
+        if(ctx.user.userId === this.activeplayer.userId) {
+            this.endGame(this.opponent.team, 'restart__', 2);
+            return {result:'restart__'};
+        } 
+        return {result:'nope'};
     }
     /** @param {ConnectionContext} ctx  */
     rollDice(ctx) {
@@ -525,6 +548,8 @@ class GameStarted extends RoomState(3) {
         this.Room.event('end', {winner: WinnerTeam, msg, code});
         this.Timers.off();
         this.Room.events.onfinish.send();
+        const [winner, loser] = this.players.sort((p1, p2)=>p1.team === WinnerTeam ? 0 : 1);
+        this.upgrade(WinState.fromGameStarted(this, winner, loser))
     }
 
     slot(index) {
@@ -565,5 +590,37 @@ class GameStarted extends RoomState(3) {
         Drops: this.Drops,
         Dices: this.Dices,
     }}
+    updata() { return this.json(); }
+}
+class WinState extends RoomState(4) {
+    constructor(lstate, Slots, Drops, winner, loser) {
+        super(lstate);
+        this.Slots = Slots
+        this.Drops = Drops
+        this.winner = winner
+        this.loser = loser
+        this.players = [winner, loser]
+        this.timeval = TimeVal.SECONDS(20).start(()=>this.upgrade(new WaitingRoomRestartState(lstate)))
+
+        balanceTravers(winner, loser, this.Room.betId)
+    }
+    /** @param {GameStarted} lstate */
+    static fromGameStarted(lstate, winner, loser) {
+        return new WinState(lstate, lstate.Slots, lstate.Drops, winner, loser);
+    }
+    json() { return {
+        Slots:this.Slots,
+        Drops:this.Drops,
+        players:this.players,
+        winner:this.winner,
+        loser:this.loser,
+        timeval:this.timeval,
+    }}
+    updata() { return this.json(); }
+}
+class WaitingRoomRestartState extends RoomState(0) {
+    msg = 'restart';
+    constructor(lstate) { super(lstate); TimeVal.SECONDS(1).start(()=>this.upgrade(WaitingState.fromRestart(this))); }
+    json() { return {msg: this.msg}; }
     updata() { return this.json(); }
 }

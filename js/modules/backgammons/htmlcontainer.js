@@ -277,9 +277,10 @@ export class BackgammonsLaunchingPopup extends showablePopup {
   }
 }
 export class BackgammonsWinPopup extends showablePopup {
-  constructor(winners = [], prize = null) {
+  constructor(betId, winner, prize = null) {
     super();
-    this.firstready = siteLanguageInited.then(siteLanguage=>{
+    const self = this;
+    this.ready = this.firstready = siteLanguageInited.then(siteLanguage=>{
       const main = document.querySelector(".main__container");
       let popupElement = this.htmlelement = document.createElement("div");
       popupElement.classList.add("popup");
@@ -305,7 +306,7 @@ export class BackgammonsWinPopup extends showablePopup {
                   <p class="domino-win-popup__winners-text">
                     ${siteLanguage.popups.winners}
                   </p>
-                  ${winners.map((winner) =>`<p class = "domino-win-popup__winner">${winner.username}</p>`).join(' ')}
+                  <p class = "domino-win-popup__winner">${winner.username}</p>
                 </div>
               </div>
             </div>
@@ -326,6 +327,7 @@ export class BackgammonsWinPopup extends showablePopup {
         if (seconds <= 0) {
           clearInterval(timerInterval);
           timerElement.innerHTML = "0";
+          self.close();
         }
       }
     
@@ -335,9 +337,10 @@ export class BackgammonsWinPopup extends showablePopup {
 }
 
 export class BackgammonsLosePopup extends showablePopup {
-  constructor(winners=[], playersTiles) {
+  constructor(betId, winner) {
     super();
-    this.firstready = siteLanguageInited.then(siteLanguage=>{
+    const self = this;
+    this.ready = this.firstready = siteLanguageInited.then(siteLanguage=>{
       let popupElement = this.htmlelement = document.createElement("div");
       popupElement.classList.add("popup");
   
@@ -354,7 +357,7 @@ export class BackgammonsLosePopup extends showablePopup {
                 <p class="domino-lose-popup__winners domino-lose-popup__winners-text">${
                   siteLanguage.popups.winners
                 }</p>
-                ${winners.map((winner) => `<p class = "domino-win-popup__winner">${winner.username}</p>`).join(' ')}
+                <p class = "domino-win-popup__winner">${winner.username}</p>
                 <div class="domino-lose-popup__tiles">
                 </div>
               </div>
@@ -421,6 +424,7 @@ export class BackgammonsLosePopup extends showablePopup {
         if (seconds <= 0) {
           clearInterval(timerInterval);
           timerElement.innerHTML = "0";
+          self.close();
         }
       }
   

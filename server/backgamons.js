@@ -7,13 +7,13 @@ const { User } = require('./models/db-models.js');
 
 console.log(TGame)
 
-const BETsList = require('./../json/bets.json').BackgammonsBETS;
+const BackgammonsBETS = require('./../json/bets.json').BackgammonsBETS;
 const GamesLobby = new class extends WSListeners  {
     /** @type {TGame[][]} */
     Games = []
     constructor() {
         super('likey');
-        this.Games = mapByIndexToVals(BETsList, ([betId,betData])=>{
+        this.Games = mapByIndexToVals(BackgammonsBETS, ([betId,betData])=>{
             return rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId])));
         });
         delete this.Games[0];
@@ -21,19 +21,19 @@ const GamesLobby = new class extends WSListeners  {
     createGame(GameID) {
         const Game = new TGame(GameID);
         Game.events.onconnect(()=>this.event('backgammons::lobby::connectionToRoom', {
-            GameID, players:Game.Players.json()
+            GameID, players:Game.players
         }))
         Game.events.onexit(()=>this.event('backgammons::lobby::connectionToRoom', {
-            GameID, players:Game.Players.json()
+            GameID, players:Game.players
         }))
         Game.events.onstart(()=>this.event('backgammons::lobby::roomStart', {
-            GameID, players:Game.Players.json()
+            GameID, players:Game.players
         }))
         Game.events.onfinish(()=>{
             this.event('backgammons::lobby::roomEnd', {
-                GameID, players:Game.Players.json()
+                GameID, players:Game.players
             })
-            setTimeout(()=>this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
+            // setTimeout(()=>this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
         })
         return Game;
     }
@@ -171,9 +171,7 @@ const WSPipelineCommands = {
      */
     restart__(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID);
-        GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
-        Debug.GAMESCOUNT++;
-        Game.event('restart__', {});
+        return Game.restart__(ctx, 'restart__', 'end')
     },
     /**
      * Debug function, restart game
@@ -182,8 +180,7 @@ const WSPipelineCommands = {
      */
     restartTest(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID)
-        GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
-        GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'test');
+        Game.restartTest()
         Game.event('restart__', {});
     },
     /**
@@ -193,8 +190,7 @@ const WSPipelineCommands = {
      */
     restartFlud(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID)
-        GamesLobby.getGameByID(ctx.GameID).endGame(1, 'restart__', 'end')
-        GamesLobby.Games[++Debug.GAMESCOUNT] = new TGame(undefined, 'flud');
+        Game.restartFlud()
         Game.event('restart__', {});
     },
     /**
