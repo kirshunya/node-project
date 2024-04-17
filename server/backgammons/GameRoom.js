@@ -80,10 +80,16 @@ const Timer = class {
         if(this.snap)
             this.snap.pending = true;
     }
+    pauseWhile(CB) {
+        this.pause();
+            res = CB();
+        this.resume();
+        return res;
+    }
     resume() {
         if(this.snap?.success||!this.snap) return;
-        this.snap.pending = false;
-        this.snap.waiting?.();
+        if(this.snap) this.snap.pending = false;
+        this.snap?.waiting?.();
         // if(!this.snap.waiting) console.log('timer in backgammons/GameRoom.js resumed, but not found \'waiting\' callback!')
     }
     success() {
@@ -342,6 +348,7 @@ class TimeVal { // TimeValTiro
         const StopableDecorator = (CB)=>()=>Timer._stopped?null:CB();
         const PausableDecorator = (CB)=>()=>Timer._pause?(Timer._CB = CB):CB();
         setTimeout(StopableDecorator(CB), this.timeval);
+        return this;
     }
     stop() { return this._stopped = true; }
     pauseWhile(CB) {
@@ -355,7 +362,7 @@ class TimeVal { // TimeValTiro
 
     value() { return this.timeval; }
     json() { return this; }
-    distance() { return this.timeval - (timestamp() - this.timestamp); }
+    distance() { return this.timeval - (timestamp() - this._timestamp); }
 }
 class LaunchingState extends RoomState(1) {
     players = [];
@@ -399,10 +406,10 @@ class DiceTeamRollState extends RoomState(2) {
             if(+player.userId===+ctx.user.userId&&!this.Dices[index]) 
                 this.Room.event('diceTeamRoll', {index, value:(this.Dices[index] = getRandomInt(1,6))});
         }
-        if(this.Dices.reduce((acc,val)=>acc===val&&acc!==0)) 
+        if(this.Dices.reduce((acc,val)=>acc===val&&!!acc)) 
             (this.upgrade(this), this.timeval.stop(), this.timeval = TimeVal.SECONDS(30).start(this.timerlose()));
-        if(this.Dices.reduce((acc,val)=>!!acc&&!!val))
-            (this.upgrade(GameStarted.fromDiceTeamRollState(this)), this.timeval.stop());
+        if(this.Dices.reduce((acc,val)=>acc!==val&&!!acc&&!!val))
+            (setTimeout(()=>this.upgrade(GameStarted.fromDiceTeamRollState(this)), 5000), this.timeval.stop());
         return {result:'nope'};
     }
 

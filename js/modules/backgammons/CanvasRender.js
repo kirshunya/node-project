@@ -671,10 +671,12 @@ export class BoardCanvas extends CanvasFunctions {
      * @param {int} secondDice 
      * @param {*} ActiveTeam 
      */
-    createDices(firstDice, secondDice, ActiveTeam) {
-        const _dices = this._dices
-        _dices.map(Dice => Dice.remove());
-        this._dices = [];
+    createDices(firstDice, secondDice, ActiveTeam, clear=true) {
+        if(clear) {
+            const _dices = this._dices
+            _dices.map(Dice => Dice.remove());
+            this._dices = [];
+        }
         const self = this;
         const scale = 230/130;
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)

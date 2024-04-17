@@ -4,7 +4,7 @@ import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
-import { BackgammonsLaunchingPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
+import { BackgammonsLaunchingPopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
 import { NowClientTime } from '../time.js';
@@ -250,9 +250,12 @@ export async function InitGame(GameInitData, localUser, ws) {
           Timers.map(timer=>timer.enable(true));
           resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
           const PlayerTempTeam = players.reduce((p1,p2)=>p1.userId===localUser.userId?BoardConstants.BLACK:p2.userId===localUser.userId?BoardConstants.WHITE:0);
-          gp.eventHandlers.diceTeamRollsState(PlayerTempTeam, ()=>req());
-          initData.Dices.map((value, index)=>gp.eventHandlers.diceTeamRoll(1+index, +value))
-          onChange = ()=>{Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
+          initData.Dices.map((value, index)=>{
+            const tempteam = +index+1
+            if(value) gp.eventHandlers.diceTeamRoll(tempteam, +value);
+            else if (tempteam === PlayerTempTeam.id) gp.eventHandlers.diceTeamRollsState(PlayerTempTeam, req);
+          })
+          onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
           const [firstPlayer, secondPlayer] = initData.players;
           const playerById = __playerById(initData.players)
@@ -269,7 +272,7 @@ export async function InitGame(GameInitData, localUser, ws) {
           //   new Timer(document.getElementById('BottomPan'), blackval)
           // ]; startTimer(initData.ActiveTeam)
       }, [4](initData) { // Win // here's started timer to emojis send on Win
-
+          // showNewPopup(new BackgammonsWinPopup())
       },
     }
     RoomStatesInitRouter[GameInitData.RoomState](GameInitData);
@@ -300,7 +303,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     }
     const WSEventRoutes = {
       ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId] (stateData); }, 
-      ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(1+index, value),
+      ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(1+(+index), +value),
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)
         //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug

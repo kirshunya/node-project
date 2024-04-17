@@ -486,7 +486,7 @@ export class GameProvider {
                 self.GameCanvas.diceTeamRollsState(Team.id);
             }
             diceTeamRoll(Team, Value) {
-                self.GameCanvas.createDices(+Value, 0, +Team);
+                self.GameCanvas.createDices(+Value, 0, +Team, false);
             }
             PermStepByButton() {
                 self.Board.StepComplete(self.GameState.CurrentStepCash.MovesStack, true);

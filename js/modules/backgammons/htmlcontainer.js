@@ -284,3 +284,155 @@ export class BackgammonsLaunchingPopup extends showablePopup {
     }, 100);
   }
 }
+export class BackgammonsWinPopup extends showablePopup {
+  constructor(winners = [], prize = null) {
+    super();
+    this.firstready = siteLanguageInited.then(siteLanguage=>{
+      const main = document.querySelector(".main__container");
+      let popupElement = this.htmlelement = document.createElement("div");
+      popupElement.classList.add("popup");
+    
+      popupElement.innerHTML = `
+         <div class="popup">
+            <div class="popup__body">
+              <div class="popup__content domino-win-popup">
+                <button class="popup__close-timer close-popup-timer">10</button>
+                <img
+                  class="domino-win-popup__img"
+                  src="img/domino-winner-image.png"
+                  alt=""
+                />
+    
+                <div class="popup__text domino-win-popup__information">
+                  <div class="domino-win-popup__sum">${
+                    siteLanguage.profilePage.myGamesPage.statsItem.sumWinText
+                  } ${prize ? prize : 0} ₼</div>
+                  <p class="domino-win-popup__title">
+                    ${siteLanguage.popups.gameFinished}
+                  </p>
+                  <p class="domino-win-popup__winners-text">
+                    ${siteLanguage.popups.winners}
+                  </p>
+                  ${winners.map((winner) =>`<p class = "domino-win-popup__winner">${winner.username}</p>`).join(' ')}
+                </div>
+              </div>
+            </div>
+          </div>
+      `;
+    
+      let timerElement = popupElement.querySelector(".close-popup-timer");
+    
+      // Устанавливаем начальное значение таймера
+      let seconds = 10;
+    
+      // Функция обновления таймера
+      function updateTimer() {
+        timerElement.textContent = seconds;
+        seconds--;
+        timerElement.innerHTML = seconds;
+    
+        if (seconds <= 0) {
+          clearInterval(timerInterval);
+          timerElement.innerHTML = "0";
+        }
+      }
+    
+      let timerInterval = setInterval(updateTimer, 1000);
+    });
+  }
+}
+
+export class BackgammonsLosePopup extends showablePopup {
+  constructor(winners=[], playersTiles) {
+    super();
+    this.firstready = siteLanguageInited.then(siteLanguage=>{
+      let popupElement = this.htmlelement = document.createElement("div");
+      popupElement.classList.add("popup");
+  
+      popupElement.innerHTML = `
+        <div class="popup">
+          <div class="popup__body">
+            <div class="popup__content domino-lose-popup">
+            <button class="popup__close-timer close-popup-timer">10</button>
+              <div class="popup__text domino-lose-popup__text">
+                <p class = "domino-lose-popup__title">${
+                  siteLanguage.popups.gameFinished
+                }</p>
+                <p id="domino-lose-popup-lost" class="domino-lose-popup__title">Нарды</p>
+                <p class="domino-lose-popup__winners domino-lose-popup__winners-text">${
+                  siteLanguage.popups.winners
+                }</p>
+                ${winners.map((winner) => `<p class = "domino-win-popup__winner">${winner.username}</p>`).join(' ')}
+                <div class="domino-lose-popup__tiles">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popupElement);
+  
+      // let showPoints = true;
+      // // if game was finished because of no available turns
+  
+      // let user = localStorage.getItem("user");
+      // if (user) {
+      //   user = JSON.parse(user);
+      // }
+  
+      // playersTiles.forEach((playerTiles) => {
+      //   if (playerTiles.tiles.length == 0) {
+      //     showPoints = false;
+      //   }
+      // });
+  
+      // const winnersBlock = popupElement.querySelector(
+      //   ".domino-lose-popup__winners"
+      // );
+  
+      // // insert before winners block new div
+      // if (showPoints) {
+      //   const newDiv = document.createElement("div");
+      //   newDiv.classList.add("domino-lose-popup__title");
+      //   if (gameMode == "CLASSIC") {
+      //     newDiv.innerHTML = siteLanguage.popups.youLostMorePoints;
+      //   } else {
+      //     newDiv.innerHTML = siteLanguage.popups.youLostPoints;
+      //   }
+      //   const lostText = document.querySelector("#domino-lose-popup-lost");
+      //   if (lostText) {
+      //     lostText.remove();
+      //   }
+  
+      //   winnersBlock.parentNode.insertBefore(newDiv, winnersBlock);
+      // }
+  
+      // formPopupTiles(
+      //   playersTiles,
+      //   popupElement,
+      //   gameMode == "CLASSIC",
+      //   false,
+      //   showPoints
+      // );
+  
+      let timerElement = popupElement.querySelector(".close-popup-timer");
+  
+      // Устанавливаем начальное значение таймера
+      let seconds = 10;
+  
+      // Функция обновления таймера
+      function updateTimer() {
+        timerElement.textContent = seconds;
+        seconds--;
+        timerElement.innerHTML = seconds;
+  
+        if (seconds <= 0) {
+          clearInterval(timerInterval);
+          timerElement.innerHTML = "0";
+        }
+      }
+  
+      let timerInterval = setInterval(updateTimer, 1000);
+    });
+  }
+}
