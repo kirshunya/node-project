@@ -114,6 +114,7 @@ const WSPipelineCommands = {
             GamesLobby.event('backgammons::lobby::connectionToRoom', {
                 GameID:ctx.GameID, players: Game.RoomState.players
             });
+            ctx.GameID = null;
         }
     },
     ['chat'](ctx, msg) {

@@ -224,7 +224,7 @@ class TGame extends SharedRoom0 {
     /** @param {TeXRoomState} newState */
     upgradeState(newState) {
         this.RoomState = newState;
-        this.event('RoomStateChanged', {newStateId: newState.RoomState, stateData:newState.json()});
+        this.event('RoomStateChanged', {newStateId: newState.RoomState, stateData:Object.assign(newState.json(), {GameID: this.GameID})});
     }
     // startGame() {
     //     this.Players.rollTeam()
@@ -391,6 +391,9 @@ class DiceTeamRollState extends RoomState(2) {
     constructor(upgradable, players) { super(upgradable); this.players = players; this.timeval.start(this.timerlose()); }
     /** @param {LaunchingState} wstate  */
     static fromLaunchingState(lstate) {
+        const [wp, bp] = lstate.players;
+        wp.team = WHITEID;
+        bp.team = BLACKID;
         return new DiceTeamRollState(lstate, lstate.players);
     }
 
@@ -447,12 +450,17 @@ class GameStarted extends RoomState(3) {
     get activeplayer() { return this.players.filter(({team})=>team === this.ActiveTeam)[0]; }
     get opponent() { return this.players.filter(({team})=>team !== this.ActiveTeam)[0]; }
 
-    constructor(upgradable, players) { super(upgradable); this.players = players; this.Timers.curTimer = this.ActiveTeam; }
+    constructor(upgradable, players, WhiteIsFirstPlayer) { 
+        super(upgradable); 
+        this.players = players; 
+        this.ActiveTeam = WhiteIsFirstPlayer?WHITEID:BLACKID;
+        this.Timers.curTimer = this.ActiveTeam;
+    }
     /** @param {DiceTeamRollState} wstate  */
     static fromDiceTeamRollState({Room, players, Dices}) {
         const [d1, d2] = Dices;
-        [players[0].team, players[1].team] = d1 > d2?[WHITEID, BLACKID]:[BLACKID, WHITEID];
-        return new GameStarted(Room, players);
+        // [players[0].team, players[1].team] = d1 > d2?[WHITEID, BLACKID]:[BLACKID, WHITEID];
+        return new GameStarted(Room, players, d1 > d2);
     }
 
     static _rollDices() { return [getRandomInt(1, 6), getRandomInt(1, 6)]; }

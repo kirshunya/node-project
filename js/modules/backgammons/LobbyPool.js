@@ -1,6 +1,6 @@
 // import {  } from "../../../server/backgammons/Utility.js";
 import { getRandomInt, localThisProvideComponent, range } from "./Utilities.js";
-import { ConnectionStables, WSEventPool, connectWSRoutes } from "./WSEP.js";
+import { ConnectionStables } from "./WSEP.js";
 import { BetsLoaded, WSEventPoolReady } from './syncronous.js';
 import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { lobbyhubReady } from "./syncronous.js";

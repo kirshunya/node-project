@@ -71,6 +71,16 @@ export const ConnectionStables = {
             })
           );
         return this.connectsended = true;
+    },
+    disconnect() {
+      window.ws.send(
+        JSON.stringify({
+          method: "backgammons/disconnt",
+        })
+      );
+      location.hash = '#backgammons-menu';
+      this.Room = null;
+      resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
     }
 }
 /*lotoserviced*/const EventsRoutes = ({
@@ -124,7 +134,11 @@ export function connectWSRoutes(...routes) {
             .map(([eventname, CallBack])=>
                 WSEventPool.on(eventname, CallBack.bind(route))))
 }
-
+/** @param  {{[eventname:string]:Function}} routes */
+function resetWSEventPool(...initRoutes) {
+    WSEventPool.EventListeners = {};
+    connectWSRoutes(...initRoutes);
+}
 export function onnewmsg(msg) {
     // EventsRoutes[msg.event]?.(msg);
     WSEventPoolReady.then(()=>WSEventPool.$$send(msg.event, msg));

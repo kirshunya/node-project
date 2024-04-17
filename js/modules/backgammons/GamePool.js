@@ -237,9 +237,9 @@ export async function InitGame(GameInitData, localUser, ws) {
           //? maybe room closed.
           // location.hash = '#gamemode-choose';
           if(initData.msg === 'restart') return location.hash = '#gamemode-choose';
-          showNewPopup(new waitingPopup(1, [localUser]));
+          showNewPopup(new waitingPopup(initData.GameID[0], [localUser]));
       }, [1](initData) { // Launching
-          showNewPopup(new BackgammonsLaunchingPopup(1, initData.players, initData.timeval));
+          showNewPopup(new BackgammonsLaunchingPopup(initData.GameID[0], initData.players, initData.timeval));
       }, [2](initData) { // DiceTeamRolling
           if(curState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
           /** @type {{players:[]}} */
@@ -252,7 +252,7 @@ export async function InitGame(GameInitData, localUser, ws) {
           hidePopups();
           Timers.map(timer=>timer.enable(true));
           resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
-          const PlayerTempTeam = players.reduce((p1,p2)=>p1.userId===localUser.userId?BoardConstants.BLACK:p2.userId===localUser.userId?BoardConstants.WHITE:0);
+          const PlayerTempTeam = players.reduce((p1,p2)=>p1.userId===localUser.userId?BoardConstants.WHITE:p2.userId===localUser.userId?BoardConstants.BLACK:0);
           gp.eventHandlers.diceTeamRollStateStart();
           initData.Dices.map((value, index)=>{
             const tempteam = +index+1
@@ -289,7 +289,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     RoomStatesInitRouter[curState](GameInitData);
     const WSEventRoutes = {
       ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); RoomStatesInitRouter[newStateId](stateData); curState = newStateId; }, 
-      ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(1+(+index), +value),
+      ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(+index+1, +value),
       ['diceTeamRollCompletesLaunching']:({dices, timeval})=>{
         const Timers = [
           new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, 'red'),
@@ -341,238 +341,3 @@ export async function InitGame(GameInitData, localUser, ws) {
         return activetimerind;
     }
 }
-
-const isPopupOpened = () => {
-  return document.querySelector(".popup") ? true : false;
-};
-export const openBackgammonsWaitingPopup = async ([betId, roomId], player,) => {
-  if (isPopupOpened()) {
-    return;
-  }
-  const siteLanguage = window.siteLanguage;
-
-  const { bet } = getDominoRoomBetInfo(+betId);
-
-  const body = document.querySelector("body");
-  let popupElement = document.createElement("div");
-  popupElement.classList.add("popup", "domino-waiting-popup-wrapper");
-  popupElement.innerHTML = `
-  <div class="popup__body">
-  <div
-    class="popup__content domino-waiting-popup"
-  >
-    <div class="popup__header">
-      <div class="popup__timer">
-        <img src="img/timer-icon.png" alt="timer" />
-        <span class="domino-waiting-popup__timer">00:00</span>
-      </div>
-      <p class="domino-waiting-popup-bet">${bet.toFixed(2)} ₼</p>
-    </div>
-    <div class="popup__text domino-waiting-popup__text">
-      <div class="domino-waiting-popup-avatars"></div>
-      <p>${siteLanguage.popups.findingPlayers}</p>
-      <div class="game-mode-banner">
-        <p>
-          ${siteLanguage.popups.gameLable}: <span class="game">Нарды</span> <span class="players">${2}</span> ${
-    siteLanguage.popups.playersLable
-  }
-        </p>
-      </div>
-    </div>
-    <div
-      style="
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-      "
-    >
-      <button
-        class="domino-waiting-popup__button domino-waiting-popup__button-room"
-      >
-        ${siteLanguage.popups.leaveRoom}
-      </button>
-      <button
-        class="domino-waiting-popup__button domino-waiting-popup__button-games"
-      >
-        ${siteLanguage.popups.leaveToGameMenu}
-      </button>
-    </div>
-  </div>
-</div>
-  `;
-
-  const avatarsBlock = popupElement.querySelector(
-    ".domino-waiting-popup-avatars"
-  );
-
-  avatarsBlock.innerHTML = range(1,2).map(i=>`
-        <div class="domino-waiting-popup-avatar-wrapper"> 
-          <div class="domino-waiting-popup-avatar loading" slot="${i}">
-        </div>
-        <p class="domino-waiting-popup-avatar__text">Search..
-      </div>
-      `).join('<div class="domino-waiting-popup-vs">VS</div>');
-
-  const avatarBlock = avatarsBlock.querySelector(`[slot="${1}"]`);
-    avatarBlock.classList.remove("loading");
-    avatarBlock.innerHTML = `
-      <img src="http${API_URL_PART}${
-        [IS_HOSTED_STATIC ? "/static/avatars/":"/", player.avatar?player.avatar:'undefined.jpeg'].join('')
-      }" alt="">
-    `;
-
-  body.appendChild(popupElement);
-  // const popupid = popupElement.dataset.popupid = getRandomInt();
-  const popupType = popupElement.dataset.popupType = 'WaitingPopup';
-  window.addEventListener('popstate', function() {
-    const popup = document.getElementsByClassName('popup')[0];
-    // if(popup?.dataset?.popupid === `${popupid}`){
-    if(popup?.dataset?.popupType === `${popupType}`){
-        window.ws.send(
-        JSON.stringify({
-          method: "backgammons/disconnt",
-          GameID: [betId, roomId],
-        })
-      );
-      popupElement.remove();
-      location.hash = '#backgammons-menu';
-    }
-  })
-
-  let timerTimeout = null;
-  // таймер
-  const timerBlock = document.querySelector(".domino-waiting-popup__timer");
-  // считаем время которое прошло, startTime - время начала ожидания
-
-  const targetTime = Date.now();
-  let nowClientTime 
-  try{
-    nowClientTime = await NowClientTime();
-  } catch(e) {
-    nowClientTime = targetTime;
-  }
-
-  let distance = nowClientTime - targetTime;
-
-  timerTimeout = setInterval(async () => {
-    distance += 200;
-
-    const minutes = Math.floor(distance / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Add leading zeros for formatting
-    const formattedMinutes = String(minutes).padStart(2, "0");
-    const formattedSeconds = String(seconds).padStart(2, "0");
-    if (timerBlock) {
-      timerBlock.innerHTML = `${formattedMinutes}:${formattedSeconds}`;
-    }
-  }, 200);
-
-  // кнопки выхода
-  const quitWainingButton = popupElement.querySelector(
-    ".domino-waiting-popup__button-room"
-  );
-
-  const quitWaitingToGamesButton = popupElement.querySelector(
-    ".domino-waiting-popup__button-games"
-  );
-
-  quitWainingButton.addEventListener("click", function () {
-    let websocket = window.ws;
-
-    try {
-      websocket.send(
-        JSON.stringify({
-          method: "backgammons/disconnt",
-          GameID: [betId, roomId],
-        })
-      );
-      // websocket.send(
-      //   JSON.stringify({
-      //     method: "leaveDominoTable",
-      //     dominoRoomId,
-      //     tableId,
-      //     playerMode,
-      //     gameMode,
-      //     userId: +JSON.parse(localStorage.getItem("user")).userId,
-      //   })
-      // );
-    } catch {
-      impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
-      setTimeout(() => location.reload(), 3000);
-    }
-    let localUser = localStorage.getItem("user");
-    localUser = JSON.parse(localUser);
-    location.hash = '#backgammons-menu';
-
-    if (websocket && websocket.readyState == 1) {
-      // // console.log("close ws");
-      clearInterval(timerTimeout);
-      // websocket.close(
-      //   3001,
-      //   JSON.stringify({
-      //     userId: localUser.userId,
-      //     username: localUser.username,
-      //     method: "disconnectGame",
-      //     page: `backgammons`,
-      //   })
-      // );
-      // websocket.close(
-      //   3001,
-      //   JSON.stringify({
-      //     userId: localUser.userId,
-      //     username: localUser.username,
-      //     method: "disconnectGame",
-      //     page: `domino${gameMode}Page${playerMode == 4 ? "4" : ""}`,
-      //   })
-      // );
-    }
-    popupElement.remove();
-  });
-
-  quitWaitingToGamesButton.addEventListener("click", function () {
-    let websocket = window.ws;
-    try {
-      websocket.send(
-        JSON.stringify({
-          method: "backgammons/disconnt",
-          // GameID: [betId, roomId],
-        })
-      );
-      // websocket.send(
-      //   JSON.stringify({
-      //     method: "leaveDominoTable",
-      //     dominoRoomId,
-      //     tableId,
-      //     playerMode,
-      //     gameMode,
-      //     userId: +JSON.parse(localStorage.getItem("user")).userId,
-      //   })
-      // );
-    } catch {
-      impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
-      setTimeout(() => location.reload(), 3000);
-    }
-    let localUser = localStorage.getItem("user");
-    localUser = JSON.parse(localUser);
-
-    if (websocket && websocket.readyState == 1) {
-      // // console.log("close ws");
-      clearInterval(timerTimeout);
-
-      // websocket.close(
-      //   3001,
-      //   JSON.stringify({
-      //     userId: localUser.userId,
-      //     username: localUser.username,
-      //     method: "disconnectGame",
-      //     page: "mainPage",
-      //   })
-      // );
-    }
-
-    popupElement.remove();
-  });
-  return popupElement;
-};

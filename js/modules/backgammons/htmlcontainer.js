@@ -1,5 +1,6 @@
 import { API_URL_PART, IS_HOSTED_STATIC } from "../config.js";
 import { range, EventProvider } from "./Utilities.js";
+import { ConnectionStables } from "./WSEP.js";
 import { BetsLoaded, siteLanguageInited } from "./syncronous.js";
 
 export const getPlayerAvatarImg = ({avatar})=>`http${API_URL_PART}${[IS_HOSTED_STATIC ? "/static/avatars/":"/", avatar?avatar:'undefined.jpeg'].join('')}`;
@@ -190,12 +191,7 @@ export class waitingPopup extends showablePopup {
   }
   exitBackgammons() {
     try {
-      window.ws.send(
-        JSON.stringify({
-          method: "backgammons/disconnt",
-        })
-      );
-      location.hash = '#backgammons-menu';
+      ConnectionStables.disconnect();
     } catch {
       impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
       setTimeout(() => location.reload(), 3000);
@@ -206,11 +202,7 @@ export class waitingPopup extends showablePopup {
   }
   exitToMain() {
     try {
-      window.ws.send(
-        JSON.stringify({
-          method: "backgammons/disconnt",
-        })
-      );
+      ConnectionStables.disconnect();
       location.hash = '#gamemode-choose';
     } catch {
       impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
