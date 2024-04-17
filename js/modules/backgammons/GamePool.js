@@ -237,9 +237,9 @@ export async function InitGame(GameInitData, localUser, ws) {
           //? maybe room closed.
           // location.hash = '#gamemode-choose';
           if(initData.msg === 'restart') return location.hash = '#gamemode-choose';
-          showNewPopup(new waitingPopup(1, [localUser]));
+          showNewPopup(new waitingPopup(GameInitData.GameID[0], [localUser]));
       }, [1](initData) { // Launching
-          showNewPopup(new BackgammonsLaunchingPopup(1, initData.players, initData.timeval));
+          showNewPopup(new BackgammonsLaunchingPopup(GameInitData.GameID[0], initData.players, initData.timeval));
       }, [2](initData) { // DiceTeamRolling
           if(curState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
           /** @type {{players:[]}} */
