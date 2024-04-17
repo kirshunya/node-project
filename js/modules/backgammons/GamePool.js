@@ -345,7 +345,7 @@ export async function InitGame(GameInitData, localUser, ws) {
         window.location.reload();
       }, ['emoji']:({userId, emojiId})=>{
         const emojiSRC = `img/emojis/${emojiId}.png`;
-        return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}" width="5rem" height="5rem">`});
+        return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}" style="width:5rem height:5rem">`});
       }, ['phrase']:({userId, phraseId})=>{
         return new Toast({title:`фраза от ${userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`]});
       }
