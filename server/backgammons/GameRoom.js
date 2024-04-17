@@ -82,7 +82,7 @@ const Timer = class {
     }
     pauseWhile(CB) {
         this.pause();
-            res = CB();
+        const res = CB();
         this.resume();
         return res;
     }
@@ -407,7 +407,7 @@ class DiceTeamRollState extends RoomState(2) {
                 this.Room.event('diceTeamRoll', {index, value:(this.Dices[index] = getRandomInt(1,6))});
         }
         if(this.Dices.reduce((acc,val)=>acc===val&&!!acc)) 
-            (this.upgrade(this), this.timeval.stop(), this.timeval = TimeVal.SECONDS(30).start(this.timerlose()));
+            ((this.Dices = [0, 0]), this.timeval.stop(), (this.timeval = TimeVal.SECONDS(30).start(this.timerlose())), this.upgrade(this));
         if(this.Dices.reduce((acc,val)=>acc!==val&&!!acc&&!!val))
             (setTimeout(()=>this.upgrade(GameStarted.fromDiceTeamRollState(this)), 5000), this.timeval.stop());
         return {result:'nope'};
@@ -456,7 +456,7 @@ class GameStarted extends RoomState(3) {
         
         if(result===true) {
             const prevstate = { ActiveTeam:this.ActiveTeam, Dices:this.Dices };
-            this.event('step', {step, prevstate, code})
+            this.Room.event('step', {step, prevstate, code})
             if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) 
                 this.endGame(this.ActiveTeam, 'Player dropped all chekers', 'win');
             else this.nextStep();
@@ -469,24 +469,52 @@ class GameStarted extends RoomState(3) {
     nextStep() {
         const Dices = this.Dices = this.opponent().autodice?GameStarted._rollDices():[0, 0];
         const ActiveTeam = this.ActiveTeam = nextTeamDict[this.ActiveTeam];
-        this.event('state', { Dices, ActiveTeam })
+        this.Room.event('state', { Dices, ActiveTeam })
         this.Timers.curTimer = ActiveTeam;
     }
     rollDice(ctx) {
         if(this.getPlayerByID(ctx.userId)?.team !== this.ActiveTeam) return {result:'nope'};
         this.Dices = GameStarted._rollDices();
-        this.event('state', {newstate: this.nextState()});
+        this.Room.event('state', {newstate: this.nextState()});
     }
     endGame(WinnerTeam, msg, code) {
         if(!Debug.TimersTurn&&code === 'timer') return; //debig
         if(this.RoomState === CONSTANTS.RoomStates.end) return;
         this.RoomState = CONSTANTS.RoomStates.end;
-        this.event('end', {winner: WinnerTeam, msg, code});
+        this.Room.event('end', {winner: WinnerTeam, msg, code});
         this.Timers.off();
         this.Room.events.onfinish.send();
     }
 
-
+    slot(index) {
+        if(index === 'blackover' || index === 'whiteover') {
+            const Drop = this.Drops;
+            return {
+                add(ColourID) {
+                    Drop[index] = 1 + (Drop[index]?Drop[index]:0);
+                },
+                take() {console.log('error: tried to access to Drop.take()')}
+            }
+        }
+        const Slot = this.Slots[index];
+        const refToArr = new (class {
+            ref
+            constructor(ref) { this.ref = ref; }
+            get Colour() { return this.ref[1]; }
+            set Colour(value) { return this.ref[1] = value; }
+            get Count() { return this.ref[0] }
+            set Count(value) { return this.ref[0] = value; }
+        })(Slot)
+        return {
+            add(ColourID) {
+                if(refToArr.Count++===0)
+                    refToArr.Colour = ColourID;
+            },
+            take(ColourID) {
+                refToArr.Colour = (--refToArr.Count===0)?0:ColourID;
+            }
+        }
+    }
     json() { return {
         RoomState: this.RoomState,
         ActiveTeam: this.ActiveTeam,

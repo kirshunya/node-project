@@ -617,6 +617,9 @@ export class BoardCanvas extends CanvasFunctions {
         window.addEventListener('load', ()=>sleep(300).then(CanvasValidate(),CanvasValidate()));
         CanvasValidate(); CanvasValidate();
     }
+    diceTeamRollStateStart(){
+        this.createDices(0,0,0,1);
+    }
     diceTeamRollsState(UserTeam, clickcallback) {
         this.showAcceptDiceRollLabel(UserTeam, clickcallback);
     }

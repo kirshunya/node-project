@@ -243,13 +243,14 @@ export async function InitGame(GameInitData, localUser, ws) {
           const {players, timeval} = initData;
           UsersPanUI.initAvatars(players[0], players[1]);
           const Timers = [
-            new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval),
-            new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval)
+            new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000),
+            new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000)
           ];
           hidePopups();
           Timers.map(timer=>timer.enable(true));
           resetTimersIntervals(setInterval(()=>Timers.map(timer=>timer.label(true)), 200));
           const PlayerTempTeam = players.reduce((p1,p2)=>p1.userId===localUser.userId?BoardConstants.BLACK:p2.userId===localUser.userId?BoardConstants.WHITE:0);
+          gp.eventHandlers.diceTeamRollStateStart();
           initData.Dices.map((value, index)=>{
             const tempteam = +index+1
             if(value) gp.eventHandlers.diceTeamRoll(tempteam, +value);
@@ -267,10 +268,10 @@ export async function InitGame(GameInitData, localUser, ws) {
           gp.eventHandlers.start(initData, initData.players);
           promisableinitables.SlotsNDropsComplete.resolve([initData.Slots, initData.Drops]);
 
-          // TimersByTeam = [
-          //   new Timer(document.getElementById('TopPan'), whiteval), 
-          //   new Timer(document.getElementById('BottomPan'), blackval)
-          // ]; startTimer(initData.ActiveTeam)
+          TimersByTeam = [
+            new Timer(document.getElementById('TopPan'), initData.Timers[0]), 
+            new Timer(document.getElementById('BottomPan'), initData.Timers[1])
+          ]; startTimer(initData.ActiveTeam)
       }, [4](initData) { // Win // here's started timer to emojis send on Win
           // showNewPopup(new BackgammonsWinPopup())
       },

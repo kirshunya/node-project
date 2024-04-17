@@ -482,6 +482,9 @@ export class GameProvider {
         }, promisesInitList);
         
         this.eventHandlers = new class {
+            diceTeamRollStateStart() {
+                self.GameCanvas.diceTeamRollStateStart();
+            }
             diceTeamRollsState(Team) {
                 self.GameCanvas.diceTeamRollsState(Team.id);
             }
