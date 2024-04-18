@@ -339,7 +339,7 @@ export async function hashNavigation() {
       const header = document.querySelector("header");
       header.classList.remove("d-none");
       footer.classList.remove("d-none");
-      mainContainer.classList.add("footer__padding", "header__padding");
+      document.querySelector(".main__container").classList.add("footer__padding", "header__padding");
       BackgammonMenu.openBackgammonsMenuPage();
       // const dominoPopup = document.querySelector(
       //   ".domino-waiting-popup-wrapper"

@@ -17,9 +17,10 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
   constructor() { lobbyhubReady.resolve(this); }
 
   show() {
-    return document.getElementsByTagName('main')[0].replaceChildren(
-      this.htmlview?this.htmlview:this.init()
-    );
+    const _container = document.getElementsByClassName('main__container')[0];
+    const container = _container?_container:htmlelement('div', ["main__container","header__padding","footer__padding"]);
+    container.replaceChildren(this.htmlview?this.htmlview:this.init())
+    return document.getElementsByTagName('main')[0].replaceChildren(container);
   }
   static TableElT = class TableElT {
     tableparts = []
@@ -65,11 +66,11 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     }
   }
   init() {
-    const container = htmlelement('div', ["main__container","header__padding","footer__padding"]);
     const mutobserverCode = `backgsLobby${getRandomInt(-65341, 65341)}`;
+    const container = htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode});
     const swipers = [];
-    const inited = BetsLoaded.then(bets=>container.replaceChildren(htmlcontainer(
-      htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode}), [
+    const inited = BetsLoaded.then(bets=>htmlcontainer(
+        container, [
         ...Object.entries(bets.BackgammonsBETS).filter(([,a])=>a).map(([betId, betData])=>(this.RoomsMap[betId] = [],
             htmlcontainer(
               htmlelement(
@@ -113,7 +114,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
             )
          ))
         ]
-      )))
+      ));
     this.htmlview = container;
     function  AddSwiperBehaviour(swiperEl) { return (swipers.push(swiperEl), swiperEl) };
     inited.then(()=>swipers.map(swiper=>new Swiper(swiper, {
@@ -143,7 +144,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
       })));
     this.__initvals&&this.resetLobbyTable(this.__initvals);
     this.updalist.map(([...args])=>this.setOnlineToTable(...args));
-    return container
+    return this.htmlview;
   }
   __initvals;
   /**
