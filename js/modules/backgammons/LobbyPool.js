@@ -5,6 +5,8 @@ import { BetsLoaded, WSEventPoolReady } from './syncronous.js';
 import { htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { lobbyhubReady } from "./syncronous.js";
 import { html, ranged } from "./htmlcontainer.js";
+import { openErorPopup } from "../pages/popup.js";
+import { getLocalUser } from "../authinterface.js";
 
 export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
   /** @type {HTMLElement} */
@@ -191,8 +193,11 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
 export function openBackgammonsMenuPage() {
   return BackgammonsLobbyHub.show()
 }
-function onclick([dominoRoomId, tableId]) {
+function onclick([betId, tableId]) {
     // const [room, table] = this;
-    // alert([dominoRoomId, tableId].join(', '));
-    ConnectionStables.connectToRoom([dominoRoomId, tableId]);
+    // alert([betId, tableId].join(', '));
+    BetsLoaded.then(({BackgammonsBETS})=>{
+      if(getLocalUser().balance < BackgammonsBETS[betId].bet) return openErorPopup('Недостаточно денег на счету');
+      return ConnectionStables.connectToRoom([betId, tableId]);
+    })
 }

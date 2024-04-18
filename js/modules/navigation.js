@@ -323,6 +323,7 @@ export async function hashNavigation() {
       console.error("Ошибка при получании даных комнаты! попробуйте еще раз");
     }
   } else if (hash === "#backgammons-menu") {
+    WSEP.ConnectionStables.disconnect();
     setTimeout(() => {
       window.ws.send(
         JSON.stringify({
@@ -334,6 +335,11 @@ export async function hashNavigation() {
           method: "backgammons/openLobby",
         })
       );
+      let footer = document.querySelector("footer");
+      const header = document.querySelector("header");
+      header.classList.remove("d-none");
+      footer.classList.remove("d-none");
+      mainContainer.classList.add("footer__padding", "header__padding");
       BackgammonMenu.openBackgammonsMenuPage();
       // const dominoPopup = document.querySelector(
       //   ".domino-waiting-popup-wrapper"

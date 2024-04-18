@@ -73,14 +73,17 @@ export const ConnectionStables = {
         return this.connectsended = true;
     },
     disconnect() {
-      window.ws.send(
-        JSON.stringify({
-          method: "backgammons/disconnt",
-        })
-      );
-      location.hash = '#backgammons-menu';
-      this.connectsended = this.Room = null;
-      resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
+        if(this.Room){
+            window.ws.send(
+                JSON.stringify({
+                method: "backgammons/disconnt",
+                })
+            );
+            if(location.hash !== '#backgammons-menu') location.hash = '#backgammons-menu';
+            VisitorLabel.classList.toggle('hidden', true);
+            this.connectsended = this.Room = null;
+            resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
+        }
     }
 }
 /*lotoserviced*/const EventsRoutes = ({
@@ -95,7 +98,7 @@ export const ConnectionStables = {
     },
     ['inConnectionBalanceError']({bet, balance}) {
         new Toast({
-            title: 'Недостаточно денег на балансе',
+            title: 'Недостаточно денег на счету',
             text: `Чтобы начать игру вам нужно иметь <font color="blue">${bet.toFixed(2)} ₼.</font>, у вас <font color="blue">${balance.toFixed(2)} ₼.</font> ВЫ В РЕЖИМЕ НАБЛЮДАТЕЛЯ`,
             theme: 'danger',
             autohide: true,

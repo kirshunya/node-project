@@ -87,7 +87,7 @@ wssend.call(ws, ...args);
     localUser = JSON.parse(localStorage.getItem("user"));
     let dominoRoomLoader = document.querySelector(".domino-game-loader");
 
-    console.log(msg);
+    // console.log(msg);
     switch (msg.method) {
       case "wsMsg":
         console.log("ws cleaned");

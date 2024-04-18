@@ -33,7 +33,7 @@ export function updateBalance(newBalance) {
  */
 /**
  * 
- * @param {*} CB 
+ * @param {localUser=>localUser>} CB 
  * @returns {any | {userId, username, }}
  */
 export function getLocalUser(CB=localUser=>localUser){
