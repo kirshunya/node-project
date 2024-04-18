@@ -146,7 +146,7 @@ const timeouts = [
   { roomId: 5, timeoutId: null, timeoutStarted: false },
 ];
 
-const backgammonwss = require("./backgamons");
+const backgammonwss = require("./backgamons").WSSConnection(aWss);
 app.ws("/backgammons", backgammonwss);
 // web sockets для подключения к играм
 app.ws("/game", (ws, req) => {

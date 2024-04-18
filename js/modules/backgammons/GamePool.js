@@ -235,11 +235,14 @@ export async function InitGame(GameInitData, localUser, ws) {
           //? maybe room closed.
           // location.hash = '#gamemode-choose';
           if(initData.msg === 'restart') return location.hash = '#gamemode-choose';
-          showNewPopup(new waitingPopup(betId, [localUser]));
+          showNewPopup(new waitingPopup(betId, initData.players));
+          isVisitor(initData.players);
       }, [1](initData) { // Launching
           showNewPopup(new BackgammonsLaunchingPopup(betId, initData.players, initData.timeval));
+          isVisitor(initData.players);
       }, [2](initData) { // DiceTeamRolling
           if(prevState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
+          isVisitor(initData.players);
           /** @type {{players:[]}} */
           const {players, timeval} = initData;
           UsersPanUI.initAvatars(players[0], players[1]);
@@ -261,20 +264,24 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
+          isVisitor(initData.players);
           const localPlayer = __playerById(initData.players)[localUser.userId];
-          localUser.team = TeamFromTeamId[+(localPlayer?.team||0)];
-          autostep.setdice(((localUser.autodice = localPlayer.autodice), localPlayer.autodice))
+          if(localPlayer) {
+            localUser.team = TeamFromTeamId[+(localPlayer?.team||0)];
+            autostep.setdice(((localUser.autodice = localPlayer.autodice), localPlayer.autodice))
+
+            const autostepToggler = document.getElementsByClassName('autostep')[0]
+            autostepToggler.addEventListener('click', ()=>{
+              autostep.dice=!autostep.dice
+              autostepToggler.classList.toggle('active', autostep.dice)
+              window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
+            });
+          }
 
           const [firstPlayer, secondPlayer] = initData.players;
           const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
           UsersPanUI.initAvatars(whiteplayer, blackplayer);
 
-          const autostepToggler = document.getElementsByClassName('autostep')[0]
-          autostepToggler.addEventListener('click', ()=>{
-            autostep.dice=!autostep.dice
-            autostepToggler.classList.toggle('active', autostep.dice)
-            window.ws.send(JSON.stringify({method:'autodice', value:autostep.dice}))
-          });
           hidePopups();
 
           gp.eventHandlers.start(initData, initData.players);
@@ -287,6 +294,7 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ TimersByTeam.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [4]({Slots, Drops, players, winner, loser, timeval}) { // Win // here's started timer to emojis send on Win
+          isVisitor(players);
           if(!prevState) { // если только перезагрузили или открыли страницу
             const [firstPlayer, secondPlayer] = players;
             const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
@@ -340,11 +348,11 @@ export async function InitGame(GameInitData, localUser, ws) {
       }, ['restart__']:()=>{
         alert(`Кто-то нажал на рестарт игры`);
         window.location.reload();
-      }, ['emoji']:({userId, emojiId})=>{
+      }, ['emoji']:({userId, username, emojiId})=>{
         const emojiSRC = `img/emojis/${emojiId}.png`;
-        return new Toast({title:`эмодзи от ${userId}`, text:`<img src="${emojiSRC}" style="width:5rem; height:5rem">`});
-      }, ['phrase']:({userId, phraseId})=>{
-        return new Toast({title:`фраза от ${userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`]});
+        return new Toast({title:`эмодзи от ${username||userId}`, text:`<img src="${emojiSRC}" style="width:5rem; height:5rem">`, autohide:true, interval:3000});
+      }, ['phrase']:({userId, username, phraseId})=>{
+        return new Toast({title:`фраза от ${username||userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`], autohide:true, interval:3000});
       }
     }
     connectWSRoutes(WSEventRoutes)
@@ -368,5 +376,10 @@ export async function InitGame(GameInitData, localUser, ws) {
         TimersByTeam[activetimerind].enable(true, isinit);
         TimersByTeam[prevtimer]?.enable(false, isinit);
         return activetimerind;
+    }
+    function isVisitor([player1, player2]) {
+      const isVisitor = player1?.userId === localUser.userId || player2?.userId === localUser.userId
+      VisitorLabel.classList.toggle('hidden', isVisitor);
+      return isVisitor;
     }
 }

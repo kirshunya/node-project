@@ -93,6 +93,15 @@ export const ConnectionStables = {
         ConnectionStables.diffsProm.resolve(diff);
         console.log('diffs', diff)
     },
+    ['inConnectionBalanceError']({bet, balance}) {
+        new Toast({
+            title: 'Недостаточно денег на балансе',
+            text: `Чтобы начать игру вам нужно иметь <font color="blue">${bet.toFixed(2)} ₼.</font>, у вас <font color="blue">${balance.toFixed(2)} ₼.</font> ВЫ В РЕЖИМЕ НАБЛЮДАТЕЛЯ`,
+            theme: 'danger',
+            autohide: true,
+            interval: 60000
+        })
+    },
     ["backgammons::connection::self"](GameInitData) {
         // const {dominoRoomId, tableId, colour, players } = msg;
         const {GameID} = GameInitData
@@ -139,6 +148,13 @@ function resetWSEventPool(...initRoutes) {
     WSEventPool.EventListeners = {};
     connectWSRoutes(...initRoutes);
 }
+window.addEventListener('DOMContentLoaded', ()=>{
+    const [outbtn] = VisitorLabel.getElementsByClassName('domino-waiting-popup__button')
+    outbtn.addEventListener('click', ()=>{
+        ConnectionStables.disconnect();
+        VisitorLabel.classList.toggle('hidden', true);
+    })
+});
 export function onnewmsg(msg) {
     // EventsRoutes[msg.event]?.(msg);
     WSEventPoolReady.then(()=>WSEventPool.$$send(msg.event, msg));

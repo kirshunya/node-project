@@ -63,7 +63,7 @@
     border-radius: 5pt;
   }
   .line {
-    background-image: url('./img/backgammons/boardlot.png');
+    background-image: url('/img/backgammons/boardlot.png');
     background-size: 100% 100%;
   /*   -webkit-background-size: cover;
   //   -moz-background-size: cover;
@@ -180,7 +180,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
-    background-image: url('img/tr-lang.png');
+    background-image: url('/img/tr-lang.png');
     display: inline-block;
     min-width: 1em;
     height: 1em;

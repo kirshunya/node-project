@@ -14,7 +14,8 @@ const Modules = setOnResolve({
     Configs: importBackgammons('Configurations'),
     LobbyPool: importBackgammons('LobbyPool'),
     GamePool: importBackgammons('GamePool'),
-    auth: importMobas('authinterface')
+    auth: importMobas('authinterface'),
+    utilities: importBackgammons('Utilities'),
 });
 let getLocalUser;
 Promise.all(Modules._promises)
@@ -35,3 +36,5 @@ function setOnResolve(AList, additionalPromises = []) {
     );
     return out;
 }
+let Toast;
+Promise.all(Modules._promises).then(()=>Modules.utilities.Toast)

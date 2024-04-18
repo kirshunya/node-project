@@ -1,6 +1,13 @@
 const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
-
+/**
+ * @typedef UserModel
+ * @property {int} id
+ * @property {FLOAT} balance
+ */
+/**
+ * @type {Model.<UserModel>}
+ */
 const User = sequelize.define("user", {
   id: {
     type: DataTypes.INTEGER,

@@ -129,7 +129,7 @@ module.exports.makeEvent = makeEvent
 module.exports.ConnectionContext = class ConnectionContext {
     /** @type {TUser} */
     user
-    get userID() { return this.user.userID; }
+    get userId() { return this.user.userID; }
     /** @type {WebSocket} */
     ws
     constructor(ws) {
@@ -141,7 +141,7 @@ module.exports.ConnectionContext = class ConnectionContext {
         return this.ws.send(JSON.stringify(response))
     }
     /** @param {string} event $eventname @param {object} response  */
-    event(event, response){
+    event(event, response={}){
         return this.send(makeEvent(event, response))
     }
 }

@@ -520,7 +520,7 @@ export class BoardCanvas extends CanvasFunctions {
      * @param {[Number, Number][]} GSlots 
      * @param {[Number, Number]} GDropped 
      */
-    constructor(gc, promisesinitlist) {
+    constructor(gc, promisesinitlist, localUser) {
         super('canvas');
         const canvas = canva = this.canvas;
 
@@ -528,6 +528,7 @@ export class BoardCanvas extends CanvasFunctions {
         console.log(`[BoardCanvas]: vars inited`)
         const self = this;
         this.gc = gc; //provides
+        this.localUser = localUser;
         this._effects = new BoardCanvasEffects(this);
 
         // slot = {
@@ -601,7 +602,7 @@ export class BoardCanvas extends CanvasFunctions {
         //         self.GetCanvasAtResoution(w > h ? h : w);
         //     }
         // }
-        const containerOfBoard = ondom.then(()=>document.getElementsByClassName('domino-game-page__body-wrapper')[0])
+        // const containerOfBoard = ondom.then(()=>document.getElementsByClassName('domino-game-page__body-wrapper')[0])
         const CanvasValidate = async()=>{
             const [CanvasWidth, CanvasHeight] = [this.canvas.width, this.canvas.height];
             const mobileMaxWidth = 780;
@@ -630,6 +631,7 @@ export class BoardCanvas extends CanvasFunctions {
             }
             if(pagewidth > mobileMaxWidth) {
                 newWidth = pagewidth - (pagewidth>1100?pagewidth>1210?495:475:452.5);
+                if(heightIfWidth(newWidth) > pageheight) newWidth = widthIfHeight(pageheight);
                 wrapper.style.flexDirection = 'row'
                 rightcol.replaceChildren(BottomPan, tabspaces, TopPan);
             } else {

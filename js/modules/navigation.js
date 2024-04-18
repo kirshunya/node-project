@@ -617,7 +617,7 @@ export function redirectToMainPage() {
   let main__container = document.createElement("div");
   main__container.classList.add("main__container");
 
-  main__container.innerHTML = `
+  main__container.innerHTML = /* html */`
   <section class="games">
     <div class="games__container" id="loto">
       <a class="game loto-room loto-room-1" room="1">

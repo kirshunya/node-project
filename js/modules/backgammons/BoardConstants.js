@@ -86,7 +86,7 @@ export class Slot {
         this.Sloter = Sloter;
     }
     ismy() {
-        return this.refToArr.Colour===this.Sloter.User?.team.id;
+        return this.refToArr.Colour===this.Sloter.User?.team?.id;
     }
     isempty() {
         return this.refToArr.Count===BoardConstants.CHECKERS.empty;

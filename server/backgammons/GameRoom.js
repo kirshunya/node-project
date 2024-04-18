@@ -1,7 +1,7 @@
 const { serializable } = require("./serializablewtf.js");
 const { getRandomInt, FCPromise } = require("./Utility");
 const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider, nextTeamDict, makeEvent } = require("./Generals");
-const { balanceTravers } = require("./aaaa.js");
+const { balanceTravers, getUserBalance } = require("./aaaa.js");
 const { WHITEID, BLACKID } = CONSTANTS;
 
 const timestamp = ()=>Date.now();
@@ -123,7 +123,7 @@ class Timers extends serializable {
         return this.timers[this.activetimer];
     }
     set curTimer(ActiveTeam) {
-        if(!ActiveTeam) return this.curTimer.reject();
+        if(ActiveTeam===null) return this.curTimer.reject();
         this.curTimer.reject();
         this.activetimer = Timers.timersIndexByTeamId[ActiveTeam];
         this.curTimer.start();
@@ -171,10 +171,12 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
         this.event('message', {text:msg.text})
     }
 }
+const {BackgammonsBETS} = require('./../../json/bets.json');
 class TGame extends SharedRoom0 {
     // /** @type {TPlayer.PlayersContainer} */
     // Players = new TPlayer.PlayersContainer(this)
     get betId() { return this.GameID[0]; }
+    get bet() { return BackgammonsBETS[this.betId].bet; }
     get players() {return this.RoomState.players; }
 
     RoomState = new WaitingState(this);
@@ -214,9 +216,9 @@ class TGame extends SharedRoom0 {
         player.autodice = value;
         this.event('autodiceset', {userId, value})
     }
-    connect(ctx, ws) {
+    async connect(ctx, ws) {
         super.connect(ctx.user, ctx, ws);
-        const res = this.RoomState.connect?.(ctx);
+        const res = await this.RoomState.connect?.(ctx);
         ctx.event('backgammons::connection::self', this[serializable.prioritetSerial]());
         return res;
     }
@@ -242,7 +244,7 @@ class TGame extends SharedRoom0 {
     // }
     /** @param {ConnectionContext} ctx */
     restart__(ctx) {
-        return this.RoomState.restart__(...arguments);
+        return this.RoomState.restart__?.(...arguments);
     }
     rollDice(ctx) {
         return this.RoomState.rollDice(ctx);
@@ -309,7 +311,7 @@ class TeXRoomState extends serializable {
     /** @param {TGame | TeXRoomState} input */
     constructor(input) {
         super();
-        console.log('TeXRoomState init', input);
+        // console.log('TeXRoomState init', input);
         if(input instanceof TGame) this.Room = input
         else if(input instanceof TeXRoomState) this.Room = input.Room; 
         else if(input.Room) this.Room = input.Room;
@@ -329,7 +331,10 @@ class WaitingState extends RoomState(0) {
         return new WaitingState(lstate);
     } 
     /** @type {ctxHandlerT<void|true>} */
-    connect(ctx) {
+    async connect(ctx) {
+        const userbalance = await getUserBalance(ctx.user.userId);
+        console.log('userbalance', userbalance);
+        if(userbalance < this.Room.bet) { return ctx.event('inConnectionBalanceError', {bet:this.Room.bet, balance:userbalance}); }
         const connres = this.players.push(ctx.user)<=2;
         if(this.players.length >= 2) 
             ((this.players.length = 2), this.upgrade(LaunchingState.fromWaitingState(this)), true);
@@ -396,17 +401,19 @@ class LaunchingState extends RoomState(1) {
 class DiceTeamRollState extends RoomState(2) {
     players = [];
     /** Если кубики брошены, будут записаны здесь @type {[int, int]}*/
-    Dices = [0, 0];
+    Dices = randdice();
     timeval = TimeVal.SECONDS(30);
     getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
     
     constructor(upgradable, players) { 
         super(upgradable); 
         this.players = players; 
-        this.timeval.start(this.timerlose());
-        for(const player of players) {
-            this.rollDice({user:player}, false);
-        }
+        // this.timeval.start(this.timerlose());
+        // for(const player of players) {
+        //     this.rollDice({user:player}, false);
+        // }
+        if(this.Dices[0] !== this.Dices[1]) this.startNextState();
+        else this.restartState()
         console.log('DiceTeamRollState autoroll', this.Dices);
     }
     /** @param {LaunchingState} wstate  */
@@ -423,38 +430,39 @@ class DiceTeamRollState extends RoomState(2) {
         }
     }
     startNextState() {
-        this.timeval.stop();
+        // this.timeval.stop();
         this.timeval = TimeVal.SECONDS(5).start(()=>this.upgrade(GameStarted.fromDiceTeamRollState(this)))
         this.red = 'red';
         this.Room.event('diceTeamRollCompletesLaunching', this.json());
     }
     restartState() {
-        this.Dices = [0, 0]
+        this.Dices = randdice();
         this.timeval.stop()
         this.timeval = TimeVal.SECONDS(5).start(()=>{
-            this.timeval = TimeVal.SECONDS(30).start(this.timerlose())
-            this.red = undefined;
-            this.upgrade(this);
+            // this.timeval = TimeVal.SECONDS(30).start(this.timerlose())
+            // this.red = undefined;
+            // this.upgrade(this);
+            this.upgrade(new DiceTeamRollState(this, this.players))
         })
         this.red = 'red';
         this.Room.event('diceTeamRollCompletesLaunching', this.json());
         
     }
-    rollDice(ctx, event=true) {
-        for(const [index, player] of Object.entries(this.players)) {
-            console.log('rollDice', index, player);
-            console.log('log:', player.userId, ctx.user.userId, this.Dices[index]);
-            if(+player.userId===+ctx.user.userId&&!this.Dices[index]) {
-                this.Dices[index] = getRandomInt(1,6)
-                if(event) this.Room.event('diceTeamRoll', {index, value:this.Dices[index]});
-            }
-        }
-        if(this.Dices.reduce((acc,val)=>acc===val&&!!acc)) 
-            this.restartState();
-        if(this.Dices.reduce((acc,val)=>acc!==val&&!!acc&&!!val))
-            this.startNextState();
-        return {result:'nope'};
-    }
+    // rollDice(ctx, event=true) {
+    //     for(const [index, player] of Object.entries(this.players)) {
+    //         console.log('rollDice', index, player);
+    //         console.log('log:', player.userId, ctx.user.userId, this.Dices[index]);
+    //         if(+player.userId===+ctx.user.userId&&!this.Dices[index]) {
+    //             this.Dices[index] = getRandomInt(1,6)
+    //             if(event) this.Room.event('diceTeamRoll', {index, value:this.Dices[index]});
+    //         }
+    //     }
+    //     if(this.Dices.reduce((acc,val)=>acc===val&&!!acc)) 
+    //         this.restartState();
+    //     if(this.Dices.reduce((acc,val)=>acc!==val&&!!acc&&!!val))
+    //         this.startNextState();
+    //     return {result:'nope'};
+    // }
 
     json() { return this.updata(); }
     updata() { return { RoomState: this.RoomState, players: this.players, Dices:this.Dices, timeval: this.timeval.json(), red:this.red }; }
@@ -475,7 +483,9 @@ class GameStarted extends RoomState(3) {
     constructor(upgradable, players, WhiteIsFirstPlayer) { 
         super(upgradable); 
         this.players = players; 
+        players.map(player=>player.autodice = true);
         this.ActiveTeam = WhiteIsFirstPlayer?WHITEID:BLACKID;
+        this.Timers.onfinish(()=>this.endGame(this.opponent.team, 'timer', 1));
         this.Timers.curTimer = this.ActiveTeam;
     }
     /** @param {DiceTeamRollState} wstate  */
@@ -521,13 +531,17 @@ class GameStarted extends RoomState(3) {
 
         if(!stop) this.Timers.curTimer = null;
         else if(!rollDice) this.Timers.curTimer = ActiveTeam;
-
+        console.log('nextState', rollDice, stop, ActiveTeam, Dices, this.activeplayer.autodice)
         return { Dices, ActiveTeam };
     }
     /** @param {ConnectionContext} ctx  */
-    restart__(ctx) {
-        if(ctx.user.userId === this.activeplayer.userId) {
-            this.endGame(this.opponent.team, 'restart__', 2);
+    restart__({user}) {
+        const [p1, p2] = this.players
+        console.log('restart__', this.players, user, ...arguments);
+        /** @type {TPlayer[]} */
+        const [player, opponent] = p1.userId === user.userId && [p1, p2] || p2.userId === user.userId && [p2, p1]
+        if(player) {
+            this.endGame(opponent.team, 'restart__', 2);
             return {result:'restart__'};
         } 
         return {result:'nope'};

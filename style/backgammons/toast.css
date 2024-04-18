@@ -13,6 +13,7 @@
 }
 
 .toast-container {
+  z-index: 100;
   position: fixed;
   top: 15px;
   left: 0;

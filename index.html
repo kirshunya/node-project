@@ -208,14 +208,39 @@
     <!-- <script src="libs/eventSource/eventsource-polyfill.js"></script> -->
     <script src="libs/fabric" defer></script>
     <script src="js/debug/repl.js" defer></script>
+    <div id="VisitorLabel" class="hidden">
+      <span>Режим Наблюдателя</span>
+      <span class="domino-waiting-popup__button">Выйти</span>
+    </div>
     <style>
       .backgammons-visitor {
         max-width: 100%;
+        img {
+          max-width: 100%;
+          margin: auto;
+          max-height: 1.2rem;
+        }
       }
-      .backgammons-visitor img {
-        max-width: 100%;
-        margin: auto;
-        max-height: 1.2rem;
+      #VisitorLabel {
+        z-index: 99;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        
+        padding: 0.75rem;
+        background: #042912;
+        border: 1px solid #ff0808;
+        border-radius: 10px;
+        color: white;
+        font-size: 1.5rem;
+
+        /* opacity: 75; */
+        &:first-child {
+          padding-bottom: 0.3rem;
+        }
+        &.hidden {
+          display: none;
+        }
       }
     </style>
   </body>

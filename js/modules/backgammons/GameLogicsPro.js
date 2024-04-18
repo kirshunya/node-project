@@ -107,7 +107,7 @@ class Board {
         const isCanToOver = _isCanToOver();
         const CashOfOiFBySlot = {}
 
-        if(ActivePlayer.team.id !== User.team.id) return {};
+        if(ActivePlayer.team.id !== User.team?.id) return {};
         if(!FromSlot.ismy()) return {};
         const TeamFirstSlot = ActivePlayer.team.id===WHITE.id?0:12;
         if(!fstepapplied) 

@@ -95,12 +95,11 @@ const WSPipelineCommands = {
      * @param {ConnectionContext} ctx 
      * @param {{GameID:[Number, Number]}} msg 
      */
-    ['backgammons/connect'](ctx, msg) {
+    async ['backgammons/connect'](ctx, msg) {
         // Lobby.UnlistenLobby(ctx, this);
-
         ctx.GameID = msg.GameID;
         const Game = GamesLobby.getGameByID(ctx.GameID);
-        const connres = Game.connect(ctx, this);
+        const connres = await Game.connect(ctx, this);
         console.log('connres', connres);
         if(connres)
             GamesLobby.event('backgammons::lobby::connectionToRoom', {
@@ -159,10 +158,10 @@ const WSPipelineCommands = {
         return {event, slots: Game.Slots, state: Game.info};
     },
     sendEmoji(ctx, msg) {
-        GamesLobby.getGameByID(ctx.GameID).event('emoji', msg);
+        GamesLobby.getGameByID(ctx.GameID).event('emoji', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
     },
     sendPhrase(ctx, msg) {
-    GamesLobby.getGameByID(ctx.GameID).event('phrase', msg);
+    GamesLobby.getGameByID(ctx.GameID).event('phrase', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
     },
     /**
      * Debug function, restart game
@@ -210,16 +209,16 @@ const WSPipelineCommands = {
  * @param {WebSocket} ws 
  * @param {import('express').Request} req 
  */
-module.exports = function(ws, req) {
+function WSSConnection(ws, req) {
     console.log('new Connection', new Date())
     ws._socket.setKeepAlive(true);
-    const ctx = new ConnectionContext(ws);
+    const ctx = ws.ctx = new ConnectionContext(ws);
 
     ws.on('message', async function(_msgblob) {
         const msg = JSON.parse(_msgblob);
         try{
             while(!ctx.user&&msg.method!=='connectGeneral') await sleep(100); // кастыльное решение гонки потоков при подключении.
-            const response = WSPipelineCommands[msg.method]?.call(ws, ctx, msg);
+            const response = await WSPipelineCommands[msg.method]?.call(ws, ctx, msg);
             response && ctx.send(response);//skips undeifned n' nulls..
         } catch(e) {
             console.error(e);
@@ -233,3 +232,13 @@ module.exports = function(ws, req) {
         }
     });
 }
+/** @type {ws.Server} */
+let aWSS = null;
+/** 
+ * @param {ws.Server} _aWSS
+ */
+const expor = _aWSS=>(aWSS=_aWSS, WSSConnection);
+const getaWSS = function(){ return aWSS }; 
+
+module.exports.WSSConnection = expor
+module.exports.getaWSS = getaWSS
