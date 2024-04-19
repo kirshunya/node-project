@@ -107,9 +107,9 @@ const Timer = class {
     }
     /** @returns {[Number, Number]} */
     json() {
-        const diff = this.snap?.actual?.();
+        // const diff = this.snap?.actual?.();
         // console.log('json()', this, diff)
-        return [this.userTime, this.snap?this.snap.timestamp:0 ];
+        return [this.userTime, this.snap?.timestamp||0 ];
     }
 }
 class Timers extends serializable {
@@ -127,6 +127,7 @@ class Timers extends serializable {
         this.curTimer.reject();
         this.activetimer = Timers.timersIndexByTeamId[ActiveTeam];
         this.curTimer.start();
+        console.log('curTiemr = ', ActiveTeam, Timers.timersIndexByTeamId[ActiveTeam], this.curTimer)
     }
     static timersIndexByTeamId = {
         [CONSTANTS.WHITEID]: 0,
@@ -151,7 +152,10 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
      */
     connect(user, ctx, ws) {
         const rikey = ctx.rikey = `${user.clientId}-${user.userId}-${getRandomInt(-10,100)}`;
-        this.event('backgammons::connection', user, 'add ignoreList and send current user..');//? player:visitor
+        const _user = {
+            userId:user.userId, username:user.username, avatar:user.avatar, team:user.team, autodice:true
+        };
+        this.event('backgammons::connection', _user, 'add ignoreList and send current user..');//? player:visitor
         this.Connections[rikey] = ({user, ctx, ws, send:(...args)=>ctx.send(...args)});
         console.log(rikey, user);
     }
@@ -529,7 +533,7 @@ class GameStarted extends RoomState(3) {
         const Dices = this.Dices = !stop&&(this.opponent.autodice||rollDice)?GameStarted._rollDices():[0, 0];
         const ActiveTeam = this.ActiveTeam = rollDice||stop?this.ActiveTeam:nextTeamDict[this.ActiveTeam];
 
-        if(!stop) this.Timers.curTimer = null;
+        if(stop) this.Timers.curTimer = null;
         else if(!rollDice) this.Timers.curTimer = ActiveTeam;
         console.log('nextState', rollDice, stop, ActiveTeam, Dices, this.activeplayer.autodice)
         return { Dices, ActiveTeam };

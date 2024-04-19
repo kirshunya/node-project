@@ -4,10 +4,20 @@ const { DataTypes } = require("sequelize");
  * @typedef UserModel
  * @property {int} id
  * @property {FLOAT} balance
+ * @property {string} avatar
+ * @property {string} email
+ * @property {string} password
+ * @property {string} username
+ * @property {boolean} isAdmin
+ * @property {Float} username
+ * @property {int} wins
+ * @property {int} losses
  */
-/**
- * @type {Model.<UserModel>}
- */
+// /**
+//  * @type {Sequelize.ModelCtor.<Sequelize.Model.<UserModel, UserModel>>}
+//  */
+// /** @type {import("sequelize").ModelCtor.<Model.<UserModel>>} */
+/** @type {import('sequelize').ModelStatic.<UserModel>} */
 const User = sequelize.define("user", {
   id: {
     type: DataTypes.INTEGER,
@@ -16,6 +26,7 @@ const User = sequelize.define("user", {
     allowNull: false,
     autoIncrement: true,
   },
+  avatar: { type: DataTypes.STRING, allowNull:true },
   email: { type: DataTypes.STRING, unique: true, allowNull: false },
   password: { type: DataTypes.STRING, unique: true, allowNull: false },
   name: { type: DataTypes.STRING, allowNull: false },
@@ -25,6 +36,58 @@ const User = sequelize.define("user", {
   wins: { type: DataTypes.INTEGER, defaultValue: 0 },
   losses: { type: DataTypes.INTEGER, defaultValue: 0 },
 });
+/** some Backgammon Room curState -- unused in BackgammonGamesHistory data */
+const BackgammonsRooms = sequelize.define('backgammonsRooms', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    unique: true,
+    allowNull: false,
+    autoIncrement: true,
+  },
+  betId: { type: DataTypes.INTEGER }, 
+  roomId: { type: DataTypes.INTEGER }, 
+
+  startedAt: { type: DataTypes.DATE, allowNull: false, },
+  startedWaitingAt: { type: DataTypes.DATE, allowNull: false, }, // if null, waiting closed, is `startedAt` === null, ignore
+  isStarted: { type: DataTypes.VIRTUAL, get() { return !!this.get('startedAt'); } },
+
+  finishedAt: { type: DataTypes.DATE, allowNull: false, },
+  isWaiting: { type: DataTypes.VIRTUAL, get() { return !!this.get('startedAt'); } },
+
+  scene: { type: DataTypes.STRING },
+  ActiveTeam: { type: DataTypes.INTEGER },
+  Dices: { type: DataTypes.INTEGER },
+  drops: { type: DataTypes.INTEGER }, // like as []
+  TeamsByPlayerId: { type: DataTypes.INTEGER },
+  player1: { type: DataTypes.INTEGER },
+  player1Team: { type: DataTypes.VIRTUAL, get() { return this.get('TeamsByPlayerId') % 10; } },
+  player2: { type: DataTypes.INTEGER },
+  player2Team: { type: DataTypes.VIRTUAL, get() { return Math.ceil(this.get('TeamsByPlayerId') / 10); } },
+
+
+  isAvialable: { type: DataTypes.BOOLEAN },
+});
+/** list of completed games  */
+const BackgammonGamesHistory = sequelize.define('BackgammonGamesHistory', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    unique: true,
+    allowNull: false,
+    autoIncrement: true,
+  },
+  bet: { type: DataTypes.INTEGER }, // if Backgammon Bets edited, we will save old value here.
+  betId: { type: DataTypes.INTEGER }, 
+  roomId: { type: DataTypes.INTEGER }, 
+  startedAt: { type: DataTypes.DATE, allowNull: false, },
+  finishedAt: { type: DataTypes.DATE, allowNull: false, },
+  players1Id: { type: DataTypes.INTEGER }, 
+  players2Id: { type: DataTypes.INTEGER }, 
+  winnerId: { type: DataTypes.INTEGER }, 
+  commision: { type: DataTypes.INTEGER },
+});
+
 
 const Stats = sequelize.define("stat", {
   id: {

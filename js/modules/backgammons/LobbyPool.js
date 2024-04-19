@@ -95,7 +95,9 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                               this.RoomsMap[betId][roomId] = new __T0BackgammonsLobbyHub.TableElT([betId, roomId])).html()
                             )
                           ]
-                        )
+                        ),
+                        htmltext('div', 'swiper-scrollbar domino-room-swiper-scrollbar swiper-scrollbar-horizontal', 
+                                  '<div class="swiper-scrollbar-drag"></div>')
                       ]
                     ),
                     htmltext('div', "domino-room__info", `
@@ -178,8 +180,8 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
 
     table.tableparts.map((part, ind)=>
         (part.classList.toggle("filled", ind < players.length),
-         (window.isAdmin == true && i == peopleItems.length - 1) &&
-          (roomHalf.innerHTML = `<div class="table-admin__userid-item">${/*players[i].userId//msg.userId*/1}</div>`)
+         (window.isAdmin == true) && (players[ind]) &&
+          (part.innerHTML = `<div class="table-admin__userid-item">${/*players[i].userId//msg.userId*/players[ind]?.userId}</div>`)
             )
     )
   }

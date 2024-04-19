@@ -113,7 +113,7 @@ export async function redirectToAdminPage() {
     showbotWinStats = JSON.parse(botWinStats.data);
   }
 
-  main.innerHTML = `
+  main.innerHTML = /* html */`
   <section class="admin">
   <div class="bot-stats">
       <h2>Статистика ботов</h2>

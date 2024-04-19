@@ -1,7 +1,4 @@
 //надо выделить функции finishGame для завершения игры и ведения статистики и startGame, для вычита баланса при старте игры и, возможно, если такое есть в сервисе, вести лог в бд
-
-const { Model } = require('sequelize');
-// const getaWSS = require('./../backgamons.js').getaWSS;
 const { User } = require('../models/db-models');
 const BackgammonsBETS = require('../../json/bets.json').BackgammonsBETS;
 async function balanceTravers(winner, loser, betId) {
@@ -28,7 +25,7 @@ async function balanceTransaction(userId, balanceDifferncial) {
 }
 /**
  * @param {int} userId
- * @returns {Model.<import('../models/db-models').UserModel>}
+ * @returns {import('../models/db-models').UserModel}
  */
 async function getUser(userId) {
   return await User.findOne({ where: { id: userId }, });

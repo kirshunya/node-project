@@ -333,12 +333,12 @@ export async function InitGame(GameInitData, localUser, ws) {
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)
         //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
-        // setActiveTimer(newstate.ActiveTeam);
+        setActiveTimer(newstate.ActiveTeam);
         code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
                        || gp.eventHandlers.ustep(step, newstate, prevstate)
       }, ['state']:({newstate})=>{
-        if(localUser.userId === 2)
-            localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+        // if(localUser.userId === 2)
+        //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
         setActiveTimer(newstate.ActiveTeam);
         gp.eventHandlers.state(newstate)
       }, ['end']:({winner})=>{
