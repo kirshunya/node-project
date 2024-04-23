@@ -166,7 +166,7 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
     disconnectAll() {
         this.Connections = {};
     }
-    event(event, obj) {
+    event(event, obj={}) {
         const msg = Object.assign(obj, {event, method:'backgammons::event'});
         // console.log(`sending`, msg, Object.values(this.Connections))
         Object.values(this.Connections).map(async(ctx)=>ctx.send(msg));
@@ -330,10 +330,10 @@ class TeXRoomState extends serializable {
 function RoomState(rsid) { return class RoomState extends TeXRoomState { RoomState = rsid }; };
 class WaitingState extends RoomState(0) {
     players = [];
-    static fromRestart(lstate) {
-        lstate.Room.disconnectAll();
-        return new WaitingState(lstate);
-    } 
+    // /** @param {TeXRoomState} lstate */
+    // static fromRestart(lstate) {
+    //     return new WaitingState(lstate);
+    // } 
     /** @type {ctxHandlerT<void|true>} */
     async connect(ctx) {
         const userbalance = await getUserBalance(ctx.user.userId);
@@ -489,7 +489,7 @@ class GameStarted extends RoomState(3) {
         this.players = players; 
         players.map(player=>player.autodice = true);
         this.ActiveTeam = WhiteIsFirstPlayer?WHITEID:BLACKID;
-        this.Timers.onfinish(()=>this.endGame(this.opponent.team, 'timer', 1));
+        this.Timers.onfinish(()=>this.endGame(this.opponent.team, 'timer', 'timer'));
         this.Timers.curTimer = this.ActiveTeam;
     }
     /** @param {DiceTeamRollState} wstate  */
@@ -618,7 +618,13 @@ class WinState extends RoomState(4) {
         this.winner = winner
         this.loser = loser
         this.players = [winner, loser]
-        this.timeval = TimeVal.SECONDS(20).start(()=>this.upgrade(new WaitingRoomRestartState(lstate)))
+        this.timeval = TimeVal.SECONDS(10).start(()=>{
+            lstate.Room.disconnectAll();
+            this.players = [];
+            this.Room.events.onexit.send();
+            this.Room.event('discontAll');
+            this.upgrade(new WaitingState(lstate))
+        })
 
         balanceTravers(winner, loser, this.Room.betId)
     }
@@ -634,11 +640,5 @@ class WinState extends RoomState(4) {
         loser:this.loser,
         timeval:this.timeval,
     }}
-    updata() { return this.json(); }
-}
-class WaitingRoomRestartState extends RoomState(0) {
-    msg = 'restart';
-    constructor(lstate) { super(lstate); TimeVal.SECONDS(1).start(()=>this.upgrade(WaitingState.fromRestart(this))); }
-    json() { return {msg: this.msg}; }
     updata() { return this.json(); }
 }
