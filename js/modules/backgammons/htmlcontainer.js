@@ -1,5 +1,5 @@
 import { API_URL_PART, IS_HOSTED_STATIC } from "../config.js";
-import { range, EventProvider, FCPromise } from "./Utilities.js";
+import { range, EventProvider, FCPromise, sleep } from "./Utilities.js";
 import { ConnectionStables } from "./WSEP.js";
 import { BetsLoaded, siteLanguageInited } from "./syncronous.js";
 
@@ -395,7 +395,7 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
     super();
     const self = this;
     this.onAccept = FCPromise();
-    this.ready = this.firstready = siteLanguageInited.then(siteLanguage=>{
+    this.ready = this.firstready = siteLanguageInited.then(async siteLanguage=>{
       let popupElement = this.htmlelement = document.createElement("div");
       popupElement.classList.add("popup");
       popupElement.innerHTML = /*html*/`
@@ -405,7 +405,7 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
                   <img src="img/popup-alert.png" alt="" />
                 </div>
                 <div class="popup__text">
-                  ${text}
+                  Войти как наблюдатель?
                 </div>
                 <div class="popup__buttons">
                   <button class="popup__button popup__submit-button red">${siteLanguage.words.yes}</button>
@@ -413,7 +413,8 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
                 </div>
               </div>
             </div>`;
-      const [enter, exit] = popupElement.getElementsByClassName('popup__buttons');
+      await sleep(10);
+      const [enter, exit] = popupElement.getElementsByClassName('popup__button');
       enter.addEventListener('click', ()=>(this.onAccept.resolve(true),this.close(true)));
       exit.addEventListener('click', ()=>this.close());
       this.onclose(()=>this.onAccept.resolve(false));

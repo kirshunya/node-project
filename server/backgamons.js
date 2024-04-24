@@ -179,7 +179,7 @@ const WSPipelineCommands = {
      */
     TestLate(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID)
-        Game.restartTest()
+        Game.RoomState.restartLate?.()
         Game.event('restart__', {});
     },
     /**
@@ -189,7 +189,7 @@ const WSPipelineCommands = {
      */
     TestFlud(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID)
-        Game.restartFlud()
+        Game.RoomState.restartFlud?.()
         Game.event('restart__', {});
     },
     /**

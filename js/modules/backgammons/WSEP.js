@@ -118,12 +118,11 @@ const EventsRoutes = ({
 
         // GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
 
-        window.TimersTurn = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
+        window.TimersTurnButton = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
         // (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
     },
-    async ['TimersTurn']({TimersTurn}){
-        window.TimersTurn = TimersTurn
-        TimersTurnDebugButton.value = `timers:${TimersTurn?'on':'off'}`
+    async ['TimersTurn'](initData){
+        document.getElementById('TimersTurnButton').innerHTML = `Timers ${initData.TimersTurn?'ON':'OFF'}`
     },
     ['autodiceset']({userId, value}) {
         if(!userId || userId === getLocalUser().userId) GamePool.autostep.setdice(value);

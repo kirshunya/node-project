@@ -11,7 +11,7 @@ import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
-import { playLose, setGameSoundsAllowed } from '../audio.js';
+import { playBckgGameStart, playLose, setGameSoundsAllowed } from '../audio.js';
 
 const TeamFromTeamId = {
   [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
@@ -142,13 +142,16 @@ export function ShowGameTable(localUser, GameID) {
 // );
 /** @type {Number} in seconds*/
 const STEPTIME = 25;
+function ServerTimeStampCompinsationUser(timestamp, setter) {
+  return ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
+}
 class Timer {
   constructor(Element, value, _STEPTIME = STEPTIME, red=false) {
       const TLabel = Element.getElementsByClassName('timer')[0];
       const TIcon = Element.getElementsByClassName('stimer')[0];
       TIcon.classList.toggle('red', red);
       let [userTime, tsamp] = value;
-      if(tsamp) ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
+      if(tsamp) ServerTimeStampCompinsationUser(tsamp, __timestamp=>tsamp=__timestamp)
       let diff = 0;
       function labelTlabel() {
         const seconds = userTime + diff;
@@ -244,6 +247,7 @@ export async function InitGame(GameInitData, localUser, ws) {
           showNewPopup(new waitingPopup(betId, initData.players));
           isVisitor(initData.players);
       }, [1](initData) { // Launching
+          playBckgGameStart();
           showNewPopup(new BackgammonsLaunchingPopup(betId, initData.players, initData.timeval));
           isVisitor(initData.players);
       }, [2](initData) { // DiceTeamRolling
@@ -270,6 +274,7 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
+          document.getElementById('TimersTurnButton').innerHTML = `Timers ${initData.TimersTurn?'ON':'OFF'}`
           isVisitor(initData.players);
           const localPlayer = __playerById(initData.players)[localUser.userId];
           if(localPlayer) {
@@ -340,7 +345,7 @@ export async function InitGame(GameInitData, localUser, ws) {
         ];
         resetTimersIntervals(startTogetherTimer(Timers));
       },
-      ['disconntAll']:()=>{
+      ['discontAll']:()=>{
         // location.hash = '#backgammons-menu';
         window.history.back();
         ConnectionStables.disconnect();

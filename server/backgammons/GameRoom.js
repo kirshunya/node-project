@@ -164,6 +164,7 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
             delete this.Connections[ctx.rikey];
     }
     disconnectAll() {
+        this.event('discontAll');
         this.Connections = {};
     }
     event(event, obj={}) {
@@ -491,6 +492,7 @@ class GameStarted extends RoomState(3) {
         this.ActiveTeam = WhiteIsFirstPlayer?WHITEID:BLACKID;
         this.Timers.onfinish(()=>this.endGame(this.opponent.team, 'timer', 'timer'));
         this.Timers.curTimer = this.ActiveTeam;
+        this.Room.events.onstart.send();
     }
     /** @param {DiceTeamRollState} wstate  */
     static fromDiceTeamRollState({Room, players, Dices}) {
@@ -531,11 +533,10 @@ class GameStarted extends RoomState(3) {
     }
     nextState(rollDice=false, stop=false) {
         const Dices = this.Dices = !stop&&(this.opponent.autodice||rollDice)?GameStarted._rollDices():[0, 0];
-        const ActiveTeam = this.ActiveTeam = rollDice||stop?this.ActiveTeam:nextTeamDict[this.ActiveTeam];
+        const ActiveTeam = this.ActiveTeam = (rollDice||stop)?this.ActiveTeam:nextTeamDict[this.ActiveTeam];
 
         if(stop) this.Timers.curTimer = null;
         else if(!rollDice) this.Timers.curTimer = ActiveTeam;
-        console.log('nextState', rollDice, stop, ActiveTeam, Dices, this.activeplayer.autodice)
         return { Dices, ActiveTeam };
     }
     /** @param {ConnectionContext} ctx  */
@@ -543,12 +544,20 @@ class GameStarted extends RoomState(3) {
         const [p1, p2] = this.players
         console.log('restart__', this.players, user, ...arguments);
         /** @type {TPlayer[]} */
-        const [player, opponent] = p1.userId === user.userId && [p1, p2] || p2.userId === user.userId && [p2, p1]
+        const [player, opponent] = (p1.userId === user.userId
+             && [p1, p2]) || (p2.userId === user.userId && [p2, p1])
         if(player) {
             this.endGame(opponent.team, 'restart__', 2);
             return {result:'restart__'};
         } 
         return {result:'nope'};
+    }
+    restartLate() {
+        this.Slots = adv0_range(0, 24, { 19:[15,1], 6:[15,2], null:()=>[0,0] });
+    }
+    restartFlud() {
+        const black1 = [1,2];
+        this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[9,2], 1:black1, 2:black1, 3:black1, 4:black1, 5:black1, 6:black1, null:()=>[0,0] });
     }
     /** @param {ConnectionContext} ctx  */
     rollDice(ctx) {
@@ -566,7 +575,8 @@ class GameStarted extends RoomState(3) {
         this.Room.event('end', {winner: WinnerTeam, msg, code});
         this.Timers.off();
         this.Room.events.onfinish.send();
-        const [winner, loser] = this.players.sort((p1, p2)=>p1.team === WinnerTeam ? 0 : 1);
+        const [p1, p2] = this.players;
+        const [winner, loser] = p1.team === WinnerTeam ? [p1, p2] : [p2, p1];
         this.upgrade(WinState.fromGameStarted(this, winner, loser))
     }
 
@@ -619,10 +629,9 @@ class WinState extends RoomState(4) {
         this.loser = loser
         this.players = [winner, loser]
         this.timeval = TimeVal.SECONDS(10).start(()=>{
-            lstate.Room.disconnectAll();
             this.players = [];
+            this.Room.disconnectAll();
             this.Room.events.onexit.send();
-            this.Room.event('discontAll');
             this.upgrade(new WaitingState(lstate))
         })
 

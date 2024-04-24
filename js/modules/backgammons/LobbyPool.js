@@ -216,8 +216,7 @@ async function onclick([betId, tableId], {players}) {
             // await (new )
             if(players.filter((player)=>player.userId === userId).length) ConnectionStables.connectToRoom([betId, tableId]);
             else if(await (new BackgammonsEnterAsVisitorPopup()).showOnReady().onAccept) ConnectionStables.connectToRoomAsVisitor([betId, tableId]);
-        }
-        BetsLoaded.then(({BackgammonsBETS})=>{
+        } else BetsLoaded.then(({BackgammonsBETS})=>{
             if(getLocalUser().balance < BackgammonsBETS[betId].bet) return openErorPopup('Недостаточно денег на счету');
             return ConnectionStables.connectToRoom([betId, tableId]);
         })
