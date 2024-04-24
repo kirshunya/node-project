@@ -398,31 +398,21 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
       let popupElement = this.htmlelement = document.createElement("div");
       popupElement.classList.add("popup");
       popupElement.innerHTML = /*html*/`
-        <div class="popup">
-          <div class="popup__body">
-            <div class="popup__content domino-lose-popup">
-            <div class="popup__text domino-lose-popup__text">
-              <p class = "domino-lose-popup__title">Войти как наблюдатель?</p>
-              <p id="domino-lose-popup-lost" class="domino-lose-popup__title">Нарды</p>
-              <p class="domino-lose-popup__winners domino-lose-popup__winners-text"></p>
-              <div
-                style="
-                  display: flex; justify-content: center;
-                  flex-wrap: wrap; gap: 10px; 
-                ">
-                  <button class="domino-waiting-popup__button domino-waiting-popup__button-room" >
-                    Войти как наблюдатель
-                  </button>
-                  <button class="domino-waiting-popup__button domino-waiting-popup__button-games">
-                    Отмена
-                  </button>
+              <div class="popup__body exit-room-popup">
+              <div class="popup__content">
+                <div class="popup__img">
+                  <img src="img/popup-alert.png" alt="" />
+                </div>
+                <div class="popup__text">
+                  ${text}
+                </div>
+                <div class="popup__buttons">
+                  <button class="popup__button popup__submit-button red">${siteLanguage.words.yes}</button>
+                  <button class="popup__button close-popup green">${siteLanguage.words.no}</button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      `;
-      const [enter, exit] = popupElement.getElementsByClassName('domino-waiting-popup__button');
+            </div>`;
+      const [enter, exit] = popupElement.getElementsByClassName('popup__buttons');
       enter.addEventListener('click', ()=>(this.onAccept.resolve(true),this.close(true)));
       exit.addEventListener('click', ()=>this.close());
       this.onclose(()=>this.onAccept.resolve(false));
@@ -430,3 +420,41 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
     });
   }
 }
+
+body.appendChild(popupElement);
+
+const button = body.querySelector(".popup__submit-button");
+button.addEventListener("click", async () => {
+  close(popupElement);
+
+  let user = localStorage.getItem("user");
+  if (user) {
+    user = JSON.parse(user);
+  } else return;
+
+  let ws = window.ws;
+  let closeMsg = {
+    reason: "rejectGameBet",
+    method: "rejectGameBet",
+    roomId: roomId,
+    bet: bet,
+    userId: user.userId,
+  };
+  ws.send(JSON.stringify(closeMsg));
+
+  // let responce = await impHttp.deleteTicketsReturnBalance(roomId, bet);
+  // if (responce.status == 200) {
+  //   authinterface.updateBalance(responce.data.balance);
+  //   location.hash = "";
+  // } else {
+  //   open("Ошибка выхода из игры", 300);
+  // }
+  // responce.data.balance
+});
+
+const closeButtons = document.querySelectorAll(".close-popup");
+closeButtons.forEach((closeButton) => {
+  closeButton.addEventListener("click", function () {
+    close(popupElement);
+  });
+});

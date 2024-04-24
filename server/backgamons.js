@@ -177,7 +177,7 @@ const WSPipelineCommands = {
      * @param {ConnectionContext} ctx 
      * @returns 
      */
-    restartTest(ctx) {
+    TestLate(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID)
         Game.restartTest()
         Game.event('restart__', {});
@@ -187,7 +187,7 @@ const WSPipelineCommands = {
      * @param {ConnectionContext} ctx 
      * @returns 
      */
-    restartFlud(ctx) {
+    TestFlud(ctx) {
         const Game = GamesLobby.getGameByID(ctx.GameID)
         Game.restartFlud()
         Game.event('restart__', {});
@@ -199,6 +199,16 @@ const WSPipelineCommands = {
      */
     TimersTurnSet(ctx, msg) {
         Debug.TimersTurn = msg.TimersTurn
+        console.log('settimers', msg)
+        GamesLobby.getGameByID(ctx.GameID).event('TimersTurn', {TimersTurn:Debug.TimersTurn});
+    },
+    /**
+     * Debug function, turn on/off timer
+     * @param {ConnectionContext} ctx 
+     * @returns 
+     */
+    TimersTurn(ctx, msg) {
+        Debug.TimersTurn = !Debug.TimersTurn
         console.log('settimers', msg)
         GamesLobby.getGameByID(ctx.GameID).event('TimersTurn', {TimersTurn:Debug.TimersTurn});
     }

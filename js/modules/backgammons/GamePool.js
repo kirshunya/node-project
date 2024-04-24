@@ -11,6 +11,7 @@ import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
+import { playLose, setGameSoundsAllowed } from '../audio.js';
 
 const TeamFromTeamId = {
   [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
@@ -220,11 +221,15 @@ export async function InitGame(GameInitData, localUser, ws) {
           oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
       }
     }
-
-    document.getElementById('TopPan')
-              .getElementsByClassName('buttons')[0]
-                  .children[0]
-                      .addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
+    function turnSound() {
+        const soundAllowed = localStorage.getItem(`sounds-game`);
+        localStorage.setItem('sounds-game', {true:`false`, false:`true`}[soundAllowed])
+        return {true:false, false:true}[soundAllowed]
+    }
+    const [restart, sound, autodice] = document.getElementById('TopPan')
+                                          .getElementsByClassName('buttons')[0].children;
+    restart.addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
+    sound.addEventListener('click', ()=>setGameSoundsAllowed(turnSound()));
     const __playerById = ([firstPlayer, secondPlayer])=>({[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer});
     /** @type {showablePopup} */
     let elcaPopup = null;
@@ -296,6 +301,7 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ TimersByTeam.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [4]({Slots, Drops, players, winner, loser, timeval}) { // Win // here's started timer to emojis send on Win
+          playLose()
           isVisitor(players);
           if(!prevState) { // если только перезагрузили или открыли страницу
             const [firstPlayer, secondPlayer] = players;
@@ -335,7 +341,8 @@ export async function InitGame(GameInitData, localUser, ws) {
         resetTimersIntervals(startTogetherTimer(Timers));
       },
       ['disconntAll']:()=>{
-        location.hash = '#backgammons-menu';
+        // location.hash = '#backgammons-menu';
+        window.history.back();
         ConnectionStables.disconnect();
       },
       ['step']:({step, prevstate, newstate, code})=>{

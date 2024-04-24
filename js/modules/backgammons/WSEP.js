@@ -89,7 +89,7 @@ export const ConnectionStables = {
         }
     }
 }
-/*lotoserviced*/const EventsRoutes = ({
+const EventsRoutes = ({
     ["backgammons::GameStarted"]({players, slots, state}){
         ConnectionStables.Room.onGameStarted.resolve({players, slots, state})
     },

@@ -212,11 +212,17 @@
       <span>Режим Наблюдателя</span>
       <span class="domino-waiting-popup__button">Выйти</span>
     </div>
+    <div id="DebugPanel" class="">
+      <span>Режим Админа</span>
+      <span class="domino-waiting-popup__button" onclick="TestFlud()">Test Flud</span>
+      <span class="domino-waiting-popup__button" onclick="TestLate()">Test Late</span>
+      <span class="domino-waiting-popup__button" id="TimersTurn" onclick="TimersTurnSet()">Timers ??</span>
+    </div>
     <style>
       .backgammons-visitor {
         max-width: 100%;
         img {
-          max-width: 100%;
+          max-width: 30%;
           margin: auto;
           max-height: 1.2rem;
         }
@@ -242,11 +248,41 @@
           display: none;
         }
       }
+      #DebugPanel {
+        z-index: 99;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        
+        padding: 0.75rem;
+        background: #042912;
+        border: 1px solid #ff0808;
+        border-radius: 10px;
+        color: white;
+        font-size: 1.5rem;
+
+        /* opacity: 75; */
+        &:first-child {
+          padding-bottom: 0.3rem;
+        }
+        &.hidden {
+          display: none;
+        }
+      }
     </style>
     <script>
       window.addEventListener('popstate', ()=>{
         // if(location.hash === "#backgammons-menu") location.hash = "#gamemode-choose"
       })
+      function TimersTurn() {
+        window.ws.send(JSON.stringify({method:'TimersTurn'}))
+      }
+      function TestFlud() {
+        window.ws.send(JSON.stringify({method:'TestFlud'}))
+      }
+      function TestLate() {
+        window.ws.send(JSON.stringify({method:'TestLate'}))
+      }
     </script>
   </body>
 </html>
