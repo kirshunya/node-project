@@ -200,6 +200,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     const promisableinitables = {
       playersComplete : FCPromise(),
       SlotsNDropsComplete : FCPromise(),
+      IsRevers : FCPromise()
     }
     const gp = new GameProvider({ User:localUser, sendstep }, promisableinitables);
     
@@ -285,6 +286,7 @@ export async function InitGame(GameInitData, localUser, ws) {
           hidePopups();
 
           gp.eventHandlers.start(initData, initData.players);
+          promisableinitables.IsRevers.resolve(blackplayer.userId === localUser.userId);
           promisableinitables.SlotsNDropsComplete.resolve([initData.Slots, initData.Drops]);
 
           TimersByTeam = [
@@ -300,6 +302,7 @@ export async function InitGame(GameInitData, localUser, ws) {
             const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
             UsersPanUI.initAvatars(whiteplayer, blackplayer);
 
+            promisableinitables.IsRevers.resolve(blackplayer.userId === localUser.userId);
             promisableinitables.SlotsNDropsComplete.resolve([Slots, Drops]);
           }
           BetsLoaded.then(({BackgammonsBETS})=>{
@@ -309,7 +312,8 @@ export async function InitGame(GameInitData, localUser, ws) {
             const prize = bet.bet - comission; // prize with comission
 
             if(winner.userId === localUser.userId) showNewPopup(new BackgammonsWinPopup(betId, winner, prize));
-            if(loser.userId === localUser.userId) showNewPopup(new BackgammonsLosePopup(betId, winner));
+            else if(loser.userId === localUser.userId) showNewPopup(new BackgammonsLosePopup(betId, winner));
+            else showNewPopup(new BackgammonsLosePopup(betId, winner));
           })
 
           const Timers = [
@@ -329,6 +333,10 @@ export async function InitGame(GameInitData, localUser, ws) {
           new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, 'red')
         ];
         resetTimersIntervals(startTogetherTimer(Timers));
+      },
+      ['disconntAll']:()=>{
+        location.hash = '#backgammons-menu';
+        ConnectionStables.disconnect();
       },
       ['step']:({step, prevstate, newstate, code})=>{
         // if(localUser.userId === 2)

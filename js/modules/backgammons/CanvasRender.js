@@ -1,6 +1,6 @@
 import { range, $myeval, ondom, sleep, black, EventProvider, Toast } from "./Utilities.js";
 import { BoardConstants, refToArr, slotinfo, TState } from "./BoardConstants.js";
-import { CONFIGS } from "./Configurations.js";
+import { CONFIGS } from "./BoardConstants.js";
 import * as audios from './../audio.js'
 const { WHITE, BLACK, EMPTY } = BoardConstants; 
 
@@ -399,7 +399,7 @@ class BoardCanvasEffects {
         // for (let ghost of this.enabledGhosts) this.canvas.remove(ghost.img);
         this.clearGhosts();
         /** @type {Array.<[string, (int[]|[Number, Number])]>} */
-        const availableKeys = Object.entries(BoardCanvas.gc.UserMovesFrom(fromIndex));
+        const availableKeys = Object.entries(BoardCanvas.gc.UserMovesFrom(CanvasCoordinates(this.BoardCanvas.reverse, fromIndex)));
         const ghosts = availableKeys.map(([key, points])=>{
             if (key === WHITE.over || key === BLACK.over) {
                 // TODO: DropRegion
@@ -409,13 +409,13 @@ class BoardCanvasEffects {
                 return new Promise(resolve=>resolve());
             }
             // this.createGhost(key, this.slots[key].count(), fromIndex);
-            return self.createGhostChecker(key, BoardCanvas.slots[key].count(), move);
+            return self.createGhostChecker(CanvasCoordinates(this.BoardCanvas.reverse, key), BoardCanvas.slots[CanvasCoordinates(this.BoardCanvas.reverse, key)].count(), move);
         });
         Promise.all(ghosts).then(()=>self.selectionChecker.bringToFront());
         function move(slotIndex) {
             if(self.moving) return;
-            if(!self.BoardCanvas.gc.move(fromIndex, slotIndex)) alert('some error in checker move command..');
-            self.BoardCanvas.moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
+            if(!self.BoardCanvas.gc.move(CanvasCoordinates(self.BoardCanvas.reverse, fromIndex), CanvasCoordinates(self.BoardCanvas.reverse, slotIndex))) alert('some error in checker move command..');
+            self.BoardCanvas._moveChecker(fromIndex, slotIndex);//Стоит ли делать типа список "сделанных ходов но не подтверждённых?"
             self.clearGhosts();
             onmove?.();
         }
@@ -439,7 +439,7 @@ class BoardCanvasEffects {
     showCheckersWhichCanMove(Dice) {
         this.clear()
         this.yellowCheckers = this.BoardCanvas.gc.MovesByDices(Dice).map(([awa, index])=>{
-            const checker = this.BoardCanvas.slots[index].last();
+            const checker = this.BoardCanvas.slots[CanvasCoordinates(this.BoardCanvas.reverse, index)].last();
             checker.img.filters.push(new fabric.Image.filters.BlendColor({
                 color: 'yellow', 
                 alpha: 0.5, 
@@ -556,12 +556,13 @@ export class BoardCanvas extends CanvasFunctions {
             [BLACK.over]: new TopDropLunk('Bottom', 0)
         };
         super.setbackground(gameboardpic);
-        promisesinitlist.SlotsNDropsComplete.then(([GSlots, GDropped])=>{
+        promisesinitlist.SlotsNDropsComplete.then(async([GSlots, GDropped])=>{
+            this.reverse = await promisesinitlist.IsRevers;
             Object.entries(GDropped).map(([overname, count])=>this.drops[overname].count = count)
             // [this.drops.whiteover.count, this.drops.blackover] = GDropped;
             this.PromisesOfCreatingPictures = Promise.all(GSlots.map((slotinfo, slotIndex)=>{
                     const slot = new refToArr(slotinfo);
-                    const SlotLet = self.slots[slotIndex] = new Slot(slotIndex);
+                    const SlotLet = self.slots[CanvasCoordinates(this.reverse, slotIndex)] = new Slot(CanvasCoordinates(this.reverse, slotIndex));
                     if(slot.Count<0) new Toast({
                         title: 'Ошибка сервера',
                         text:`На сервере произошла ошибка, количество пешек на одном из слотов <font color="bkue">отрицательное</font>. <font color="green">Пожалуйста перезапустите игру.</font> Эта ошибка возможна только в режиме <font color="red">отладки</font>, когда все <u>проверки отключены</u>, в продукте этого не будет.`,
@@ -821,15 +822,15 @@ export class BoardCanvas extends CanvasFunctions {
                     this._effects.moving = false;
                     const enteredTo = this._effects.enteredIntoGhost(img);
                     if(enteredTo) {
-                        if(!self.gc.move(checkerFromImg.slot.index, enteredTo[1])) alert('some error in checker move command..');
+                        if(!self.gc.move(CanvasCoordinates(this.reverse, checkerFromImg.slot.index), CanvasCoordinates(this.reverse, enteredTo[1]))) alert('some error in checker move command..');
                         self._effects.clearGhosts();
-                        self.moveChecker(checkerFromImg.slot.index, enteredTo[1])
+                        self._moveChecker(checkerFromImg.slot.index, enteredTo[1])
                     } else {
                         if(Colour === WHITE.id && img.top < 10 && this.drops[WHITE.over].resolver) {
                             this.drops[WHITE.over].resolver()
                         } else if(Colour === BLACK.id && img.top+img.height > BoardHeight-66 && this.drops[BLACK.over].resolver) {
                             this.drops[BLACK.over].resolver()
-                        } else self.moveChecker(checkerFromImg.slot.index,
+                        } else self._moveChecker(checkerFromImg.slot.index,
                                                 checkerFromImg.slot.index, false)
                     }
                 })
@@ -837,19 +838,21 @@ export class BoardCanvas extends CanvasFunctions {
                 return ([checkerFromImg, slotIndex, checkerIndex]);
             })
     }
+    moveChecker(from, to, clear=true, umimg) {
+        return this._moveChecker(CanvasCoordinates(this.reverse, from), CanvasCoordinates(this.reverse, to), clear, umimg)
+    }
     /**
      * 
      * @param {int} from 
      * @param {int} to 
      */
-    moveChecker(from, to, clear=true, umimg) {
+    _moveChecker(from, to, clear=true, umimg) {
         clear&&this._effects.clearGhosts();
         const {canvas} = this;
         let isOver = to === WHITE.over || to === BLACK.over;
         const checker = (from === WHITE.over || from === BLACK.over)
                                         ? alert('moveChecker from Over?? in CanvasRender.js')
                                         : this.slots[from].getRemoveLast()
-        
         if(isOver) {
             const drop = this.drops[to];
             const Direction = {[WHITE.over]:-checkerSize, [BLACK.over]:BoardHeight+checkerSize}[to]
@@ -891,7 +894,9 @@ export class BoardCanvas extends CanvasFunctions {
         }
     }
 }
-
+function CanvasCoordinates(reverse, index) {
+    return reverse?(+index+12)%24:+index
+}
 
 // function resetGame(){
 //     for (let team = 0; team < 2; team++){

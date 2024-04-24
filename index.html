@@ -221,7 +221,6 @@
           max-height: 1.2rem;
         }
       }
-      .a{}
       #VisitorLabel {
         z-index: 99;
         position: fixed;
@@ -244,5 +243,10 @@
         }
       }
     </style>
+    <script>
+      window.addEventListener('popstate', ()=>{
+        // if(location.hash === "#backgammons-menu") location.hash = "#gamemode-choose"
+      })
+    </script>
   </body>
 </html>

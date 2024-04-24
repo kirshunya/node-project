@@ -72,6 +72,9 @@ export const ConnectionStables = {
           );
         return this.connectsended = true;
     },
+    connectToRoomAsVisitor([betId, roomId]) {
+
+    },
     disconnect() {
         if(this.Room){
             window.ws.send(

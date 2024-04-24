@@ -1,5 +1,5 @@
 import { API_URL_PART, IS_HOSTED_STATIC } from "../config.js";
-import { range, EventProvider } from "./Utilities.js";
+import { range, EventProvider, FCPromise } from "./Utilities.js";
 import { ConnectionStables } from "./WSEP.js";
 import { BetsLoaded, siteLanguageInited } from "./syncronous.js";
 
@@ -82,6 +82,7 @@ export class showablePopup {
   htmlelement;
   get isOpened() { return document.body.contains(this.htmlelement); }
   onclose = new EventProvider();
+  constructor() { window.addEventListener('popstate', ()=>{ if(this.isOpened) this.close(); }) }
 
   show() { document.body.appendChild(this.htmlelement); }
   close(perm=false) { this.htmlelement.remove(); !perm&&this.onclose.send(); }
@@ -146,7 +147,6 @@ export class waitingPopup extends showablePopup {
       return popupElement;
     });
     this.onclose.subsrcibe(()=>this.exitBackgammons());
-    window.addEventListener('popstate', ()=>{ if(this.isOpened) this.close(); })
     this.ready = Promise.all([
       this.firstready.then(()=>this.initTimer()),
       this.firstready.then(()=>this.initQuitToMainMenuControl()),
@@ -367,49 +367,6 @@ export class BackgammonsLosePopup extends showablePopup {
       `;
       document.body.appendChild(popupElement);
   
-      // let showPoints = true;
-      // // if game was finished because of no available turns
-  
-      // let user = localStorage.getItem("user");
-      // if (user) {
-      //   user = JSON.parse(user);
-      // }
-  
-      // playersTiles.forEach((playerTiles) => {
-      //   if (playerTiles.tiles.length == 0) {
-      //     showPoints = false;
-      //   }
-      // });
-  
-      // const winnersBlock = popupElement.querySelector(
-      //   ".domino-lose-popup__winners"
-      // );
-  
-      // // insert before winners block new div
-      // if (showPoints) {
-      //   const newDiv = document.createElement("div");
-      //   newDiv.classList.add("domino-lose-popup__title");
-      //   if (gameMode == "CLASSIC") {
-      //     newDiv.innerHTML = siteLanguage.popups.youLostMorePoints;
-      //   } else {
-      //     newDiv.innerHTML = siteLanguage.popups.youLostPoints;
-      //   }
-      //   const lostText = document.querySelector("#domino-lose-popup-lost");
-      //   if (lostText) {
-      //     lostText.remove();
-      //   }
-  
-      //   winnersBlock.parentNode.insertBefore(newDiv, winnersBlock);
-      // }
-  
-      // formPopupTiles(
-      //   playersTiles,
-      //   popupElement,
-      //   gameMode == "CLASSIC",
-      //   false,
-      //   showPoints
-      // );
-  
       let timerElement = popupElement.querySelector(".close-popup-timer");
   
       // Устанавливаем начальное значение таймера
@@ -429,6 +386,47 @@ export class BackgammonsLosePopup extends showablePopup {
       }
   
       let timerInterval = setInterval(updateTimer, 1000);
+    });
+  }
+}
+export class BackgammonsEnterAsVisitorPopup extends showablePopup {
+  constructor(betId) {
+    super();
+    const self = this;
+    this.onAccept = FCPromise();
+    this.ready = this.firstready = siteLanguageInited.then(siteLanguage=>{
+      let popupElement = this.htmlelement = document.createElement("div");
+      popupElement.classList.add("popup");
+      popupElement.innerHTML = /*html*/`
+        <div class="popup">
+          <div class="popup__body">
+            <div class="popup__content domino-lose-popup">
+            <div class="popup__text domino-lose-popup__text">
+              <p class = "domino-lose-popup__title">Войти как наблюдатель?</p>
+              <p id="domino-lose-popup-lost" class="domino-lose-popup__title">Нарды</p>
+              <p class="domino-lose-popup__winners domino-lose-popup__winners-text"></p>
+              <div
+                style="
+                  display: flex; justify-content: center;
+                  flex-wrap: wrap; gap: 10px; 
+                ">
+                  <button class="domino-waiting-popup__button domino-waiting-popup__button-room" >
+                    Войти как наблюдатель
+                  </button>
+                  <button class="domino-waiting-popup__button domino-waiting-popup__button-games">
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      const [enter, exit] = popupElement.getElementsByClassName('domino-waiting-popup__button');
+      enter.addEventListener('click', ()=>(this.onAccept.resolve(true),this.close(true)));
+      exit.addEventListener('click', ()=>this.close());
+      this.onclose(()=>this.onAccept.resolve(false));
+      // document.body.appendChild(popupElement);
     });
   }
 }
