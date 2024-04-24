@@ -115,7 +115,8 @@ export function dominoChoosePageListeners() {
     //   impPopup.openErorPopup(siteLanguage.popups.pageUnavailable);
     //   return;
     // }
-    location.hash = "#backgammons-menu";
+    window.history.pushState(null, '', "#backgammons-menu");
+    impNav.hashNavigation();
   });
 
   let lotoButton = document.querySelector(".mode-item.loto");

@@ -203,7 +203,8 @@ export class waitingPopup extends showablePopup {
   exitToMain() {
     try {
       ConnectionStables.disconnect();
-      location.hash = '#gamemode-choose';
+      window.history.go(-2);
+      // location.hash = '#gamemode-choose';
     } catch {
       impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
       setTimeout(() => location.reload(), 3000);

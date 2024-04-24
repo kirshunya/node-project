@@ -82,7 +82,8 @@ export const ConnectionStables = {
                 method: "backgammons/disconnt",
                 })
             );
-            if(location.hash !== '#backgammons-menu') location.hash = '#backgammons-menu';
+            // if(location.hash !== '#backgammons-menu') location.hash = '#backgammons-menu';
+            window.history.go(-1);
             VisitorLabel.classList.toggle('hidden', true);
             this.connectsended = this.Room = null;
             resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
