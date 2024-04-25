@@ -1,5 +1,5 @@
 //надо выделить функции finishGame для завершения игры и ведения статистики и startGame, для вычита баланса при старте игры и, возможно, если такое есть в сервисе, вести лог в бд
-const { User, BackgammonsRooms, BackgammonGameHistory } = require('../models/db-models');
+const { User, BackgammonsRooms, BackgammonGameHistory } = require('../models/db-models.js');
 const BackgammonsBETS = require('../../json/bets.json').BackgammonsBETS;
 async function balanceTravers(winner, loser, betId) {
     const bet = BackgammonsBETS[betId];
@@ -25,7 +25,7 @@ async function balanceTransaction(userId, balanceDifferncial) {
 }
 /**
  * @param {int} userId
- * @returns {import('../models/db-models').UserModel}
+ * @returns {import('../models/db-models.js').UserModel}
  */
 async function getUser(userId) {
   return await User.findOne({ where: { id: userId }, });
@@ -36,7 +36,7 @@ async function getUserBalance(userId) {
 }
 async function sendUpdateBalance(userId, balance) {
   // console.log(getaWSS, )
-  const aWSS = require('./../backgamons.js').getaWSS();
+  const aWSS = require('../backgamons.js').getaWSS();
   for(const client of aWSS.clients) {
     console.log(client.ctx?.user, userId, client.ctx?.user?.userId === userId);
     if(client.ctx?.user?.userId === userId)
@@ -88,4 +88,15 @@ async function createRooms(){
       const room = await BackgammonsRooms.create({ betId, roomId })
     }
   }
+}
+
+async function findAdminData(){
+  return await BackgammonGameHistory.findAll({
+    attributes: [
+      'bet',
+      [sequelize.fn('sum', sequelize.col('commision')), 'commision_sum'],
+      [sequelize.fn('count', 'bet'), 'games_count'],
+    ],
+    group: ['bet'],
+  });
 }

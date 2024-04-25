@@ -1,7 +1,7 @@
 const { serializable } = require("./serializablewtf.js");
 const { getRandomInt, FCPromise } = require("./Utility");
 const { CONSTANTS, Debug, TUser, TPlayer, TState, ConnectionContext, EventProvider, nextTeamDict, makeEvent } = require("./Generals");
-const { balanceTravers, getUserBalance } = require("./aaaa.js");
+const { balanceTravers, getUserBalance } = require("./DataBaseFunctions.js");
 const { WHITEID, BLACKID } = CONSTANTS;
 
 const timestamp = ()=>Date.now();
