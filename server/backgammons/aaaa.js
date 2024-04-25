@@ -1,5 +1,5 @@
 //надо выделить функции finishGame для завершения игры и ведения статистики и startGame, для вычита баланса при старте игры и, возможно, если такое есть в сервисе, вести лог в бд
-const { User } = require('../models/db-models');
+const { User, BackgammonsRooms, BackgammonGameHistory } = require('../models/db-models');
 const BackgammonsBETS = require('../../json/bets.json').BackgammonsBETS;
 async function balanceTravers(winner, loser, betId) {
     const bet = BackgammonsBETS[betId];
@@ -49,3 +49,43 @@ function logInvalidTransaction(userId, balanceDifferncial, e) {
 module.exports = {
   balanceTravers, getUser, getUserBalance
 };
+
+async function logGameStatsToHistory(betId, roomId, startedAt, winnerId, looserId, comission){
+  const game = await BackgammonGameHistory.create({ betId: betId
+  , startedAt: startedAt
+  , comission: comission
+  , roomId: roomId
+  , bet: BackgammonsBETS[betId]
+  , winnerId: winnerId
+  , looserId: looserId
+  , finishedAt: new Date})
+}
+
+async function waitingStartRoom(betId, roomId, player1Id){
+  const room = await BackgammonsRooms.find({where:{betId, roomId}});
+  room.update({ startedWaitingAt: new Date, player1Id: player1Id })
+}
+
+async function startRoom(betId, roomId, player2Id, scene, ActiveTeam, Dices, Drops, TeamsByPlayerId){
+  const room = await BackgammonsRooms.find({where:{betId, roomId}});
+  room.update({ startedAt: new Date, player2Id: player2Id, scene, ActiveTeam, Dices, Drops, TeamsByPlayerId });
+}
+
+async function updateRoomScene(scene, ActiveTeam, Dices, Drops){
+  const room = await BackgammonsRooms.find({where:{betId, roomId}});
+  room.update({ scene, ActiveTeam, Dices, Drops });
+}
+
+async function finishRoom(){
+  const room = await BackgammonsRooms.find({where:{betId, roomId}});
+  room.update({ startedAt: null, startedWaitingAt: null, player1Id: null, player2Id: null, scene: null, ActiveTeam: null, Dices: null, Drops: null, TeamsByPlayerId: null });
+}
+
+async function createRooms(){
+  await BackgammonsRooms.destroy({ where: {}, truncate: true })
+  for(const [betId, betInfo] of Object.entries(BackgammonsBETS)){
+    for (const roomId of range(1, 7)){
+      const room = await BackgammonsRooms.create({ betId, roomId })
+    }
+  }
+}

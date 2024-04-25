@@ -45,24 +45,23 @@ const BackgammonsRooms = sequelize.define('backgammonsRooms', {
     allowNull: false,
     autoIncrement: true,
   },
-  betId: { type: DataTypes.INTEGER }, 
-  roomId: { type: DataTypes.INTEGER }, 
+  betId: { type: DataTypes.INTEGER, allowNull: false }, 
+  roomId: { type: DataTypes.INTEGER, allowNull: false },
 
-  startedAt: { type: DataTypes.DATE, allowNull: false, },
-  startedWaitingAt: { type: DataTypes.DATE, allowNull: false, }, // if null, waiting closed, is `startedAt` === null, ignore
+  startedAt: { type: DataTypes.DATE },
+  startedWaitingAt: { type: DataTypes.DATE }, // if null, waiting closed, is `startedAt` === null, ignore
   isStarted: { type: DataTypes.VIRTUAL, get() { return !!this.get('startedAt'); } },
 
-  finishedAt: { type: DataTypes.DATE, allowNull: false, },
   isWaiting: { type: DataTypes.VIRTUAL, get() { return !!this.get('startedAt'); } },
 
   scene: { type: DataTypes.STRING },
   ActiveTeam: { type: DataTypes.INTEGER },
   Dices: { type: DataTypes.INTEGER },
-  drops: { type: DataTypes.INTEGER }, // like as []
+  Drops: { type: DataTypes.INTEGER }, // like as []
   TeamsByPlayerId: { type: DataTypes.INTEGER },
-  player1: { type: DataTypes.INTEGER },
+  player1Id: { type: DataTypes.INTEGER },
   player1Team: { type: DataTypes.VIRTUAL, get() { return this.get('TeamsByPlayerId') % 10; } },
-  player2: { type: DataTypes.INTEGER },
+  player2Id: { type: DataTypes.INTEGER },
   player2Team: { type: DataTypes.VIRTUAL, get() { return Math.ceil(this.get('TeamsByPlayerId') / 10); } },
 
 
@@ -78,13 +77,12 @@ const BackgammonGamesHistory = sequelize.define('BackgammonGamesHistory', {
     autoIncrement: true,
   },
   bet: { type: DataTypes.INTEGER }, // if Backgammon Bets edited, we will save old value here.
-  betId: { type: DataTypes.INTEGER }, 
-  roomId: { type: DataTypes.INTEGER }, 
+  betId: { type: DataTypes.INTEGER, allowNull: false} , 
+  roomId: { type: DataTypes.INTEGER, allowNull: false }, 
   startedAt: { type: DataTypes.DATE, allowNull: false, },
   finishedAt: { type: DataTypes.DATE, allowNull: false, },
-  players1Id: { type: DataTypes.INTEGER }, 
-  players2Id: { type: DataTypes.INTEGER }, 
   winnerId: { type: DataTypes.INTEGER }, 
+  looserId: { type: DataTypes.INTEGER }, 
   commision: { type: DataTypes.INTEGER },
 });
 
@@ -303,6 +301,8 @@ Deposit.belongsTo(User);
 module.exports = {
   User,
   Token,
+  BackgammonGamesHistory,
+  BackgammonsRooms,
   LotoSetting,
   LotoGame,
   LotoCard,
