@@ -351,7 +351,7 @@ export async function hashNavigation() {
   } else if (hash.includes("#backgammon-room-table")) {
     hideNavigation();
     const [hashName, betId, roomId] = hash.split("/");
-    WSEP.ConnectionStables.connectToRoom([betId, roomId])
+    WSEP.ConnectionStables.connectToRoom([betId, roomId], false)
     if (betId || roomId) {
       BackgammonGameTable.ShowGameTable(localUser, [betId, roomId]);
       // try {

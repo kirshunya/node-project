@@ -745,7 +745,8 @@ wssend.call(ws, ...args);
       if (navigator.onLine) {
         const newWs = connectWebsocketFunctions();
         window.ws = newWs;
-        location.hash = "#gamemode-choose";
+        if(!location.hash.includes('backgammon-room-table')) 
+          location.hash = "#gamemode-choose";
         impNav.pageNavigation(newWs);
         impNav.addHashListeners();
       }

@@ -5,7 +5,7 @@ async function balanceTravers(winner, loser, betId) {
     const bet = BackgammonsBETS[betId];
     const comission = bet.comission*2; // comission from 2 players
     const lose = bet.bet;
-    const prize = bet.bet - comission; // prize with comission
+    const prize = bet.bet*(1-comission); // prize with comission
 
     // get money from loser user
     await balanceTransaction(loser.userId, -lose);
@@ -14,11 +14,12 @@ async function balanceTravers(winner, loser, betId) {
 }
 async function balanceTransaction(userId, balanceDifferncial) {
   try {
-    const _user = await getUser(userId)
+    const _user = await getUser(userId);
+    const newbalance = _user.balance + balanceDifferncial;
     await _user.update({
-        balance: _user.balance + balanceDifferncial,
+        balance: newbalance,
     });
-    sendUpdateBalance(userId, _user.balance + balanceDifferncial)
+    sendUpdateBalance(userId, newbalance)
   } catch (e) {
     logInvalidTransaction(userId, balanceDifferncial, e);
   }
