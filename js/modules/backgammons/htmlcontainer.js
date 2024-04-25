@@ -192,6 +192,7 @@ export class waitingPopup extends showablePopup {
   exitBackgammons() {
     try {
       ConnectionStables.disconnect();
+      window.history.go(-1);
     } catch {
       impPopup.openErorPopup(siteLanguage.popups.connectionErrorText);
       setTimeout(() => location.reload(), 3000);

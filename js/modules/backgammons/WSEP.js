@@ -61,7 +61,10 @@ export const ConnectionStables = {
     debmess: [],
 
     connectsended: null,
-    connectToRoom([betId, roomId]) {
+    connectToRoom([betId, roomId], fromLobby=false) {
+        //emiting browser history
+        fromLobby&&history.replaceState({}, null, '#gamemode-choose');
+        fromLobby&&history.pushState({}, null, '#backgammons-menu');
         location.hash = `#backgammon-room-table/${betId}/${roomId}`;
         if(this.connectsended) return false;
         window.ws.send(
@@ -73,7 +76,7 @@ export const ConnectionStables = {
         return this.connectsended = true;
     },
     connectToRoomAsVisitor([betId, roomId]) {
-
+        return this.connectToRoom([betId, roomId]);
     },
     disconnect() {
         if(this.Room){
@@ -83,7 +86,6 @@ export const ConnectionStables = {
                 })
             );
             // if(location.hash !== '#backgammons-menu') location.hash = '#backgammons-menu';
-            window.history.go(-1);
             VisitorLabel.classList.toggle('hidden', true);
             this.connectsended = this.Room = null;
             resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
