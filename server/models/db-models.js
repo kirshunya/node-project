@@ -37,7 +37,7 @@ const User = sequelize.define("user", {
   losses: { type: DataTypes.INTEGER, defaultValue: 0 },
 });
 /** Settings for games, but i maked this for Backgammons  */
-const GamesSettings = sequelize.define('GamesSettings', {
+const GamesSettings = sequelize.define('gamessettings', {
   name: {
     type: DataTypes.STRING,
     primaryKey: true,
@@ -50,7 +50,7 @@ const GamesSettings = sequelize.define('GamesSettings', {
   }
 })
 /** some Backgammon Room curState -- unused in BackgammonGamesHistory data */
-const BackgammonsRooms = sequelize.define('backgammonsRooms', {
+const BackgammonsRooms = sequelize.define('backgammonsrooms', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -78,7 +78,7 @@ const BackgammonsRooms = sequelize.define('backgammonsRooms', {
   isAvialable: { type: DataTypes.BOOLEAN, defaultValue:true },
 });
 /** list of completed games  */
-const BackgammonGamesHistory = sequelize.define('BackgammonGamesHistory', {
+const BackgammonGamesHistory = sequelize.define('backgammongameshistory', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
