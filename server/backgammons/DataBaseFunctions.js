@@ -3,7 +3,7 @@ const { request } = require('express');
 const { User, BackgammonsRooms, BackgammonGamesHistory, Stats, GamesSettings } = require('../models/db-models.js');
 const { range } = require('./Utility.js');
 const { getaWSS } = require('../backgamons.js');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const { BackgammonsBETS } = require('./BetsInfo.js');
 
 // ======== UNIFIC ? ========
@@ -92,20 +92,20 @@ async function setGameSettingValue(settingName, value) {
   return GamesSettings.upsert({name:settingName, value})
 }
 // ======== Usefull Operations ========
-async function BackgammonsBalanceTravers(winner, loser, betId) {
-  const bet = BackgammonsBETS.get(betId);
-  const comission = bet.bet*bet.comission*2; // comission from 2 players
-  const lose = bet.bet;
-  const prize = bet.bet-comission; // prize with comission
+async function BackgammonsBalanceTravers(winner, loser, betInfo) {
+  // const betInfo = BackgammonsBETS.get(betId);
+  const comission = betInfo.bet*betInfo.comission*2; // comission from 2 players
+  const lose = betInfo.bet;
+  const prize = betInfo.bet-comission; // prize with comission
   // get money from loser user
   await balanceTransaction(loser.userId, -lose);
   // send money to winner user
   await balanceTransaction(winner.userId, prize);
-  return [bet, comission, lose, prize];
+  return [betInfo, comission, lose, prize];
 }
-async function completeGame([betId, roomId], winner, loser, ) {
+async function completeGame([betId, roomId], winner, loser, betInfo) {
   const room = await RoomInfo([betId, roomId]);
-  const [bet, comission, lose, prize] = await BackgammonsBalanceTravers(winner, loser, betId);
+  const [bet, comission, lose, prize] = await BackgammonsBalanceTravers(winner, loser, betInfo);
   Promise.all([
     getStatsOf(winner.userId), getStatsOf(loser.userId)
   ]).then(([winnerStats, loserStats])=>{
@@ -133,7 +133,11 @@ async function getBackgammonsGeneralInfo(fromdate){
     ],
     group: ['bet'],
   }
-  if(fromdate) request.where ={ startedAt: { $between:[fromdate, new Date(fromdate.valueOf() + 86350989)] } }
+  if(fromdate) request.where = { 
+    startedAt: { 
+      [Op.between]: [new Date(fromdate), new Date(new Date(fromdate).valueOf() + 86350989)] 
+    } 
+  }
   return (await BackgammonGamesHistory.findAll(request)).map(({dataValues})=>dataValues);
 }
 
