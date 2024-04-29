@@ -898,7 +898,7 @@ function getRoomCommisionInfo(roomId) {
 async function insertBackgammonsDataInTables(gamesData=[]) {
     const tableBody = document.querySelector(".date-stats-body-nards");
     const loadedBets = gamesData.map(({bet})=>+bet);
-    const nullBaseList = (await BetsLoaded).BackgammonsBETS.filter(betInfo=>betInfo).map(({bet})=>{
+    const nullBaseList = (await BetsLoaded).BackgammonsBETS.mapPairs(({bet}, betId, allist)=>{
       if(loadedBets.includes(+bet)) return undefined;
       return {bet, commision_sum:0, games_count:0}
     }).filter(line=>line);

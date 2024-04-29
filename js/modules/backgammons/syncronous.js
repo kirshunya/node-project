@@ -14,7 +14,9 @@ siteLanguageInited.then(log('siteLanguage'));
 /** @returns {Promise.<BetsInfoList>} */
 const loadBetsInfo = ()=>fetch("./json/bets.json").then(localize=>localize.json()).then(BetsInfo=>{
     // BetsInfo.BackgammonsBETS = new Map(Object.entries(BetsInfo.BackgammonsBETS));
-    BetsInfo.BackgammonsBETS.mapPairs = (CB)=>Object.entries(BetsInfo.BackgammonsBETS).map(([betId, BetsInfo])=>CB(BetsInfo, +betId, BetsInfo.BackgammonsBETS));
+    BetsInfo._BackgammonsBETS = BetsInfo.BackgammonsBETS;
+    BetsInfo.BackgammonsBETS.mapPairs = (CB)=>Object.entries(BetsInfo.BackgammonsBETS)
+                                                        .map(([betId, BetsInfo])=>isNaN(+betId)||CB(BetsInfo, +betId, BetsInfo.BackgammonsBETS)).filter(res=>res!==true);
     BetsInfo.BackgammonsBETS.get = (betId)=>BetsInfo.BackgammonsBETS[betId];
     return BetsInfo;
 })
