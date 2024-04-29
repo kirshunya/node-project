@@ -82,7 +82,6 @@ export function pdom(string, ...values) {
   function isCollection(value) {
     return (value instanceof HTMLCollection) || (value instanceof NodeList);
   }
-  debugger;
   tempContainer.innerHTML = string.map((stringpath, valueId)=>`${stringpath}${
             (isHTMLContent(values[valueId])||isCollection(values[valueId]))?'<div class="templated-Element-replacable-0001"></div>'
                                                                             :values[valueId]===undefined?'':values[valueId]}`).join('');

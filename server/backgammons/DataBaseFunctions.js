@@ -86,7 +86,7 @@ async function createRooms(){
   return Promise.all(BackgammonsBETS.mapPairs((betInfo, betId)=>(range(1, 7)).map(async roomId=>BackgammonsRooms.create({ betId, roomId }))).flat(3))
 }
 async function getGameSettingValue(settingName) {
-  return GamesSettings.findByPk(settingName).then(({dataValues})=>dataValues);
+  return GamesSettings.findByPk(settingName).then(({dataValues:{value}})=>value);
 }
 async function setGameSettingValue(settingName, value) {
   return GamesSettings.upsert({name:settingName, value})

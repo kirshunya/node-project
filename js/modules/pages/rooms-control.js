@@ -1,3 +1,4 @@
+import { pdom } from "../backgammons/htmlcontainer.js";
 import { BetsLoaded } from "../backgammons/syncronous.js";
 import * as impHttp from "../http.js";
 
@@ -101,19 +102,59 @@ export async function openRoomManagement() {
       </ul>
       <button class="save-button" type="submit">${siteLanguage.roomManagementPage.save}</button>
     </div>
-    <div id="nardsRoomControls" room="nards">
-      <ul>
-          <li class="main">Нарды <button class="toggleBackgammons">Отключить/Включить</button></li>
-          <li>Комната 10М <button class="betDelete">Удалить</button></li>
-          <li><button class="betPush">Добавить комнату</button></li>
-          <button class="save-button nards"></button>
-      </ul>
+    <div class="room-management-room" id="nardsRoomControls" room="nards">
+      подгрузка...
     </div>
+    <style>
+      #nardsRoomControls{
+        padding-left: 0.5rem;
+        .toggleBackgammons {
+          margin-left: 0.5rem;
+          &.enable { background-color: green; }
+          &.disable {background-color: red; }
+        }
+        .betPush, .betEditAccess { 
+          background-color: green;
+          color: white;
+        }
+        .betEdit { background-color: yellow; }
+        .betEditCancel { background-color: orange; }
+        .betDelete { background-color: red; }
+        button {
+          margin-left: 0.5rem;
+          padding: 0px 0.3rem;
+          opacity: 80%;
+          border-radius: 3pt;
+          transition: 100ms;
+          border-bottom: 1px white solid;
+          &:hover {
+            opacity: 100%;
+          }
+        }
+        dl {
+          input { 
+            width: 4rem;
+            padding: 0px 0.5rem;
+            border-radius: 3pt;
+            border: 1px solid blue;
+            background-color: #87c1e3;
+          }
+          &::before {
+            content: '•';
+            margin-left:0.5rem;
+            margin-right:0.5rem;
+          }
+          button { display: none; }
+          .betPush {display: inline-block; }
+          &:hover { button { display: inline-block; } }
+        }
+      }
+    </style>
   </section>
     `;
 
-  await getRoomManagementData();
   addNardRoomsControls(document.getElementById('nardsRoomControls'));
+  await getRoomManagementData();
   // делаем что когда нажимаем основную комнату то блокируются все
   const roomsControlPage = document.querySelector(".admin-rooms-controll-page");
 
@@ -311,16 +352,48 @@ const getRoomManagementData = async () => {
   });
 };
 async function addNardRoomsControls(div) {
+  /** @type {{[betId:number]:import("../backgammons/syncronous.js").BetInfo}} */
   const betCash = {};
   (await BetsLoaded).BackgammonsBETS.mapPairs((betInfo, betId)=>betInfo&&(betCash[betId]=betInfo));
+  const defaultCommision = betCash[1].comission;//пхе-пхе
+  let bckgstatus = (await impHttp.getBackgammonsStatus()).data.code;
+  class RoomInfoLine { 
+    constructor(betId, bet, comission) { return pdom/*html*/`<dl data-betid=${betId}>Комната <span>${bet}</span>М коммисия ${comission*100}%<button class="betEdit">редактировать</button><button class="betDelete">Удалить</button></dl>`; }
+    static asString(betId, bet, comission) { return /*html*/`<dl data-betid=${betId}>Комната <span>${bet}</span>М коммисия ${comission*100}%<button class="betEdit">редактировать</button><button class="betDelete">Удалить</button></dl>` }
+  }
+  function reprint() {
+    div.innerHTML = /*html*/`
+      <h3>Нарды<button class="toggleBackgammons">${{200:'Отключить', 500:'Включить'}[bckgstatus]}</button></h3>
+      <dt>
+          ${Object.entries(betCash).map(([betId, {bet, comission}])=>
+              /*html*/`<dl data-betid=${betId}>Комната <span>${bet}</span>М коммисия ${comission*100}%<button class="betEdit">редактировать</button><button class="betDelete">Удалить</button></dl>`).join(' ')}
+          <dl><button class="betPush">Добавить комнату</button></dl>
+  </dt>
+      <button class="save-button nards">Сохранить</button>`
+  }
+  reprint();
 
-  div.addEventListener('click', ({target})=>{
-    if(target.classList.contains("toggleBackgammons")) {
+  div.addEventListener('click', /** @param {{target:HTMLElement}} param0 */({target:targetButton})=>{
+    const targetLine = targetButton.parentNode;
+    const targetLinesList = targetLine.parentNode;
+    const betId = targetLine.dataset.betid;
+    if(targetButton.classList.contains("toggleBackgammons")) {
 
-    } else if(target.classList.contains("betDelete")) {
+    } else if(targetButton.classList.contains("betDelete")) {
       
-    } else if(target.classList.contains("betPush")) {
+    } else if(targetButton.classList.contains("betEditAccess")) {
       
+    } else if(targetButton.classList.contains("betEditCancel")) {
+      
+    } else if(targetButton.classList.contains("betEdit")) {
+      const inputLineFrag = pdom/* html */`<dl data-betid="${betId}">BET: <input value="${targetLine.getElementsByTagName('span')[0].innerHTML}">M; COMISSION: <input value="${defaultCommision*100}">%<button class="betEditAccess">Сохранить</button><button class="betEditCancel">Отмена</button></dl>`;
+      const inputLine = inputLineFrag.firstChild
+      //inputLine.children[0].getElementsByClassName('betEditAccess')[0].addEventListener('click', ()=>targetLinesList.replaceChild(new RoomInfoLine(), inputLine));
+      inputLine.getElementsByClassName('betEditCancel')[0].addEventListener('click', ()=>targetLinesList.replaceChild(targetLine, inputLine));
+      targetLinesList.replaceChild(inputLineFrag, targetLine);
+    } else if(targetButton.classList.contains("betPush")) {
+      const inputLine = pdom/* html */`<dl>BET: <input>M; COMISSION: <input value="${defaultCommision*100}">%<button class="betEditAccess">Сохранить</button><button class="betEditCancel">Отмена</button></dl>`;
+      targetLinesList.replaceChild(inputLine, targetLine);
     }
   })
   function toggleBackgammons() {}

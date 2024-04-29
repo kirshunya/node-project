@@ -454,6 +454,15 @@ export async function getPlayedBackgammonsGamesByDate(date) {
     return await e.response;
   }
 }
+export async function getBackgammonsStatus() {
+  try {
+    const response = await $api.get(`/backgammons-status`);
+    return await response;
+  } catch (e) {
+    console.log(e.response);
+    return await e.response;
+  }
+}
 export async function getDominoStatus() {
   try {
     const response = await $api.get("/game/domino-status");
