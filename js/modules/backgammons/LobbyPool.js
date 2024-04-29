@@ -7,6 +7,35 @@ import { lobbyhubReady } from "./syncronous.js";
 import { html, ranged } from "./htmlcontainer.js";
 import { openErorPopup } from "../pages/popup.js";
 import { getLocalUser } from "../authinterface.js";
+
+const GlobalTimersList = {
+    /** @type {{timestamp:int, label:HTMLElement, active:boolean}[]} */
+    timers: [],
+    timeroff: Symbol('timeroff'),
+
+    startLoop(){
+        this.intervalid = setInterval(()=>{
+            const timestamp = Date.now();
+            this.timers.map((timer, i)=>{
+                if(!timer.active) {
+                    timer.label.innerHTML = '00:00';
+                    return 10+i;
+                }
+                const diff = timestamp - timer.timestamp;
+                const secs = Math.floor(diff / 1000), secs60 = secs % 60;
+                const mins = Math.floor(secs / 60), mins60 = mins % 60;
+                // const hours = Math.floor(mins / 60);
+                timer.label.innerHTML = `${mins60<10?`0${mins60}`:mins60}:${secs60<10?`0${secs60}`:secs60}`;
+                return false;
+            }).filter(timeractive=>timeractive).map((timerindex, i)=>this.timers.splice(timerindex-10+i,1));
+        }, 200);
+    },
+    pushTimer(timestamp=Date.now(), label) {
+        const info = {timestamp, label, active:true};
+        this.timers.push(info);
+        return info;
+    }
+}
 class TableElT {
   /** @type {[HTMLElement, HTMLElement]} */
     tableparts = []
@@ -31,6 +60,18 @@ class TableElT {
         )
         return true;
     }
+    set enable(enable) {
+        this.eyelabel.firstChild.src = enable  ? 'img/backgammons/eyeh.png'
+                                               : 'img/backgammons/eyek.png'
+        return true;
+    }
+    _timer = null
+    set timer(timestamp) {
+        if(timestamp === GlobalTimersList.timeroff && this._timer) this._timer.active = false;
+        else this._timer = GlobalTimersList.pushTimer(timestamp, this.timerlabel);
+        return true;
+    }
+    
     /** @param {[int, int]} GameID    */
     constructor(GameID) {
         /** @type {[int, int]} */
@@ -73,23 +114,25 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
             BackgammonsLobbyHub.resetLobbyTable(rooms);
         },
         ["backgammons::lobby::connectionToRoom"]({GameID, players}) {
-                BackgammonsLobbyHub.setOnlineToTable(GameID, players);
+            BackgammonsLobbyHub.updateTable(GameID, players);
         },
         ["backgammons::lobby::roomStart"]({GameID}) {
-                BackgammonsLobbyHub.visitEnableToggle(GameID, true);
+            BackgammonsLobbyHub.updateTable(GameID, null, true);
         },
-        ["backgammons::lobby::GameEnd"](msg) {
-                BackgammonsLobbyHub.setOnlineToTable(GameID, []);
-                BackgammonsLobbyHub.visitEnableToggle(GameID, false);
+        ["backgammons::lobby::roomClosing"]({GameID}) {
+            BackgammonsLobbyHub.updateTable(GameID, null, false);
+        },
+        ["backgammons::lobby::roomEnd"]({GameID}) {
+            BackgammonsLobbyHub.updateTable(GameID, [], false, GlobalTimersList.timeroff);
         }
     }
     init() {
         const mutobserverCode = `backgsLobby${getRandomInt(-65341, 65341)}`;
         const container = htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode});
         const swipers = [];
-        const inited = BetsLoaded.then(bets=>htmlcontainer(
+        const inited = BetsLoaded.then(({BackgammonsBETS})=>htmlcontainer(
                 container, [
-                ...Object.entries(bets.BackgammonsBETS).filter(([,a])=>a).map(([betId, betData])=>(this.RoomsMap[betId] = [],
+                ...[...BackgammonsBETS.entries()].map(([betId, {bet}])=>(this.RoomsMap[betId] = [],
                         htmlcontainer(
                             htmlelement(
                                     'div', 
@@ -122,7 +165,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                                             <p class="domino-room-bet__text">
                                                 Цена комнаты:
                                             </p>
-                                            <p class="domino-room-bet">${betData.bet}₼</p>
+                                            <p class="domino-room-bet">${bet}₼</p>
                                             <p class="domino-room-duration">
                                                 <span>Одна игра</span>
                                                 <span>Длительность игры: 5 минут</span>
@@ -163,7 +206,8 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                     },
             })));
         this.__initvals&&this.resetLobbyTable(this.__initvals);
-        this.updalist.map(([...args])=>this.setOnlineToTable(...args));
+        this.updalist.map(([...args])=>this.updateTable(...args));
+        GlobalTimersList.intervalid||GlobalTimersList.startLoop();
         return this.htmlview;
     }
     __initvals;
@@ -178,28 +222,34 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
             if(!tables) return;
             tables.map((rinfo, roomId)=>{
                     if(!rinfo) return;
-                    const [players, state] = rinfo;
-                    BackgammonsLobbyHub.setOnlineToTable([betId, roomId], players);
-                    BackgammonsLobbyHub.visitEnableToggle([betId, roomId], state === 3); // if GameStarted visitors eyes red
+                    const [players, state, startedAt] = rinfo;
+                    BackgammonsLobbyHub.updateTable([betId, roomId], players, state===3, startedAt);
             })
         });
     }
     updalist = []
-    setOnlineToTable([betId, roomId], players) {
+    updateTable([betId, roomId], players=null, enable=null, startedAt=undefined) {
         if(!this.htmlview) return this.updalist.push([...arguments])
         const table = this.RoomsMap[betId]?.[roomId];
         if(!table) return console.warn(`table[${betId}][${roomId}] not Found`);
-        table.players = players;
-        
+        players&&(table.players = players);
+        enable!==null&&(table.enable = enable);
+        (enable||startedAt)&&(table.timer = startedAt||Date.now());
     }
-    visitEnableToggle([betId, roomId], enable) {
-        const table = this.RoomsMap[betId]?.[roomId];
-        if(!table) return console.warn(`table[${betId}][${roomId}] not Found`);
-        table.eyelabel.firstChild.src = enable
-                                                                                ? 'img/backgammons/eyeh.png'
-                                                                                : 'img/backgammons/eyek.png'
+    /** @param {TableElT} Table  */
+    _setOnlineToTable(Table, players) {
+        Table.players = players;
     }
+    _visitEnableToggle(Table, enable) {
+        Table.eyelabel.firstChild.src = enable  ? 'img/backgammons/eyeh.png'
+                                                : 'img/backgammons/eyek.png'
+    }
+    /** @deprecated */
+    setOnlineToTable([betId, roomId], players) { return this._setOnlineToTable([betId, roomId], players); }
+    /** @deprecated */
+    visitEnableToggle([betId, roomId], enable) { return this._visitEnableToggle([betId, roomId], null, enable); }
 }
+/** @deprecated */
 export function openBackgammonsMenuPage() {
     return BackgammonsLobbyHub.show()
 }

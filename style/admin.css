@@ -15,7 +15,6 @@
   flex-direction: column;
   gap: 10px;
 }
-
 h2 {
   margin-top: 0;
   font-size: 18px;
@@ -207,13 +206,15 @@ th {
   border-bottom: 0.5px solid #333;
 }
 
-.date-stats-domino-classic-table {
+.date-stats-domino-classic-table, .date-stats-nards-table {
   margin: 0 auto;
   max-width: max-content;
 }
 
 .date-stats-domino-classic-table .date-stats-item,
-.date-stats-domino-classic-table .date-stats-header {
+.date-stats-domino-classic-table .date-stats-header,
+.date-stats-nards-table .date-stats-item,
+.date-stats-nards-table .date-stats-header {
   padding: 5px 0;
   display: grid;
   grid-template-columns: repeat(3, 150px);

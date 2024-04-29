@@ -11,7 +11,7 @@ import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
-import { playBckgGameStart, playLose, setGameSoundsAllowed } from '../audio.js';
+import { playBckgGameStart, playLose, playWin, setGameSoundsAllowed } from '../audio.js';
 
 const TeamFromTeamId = {
   [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
@@ -239,6 +239,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
     let curState = GameInitData.RoomState, prevState = null;
+    document.getElementById('TimersTurnButton').innerHTML = `Timers ${GameInitData.TimersTurn?'ON':'OFF'}`
     const RoomStatesInitRouter = {
       [0](initData) {//Waiting
           //? maybe room closed.
@@ -274,7 +275,6 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
-          document.getElementById('TimersTurnButton').innerHTML = `Timers ${initData.TimersTurn?'ON':'OFF'}`
           isVisitor(initData.players);
           const localPlayer = __playerById(initData.players)[localUser.userId];
           if(localPlayer) {
@@ -306,7 +306,7 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ TimersByTeam.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [4]({Slots, Drops, players, winner, loser, timeval}) { // Win // here's started timer to emojis send on Win
-          playLose()
+          
           isVisitor(players);
           if(!prevState) { // если только перезагрузили или открыли страницу
             const [firstPlayer, secondPlayer] = players;
@@ -322,9 +322,9 @@ export async function InitGame(GameInitData, localUser, ws) {
             const lose = bet.bet;
             const prize = bet.bet - comission; // prize with comission
 
-            if(winner.userId === localUser.userId) showNewPopup(new BackgammonsWinPopup(betId, winner, prize));
-            else if(loser.userId === localUser.userId) showNewPopup(new BackgammonsLosePopup(betId, winner));
-            else showNewPopup(new BackgammonsLosePopup(betId, winner));
+            if(winner.userId === localUser.userId) (playWin(), showNewPopup(new BackgammonsWinPopup(betId, winner, prize)));
+            else if(loser.userId === localUser.userId) (playLose(), showNewPopup(new BackgammonsLosePopup(betId, winner)));
+            else (playWin(), showNewPopup(new BackgammonsLosePopup(betId, winner)));
           })
 
           const Timers = [
@@ -400,6 +400,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     function isVisitor([player1, player2]) {
       const isVisitor = player1?.userId === localUser.userId || player2?.userId === localUser.userId
       VisitorLabel.classList.toggle('hidden', isVisitor);
+      document.getElementById('DebugPanel')?.classList?.toggle('hidden', false);
       return isVisitor;
     }
 }

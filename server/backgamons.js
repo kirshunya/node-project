@@ -1,21 +1,24 @@
+/** @type {ws.Server} */
+let aWSS = null;
+module.exports.getaWSS = ()=>aWSS;
 const { serializable } = require('./backgammons/serializablewtf.js');
-module.exports.A0 = class A0 extends serializable {};
 const { range, WSListeners, rangebyvals, mapByIndexToVals, sleep } = require('./backgammons/Utility.js');
-const { TGame, timestamp } = require('./backgammons/GameRoom.js');
+const { TGame, } = require('./backgammons/GameRoom.js');
+const { timestamp } = require("./backgammons/Utility.js");
 const { ConnectionContext, Debug, makeEvent } = require('./backgammons/Generals.js');
-const { User } = require('./models/db-models.js');
+const { User, GamesSettings } = require('./models/db-models.js');
+const { Router } = require('express');
+const { getBackgammonsGeneralInfo, createRooms, getGameSettingValue } = require('./backgammons/DataBaseFunctions.js');
+const { BackgammonsBETS } = require('./backgammons/BetsInfo.js');
 
 console.log(TGame)
 
-const BackgammonsBETS = require('./../json/bets.json').BackgammonsBETS;
-const GamesLobby = new class extends WSListeners  {
+const GamesLobby = new class extends WSListeners {
     /** @type {TGame[][]} */
     Games = []
     constructor() {
         super('likey');
-        this.Games = mapByIndexToVals(BackgammonsBETS, ([betId,betData])=>{
-            return rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId])));
-        });
+        this.Games = BackgammonsBETS.mapPairs((betInfo, betId)=>rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId]))))
         delete this.Games[0];
     }
     createGame(GameID) {
@@ -27,14 +30,20 @@ const GamesLobby = new class extends WSListeners  {
             GameID, players:Game.players
         }))
         Game.events.onstart(()=>this.event('backgammons::lobby::roomStart', {
-            GameID, players:Game.players
-        }))
+            GameID, players:Game.players, startedAt:Game.RoomState.startedAt
+        }));
+        Game.events.onclosing(()=>{
+            this.event('backgammons::lobby::roomClosing', {
+                GameID, players:Game.players
+            })
+            // setTimeout(()=>this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
+        });
         Game.events.onfinish(()=>{
             this.event('backgammons::lobby::roomEnd', {
                 GameID, players:Game.players
             })
             // setTimeout(()=>this.Games[GameID[0]][GameID[1]]=this.createGame(GameID), 20*1000);
-        })
+        });
         return Game;
     }
     connect(user, ctx) {
@@ -161,7 +170,7 @@ const WSPipelineCommands = {
         GamesLobby.getGameByID(ctx.GameID).event('emoji', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
     },
     sendPhrase(ctx, msg) {
-    GamesLobby.getGameByID(ctx.GameID).event('phrase', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
+        GamesLobby.getGameByID(ctx.GameID).event('phrase', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
     },
     /**
      * Debug function, restart game
@@ -242,13 +251,49 @@ function WSSConnection(ws, req) {
         }
     });
 }
-/** @type {ws.Server} */
-let aWSS = null;
+/** @type {Router} */
+const UsersRouter = new Router();
+/** @type {Router} */
+const AdminsRouter = new Router();
+AdminsRouter.get('/played-backgammons-games', async function(req, res, next) {
+    try{
+        console.log('/played-backgammons-games', req.query);
+        return res.json(await getBackgammonsGeneralInfo(query.date));
+    } catch(e) {
+        next(e)
+    }
+});
+AdminsRouter.post('/backgammons-status', async function(req, res, next) {
+    try{
+        const info = {
+            get on() { return {status:'active', code:200}; },
+            get off() { return {status:'disabled', code:500}; }
+        }[req.query.status];
+        setGameSettingValue('BackgammonsStatus', info);
+        return res.status(200).json({});
+    } catch(e) {
+        next(e)
+    }
+});
+AdminsRouter.post('/editBets', async function(req, res, next) {
+    try{
+        const body = req.body;
+        return res.status(200).json({});
+    } catch(e) {
+        next(e)
+    }
+});
+UsersRouter.get('/backgammons-status', async function(req, res, next) {
+    try{
+        return getGameSettingValue('BackgammonsStatus').then(statucInfo=>res.json({code:statucInfo.code}));
+    } catch(e) {
+        next(e)
+    }
+});
 /** 
  * @param {ws.Server} _aWSS
  */
-const expor = _aWSS=>(aWSS=_aWSS, WSSConnection);
-const getaWSS = function(){ return aWSS }; 
-
-module.exports.WSSConnection = expor
-module.exports.getaWSS = getaWSS
+module.exports.WSSConnection = _aWSS=>(aWSS=_aWSS, WSSConnection);
+module.exports.UsersRouter = UsersRouter;
+module.exports.AdminsRouter = AdminsRouter;
+module.exports.createRooms = createRooms;

@@ -1,3 +1,4 @@
+import { BetsLoaded } from "../backgammons/syncronous.js";
 import * as impHttp from "../http.js";
 
 export async function openRoomManagement() {
@@ -9,12 +10,12 @@ export async function openRoomManagement() {
     main.classList.add("header__padding");
   }
 
-  main.innerHTML = `
-  <section class = "admin-rooms-controll-page">
-    <div class="room-management-room" room = 'loto'>
+  main.innerHTML = /* html */`
+  <section class="admin-rooms-controll-page">
+    <div class="room-management-room" room="loto">
       <ul class="room-management-bets">
         <li>
-          <input class=" loto-page-toggle-input mainRoomCheckbox" type="checkbox" name="loto" room = "loto">
+          <input class=" loto-page-toggle-input mainRoomCheckbox" type="checkbox" name="loto" room="loto">
           <span>${siteLanguage.roomManagementPage.mainLotoRoom}</span>
         </li>
         <li>
@@ -38,13 +39,13 @@ export async function openRoomManagement() {
           <span>${siteLanguage.roomManagementPage.room} 10M</span>
         </li>
       </ul>
-      <button class = 'save-button' type="submit">${siteLanguage.roomManagementPage.save}</button>
+      <button class="save-button" type="submit">${siteLanguage.roomManagementPage.save}</button>
     </div>
   
-    <div class="room-management-room" room = 'domino-classic'>
+    <div class="room-management-room" room="domino-classic">
       <ul class="room-management-bets">
         <li>
-          <input class=" domino-classic-page-toggle-input mainDominoClassicRoomCheckbox mainRoomCheckbox" type="checkbox" room = "domino-classic" name="mainDominoClassicRoom">
+          <input class=" domino-classic-page-toggle-input mainDominoClassicRoomCheckbox mainRoomCheckbox" type="checkbox" room="domino-classic" name="mainDominoClassicRoom">
           <span>${siteLanguage.roomManagementPage.mainDominoClassicRoom}</span>
         </li>
         <li>
@@ -68,13 +69,13 @@ export async function openRoomManagement() {
           <span>${siteLanguage.roomManagementPage.room} 10M</span>
         </li>
       </ul>
-      <button class = 'save-button' type="submit">${siteLanguage.roomManagementPage.save}</button>
+      <button class="save-button" type="submit">${siteLanguage.roomManagementPage.save}</button>
     </div>
   
-    <div class="room-management-room" room = 'domino-telephone'>
+    <div class="room-management-room" room="domino-telephone">
       <ul class="room-management-bets">
         <li>
-          <input class=" mainDominoTelephoneRoomCheckbox mainRoomCheckbox" type="checkbox" name="mainDominoTelephoneRoom" value="mainDominoTelephoneRoom" room = "domino-telephone">
+          <input class=" mainDominoTelephoneRoomCheckbox mainRoomCheckbox" type="checkbox" name="mainDominoTelephoneRoom" value="mainDominoTelephoneRoom" room="domino-telephone">
           <span>${siteLanguage.roomManagementPage.mainDominoTelephoneRoom}</span>
         </li>
         <li>
@@ -98,156 +99,153 @@ export async function openRoomManagement() {
           <span>${siteLanguage.roomManagementPage.room} 10M</span>
         </li>
       </ul>
-      <button class = 'save-button' type="submit">${siteLanguage.roomManagementPage.save}</button>
+      <button class="save-button" type="submit">${siteLanguage.roomManagementPage.save}</button>
+    </div>
+    <div id="nardsRoomControls" room="nards">
+      <ul>
+          <li class="main">Нарды <button class="toggleBackgammons">Отключить/Включить</button></li>
+          <li>Комната 10М <button class="betDelete">Удалить</button></li>
+          <li><button class="betPush">Добавить комнату</button></li>
+          <button class="save-button nards"></button>
+      </ul>
     </div>
   </section>
     `;
 
   await getRoomManagementData();
-
+  addNardRoomsControls(document.getElementById('nardsRoomControls'));
   // делаем что когда нажимаем основную комнату то блокируются все
-  let roomsControlPage = document.querySelector(".admin-rooms-controll-page");
+  const roomsControlPage = document.querySelector(".admin-rooms-controll-page");
 
-  if (roomsControlPage) {
-    let mainRoomsButtons =
-      roomsControlPage.querySelectorAll(".mainRoomCheckbox");
-    // console.log(mainRoomsButtons);
-    mainRoomsButtons.forEach((button) => {
-      button.addEventListener("change", function () {
-        if (button.checked) {
-          let buttonLi = button.parentNode;
-          let buttonParentBlock = buttonLi.parentNode;
-          let allCheckboxInParent =
-            buttonParentBlock.querySelectorAll(".room-checkbox");
-          allCheckboxInParent.forEach((checkbox) => {
-            checkbox.checked = true;
-          });
+  if (!roomsControlPage) return;
+  const mainRoomsButtons =
+    roomsControlPage.querySelectorAll(".mainRoomCheckbox");
+  // console.log(mainRoomsButtons);
+  mainRoomsButtons.forEach((button) => {
+    button.addEventListener("change", function () {
+      const buttonLi = button.parentNode;
+      const buttonParentBlock = buttonLi.parentNode;
+      const allCheckboxInParent =
+        buttonParentBlock.querySelectorAll(".room-checkbox");
+      allCheckboxInParent.forEach((checkbox) => {
+        checkbox.checked = button.checked;
+      });
+    });
+  });
+
+  // const roomsControl = {
+  //   loto: false,
+  //   dominoClassic: true,
+  //   dominoTelephone: false,
+  //   lotoRooms: [{roomId: 1, isAvailable: false}],
+  //   dominoClassicRooms: [{roomId: 2, isAvailable: true}],
+  //   dominoTelephoneRooms: [{roomId: 3, isAvailable: false}],
+  // };
+
+  // const roomsControl = {
+  //   loto: false,
+  //   lotoRooms: [],
+  // };
+  // const roomsControl = {
+  //   dominoClassic: false,
+  //   dominoClassicRooms: [],
+  // };
+  // const roomsControl = {
+  //   dominoTelephone: false,
+  //   dominoTelephoneRooms: [],
+  // };
+
+  // вытягиваем поля когда нажимаем кнопку сохранить
+  let saveButton = roomsControlPage.querySelectorAll(".save-button");
+  saveButton.forEach((button) => {
+    if(button.classList.contains('nards')) return;
+    button.addEventListener("click", async function () {
+      let parent = button.parentElement;
+      if (!parent) {
+        return;
+      }
+      let pageAttribute = parent.getAttribute("room");
+      // console.log(pageAttribute);
+
+      if (pageAttribute == "loto") {
+        let lotoPageCheckbox =
+          parent.querySelector(".mainRoomCheckbox")?.checked;
+        
+        const lotoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
+        const lotoRooms = lotoRoomsCheckbox.map((room) =>({
+            roomId: +room.getAttribute("roomId"),
+            isAvailable: !room.checked,
+          }));
+
+        const roomsControl = {
+          loto: !lotoPageCheckbox || false,
+          lotoRooms: lotoRooms,
+        };
+        // console.log(roomsControl);
+
+        let responce = await impHttp.updateRoomsControl(roomsControl, "loto");
+        if (responce.status == 200) {
+          alert("Комнаты сохранены");
         } else {
-          let buttonLi = button.parentNode;
-          let buttonParentBlock = buttonLi.parentNode;
-          let allCheckboxInParent =
-            buttonParentBlock.querySelectorAll(".room-checkbox");
-          allCheckboxInParent.forEach((checkbox) => {
-            checkbox.checked = false;
-          });
+          alert("Ошибка сохранения");
         }
-      });
+      } else if (pageAttribute == "domino-classic") {
+        let dominoPageCheckbox =
+          parent.querySelector(".mainRoomCheckbox")?.checked;
+        let dominoRooms = [];
+        let dominoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
+        dominoRoomsCheckbox.forEach((room) => {
+          dominoRooms.push({
+            roomId: +room.getAttribute("roomId"),
+            isAvailable: !room.checked,
+          });
+        });
+
+        const roomsControl = {
+          dominoClassic: !dominoPageCheckbox || false,
+          dominoClassicRooms: dominoRooms,
+        };
+
+        // console.log(roomsControl);
+        let responce = await impHttp.updateRoomsControl(
+          roomsControl,
+          "domino-classic"
+        );
+        if (responce.status == 200) {
+          alert("Комнаты сохранены");
+        } else {
+          alert("Ошибка сохранения");
+        }
+      } else if (pageAttribute == "domino-telephone") {
+        let dominoPageCheckbox =
+          parent.querySelector(".mainRoomCheckbox")?.checked;
+        let dominoRooms = [];
+        let dominoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
+        dominoRoomsCheckbox.forEach((room) => {
+          dominoRooms.push({
+            roomId: +room.getAttribute("roomId"),
+            isAvailable: !room.checked,
+          });
+        });
+
+        const roomsControl = {
+          dominoTelephone: !dominoPageCheckbox || false,
+          dominoTelephoneRooms: dominoRooms,
+        };
+        // console.log(roomsControl);
+        let responce = await impHttp.updateRoomsControl(
+          roomsControl,
+          "domino-telephone"
+        );
+        if (responce.status == 200) {
+          alert("Комнаты сохранены");
+        } else {
+          alert("Ошибка сохранения");
+        }
+      }
     });
-
-    // const roomsControl = {
-    //   loto: false,
-    //   dominoClassic: true,
-    //   dominoTelephone: false,
-    //   lotoRooms: [{roomId: 1, isAvailable: false}],
-    //   dominoClassicRooms: [{roomId: 2, isAvailable: true}],
-    //   dominoTelephoneRooms: [{roomId: 3, isAvailable: false}],
-    // };
-
-    // const roomsControl = {
-    //   loto: false,
-    //   lotoRooms: [],
-    // };
-    // const roomsControl = {
-    //   dominoClassic: false,
-    //   dominoClassicRooms: [],
-    // };
-    // const roomsControl = {
-    //   dominoTelephone: false,
-    //   dominoTelephoneRooms: [],
-    // };
-
-    // вытягиваем поля когда нажимаем кнопку сохранить
-    let saveButton = roomsControlPage.querySelectorAll(".save-button");
-    saveButton.forEach((button) => {
-      button.addEventListener("click", async function () {
-        let parent = button.parentElement;
-        if (!parent) {
-          return;
-        }
-        let pageAttribute = parent.getAttribute("room");
-        // console.log(pageAttribute);
-
-        if (pageAttribute == "loto") {
-          let lotoPageCheckbox =
-            parent.querySelector(".mainRoomCheckbox")?.checked;
-          let lotoRooms = [];
-          let lotoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
-          lotoRoomsCheckbox.forEach((room) => {
-            lotoRooms.push({
-              roomId: +room.getAttribute("roomId"),
-              isAvailable: !room.checked,
-            });
-          });
-
-          const roomsControl = {
-            loto: !lotoPageCheckbox || false,
-            lotoRooms: lotoRooms,
-          };
-          // console.log(roomsControl);
-
-          let responce = await impHttp.updateRoomsControl(roomsControl, "loto");
-          if (responce.status == 200) {
-            alert("Комнаты сохранены");
-          } else {
-            alert("Ошибка сохранения");
-          }
-        } else if (pageAttribute == "domino-classic") {
-          let dominoPageCheckbox =
-            parent.querySelector(".mainRoomCheckbox")?.checked;
-          let dominoRooms = [];
-          let dominoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
-          dominoRoomsCheckbox.forEach((room) => {
-            dominoRooms.push({
-              roomId: +room.getAttribute("roomId"),
-              isAvailable: !room.checked,
-            });
-          });
-
-          const roomsControl = {
-            dominoClassic: !dominoPageCheckbox || false,
-            dominoClassicRooms: dominoRooms,
-          };
-
-          // console.log(roomsControl);
-          let responce = await impHttp.updateRoomsControl(
-            roomsControl,
-            "domino-classic"
-          );
-          if (responce.status == 200) {
-            alert("Комнаты сохранены");
-          } else {
-            alert("Ошибка сохранения");
-          }
-        } else if (pageAttribute == "domino-telephone") {
-          let dominoPageCheckbox =
-            parent.querySelector(".mainRoomCheckbox")?.checked;
-          let dominoRooms = [];
-          let dominoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
-          dominoRoomsCheckbox.forEach((room) => {
-            dominoRooms.push({
-              roomId: +room.getAttribute("roomId"),
-              isAvailable: !room.checked,
-            });
-          });
-
-          const roomsControl = {
-            dominoTelephone: !dominoPageCheckbox || false,
-            dominoTelephoneRooms: dominoRooms,
-          };
-          // console.log(roomsControl);
-          let responce = await impHttp.updateRoomsControl(
-            roomsControl,
-            "domino-telephone"
-          );
-          if (responce.status == 200) {
-            alert("Комнаты сохранены");
-          } else {
-            alert("Ошибка сохранения");
-          }
-        }
-      });
-    });
-  }
+  });
+  
 }
 
 const getRoomManagementData = async () => {
@@ -312,3 +310,18 @@ const getRoomManagementData = async () => {
     }
   });
 };
+async function addNardRoomsControls(div) {
+  const betCash = {};
+  [...(await BetsLoaded).BackgammonsBETS.entries()].map(([betId, betInfo])=>betInfo&&(betCash[betId]=betInfo));
+
+  div.addEventListener('click', ({target})=>{
+    if(target.classList.contains("toggleBackgammons")) {
+
+    } else if(target.classList.contains("betDelete")) {
+      
+    } else if(target.classList.contains("betPush")) {
+      
+    }
+  })
+  function toggleBackgammons() {}
+}

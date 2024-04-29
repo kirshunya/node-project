@@ -11,10 +11,14 @@ export const popupsinited = FCPromise();
 popupsinited.then(log('popups'));
 export const siteLanguageInited = new RewritablePromiseEmit();
 siteLanguageInited.then(log('siteLanguage'));
-/** @returns {Promise.<import("./../../../json/bets.json")>} */
-const loadBetsInfo = ()=>fetch("./json/bets.json").then(localize=>localize.json())
+/** @returns {Promise.<BetsInfoList>} */
+const loadBetsInfo = ()=>fetch("./json/bets.json").then(localize=>localize.json()).then(BetsInfo=>{
+    BetsInfo.BackgammonsBETS = new Map(Object.entries(BetsInfo.BackgammonsBETS));
+    // BetsInfo.mapPairs = (CB)=>Object.entries(BetsInfo.BackgammonsBETS).map(([betId, BetsInfo])=>CB(BetsInfo, +betId, BetsInfo.BackgammonsBETS));
+    return BetsInfo;
+})
 export const BetsLoaded = loadBetsInfo();
-BetsLoaded.then(bets=>console.log('bets'));
+BetsLoaded.then(bets=>console.log('bets', bets));
 
 function whileundefined(nameCallBack, oncomplete) {
     const periodicChecker = setInterval(()=>{
@@ -32,3 +36,16 @@ export const swipersloaded = new Promise(resolve=>whileundefined(()=>Swiper, res
 swipersloaded.then(log('Swiper'));
 export const axiosloaded = new Promise(resolve=>whileundefined(()=>axios, resolve));
 axiosloaded.then(log('axios'));
+/**
+ * @typedef BetInfo
+ * @property {number} bet
+ * @property {number} comission
+ */
+/**
+ * @typedef {{[betId:number]:BetInfo, mapPairs:(CB:(betInfo:BetInfo, betId:number, BetsInfoList:BackgammonsBETSContainer)=>any)=>any[]}} BackgammonsBETSContainer
+ */
+/** 
+ * @typedef BetsInfoList
+ * @property {Map.<string, BetInfo>} BackgammonsBETS
+ * @property {{[betId:number]:BetInfo}} DominoBETS
+ */

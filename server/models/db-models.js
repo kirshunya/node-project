@@ -36,6 +36,19 @@ const User = sequelize.define("user", {
   wins: { type: DataTypes.INTEGER, defaultValue: 0 },
   losses: { type: DataTypes.INTEGER, defaultValue: 0 },
 });
+/** Settings for games, but i maked this for Backgammons  */
+const GamesSettings = sequelize.define('GamesSettings', {
+  name: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    unique: true,
+    allowNull: false,
+  },
+  value: {
+    type: DataTypes.JSON,
+    allowNull: true
+  }
+})
 /** some Backgammon Room curState -- unused in BackgammonGamesHistory data */
 const BackgammonsRooms = sequelize.define('backgammonsRooms', {
   id: {
@@ -48,24 +61,21 @@ const BackgammonsRooms = sequelize.define('backgammonsRooms', {
   betId: { type: DataTypes.INTEGER, allowNull: false }, 
   roomId: { type: DataTypes.INTEGER, allowNull: false },
 
-  startedAt: { type: DataTypes.DATE },
-  startedWaitingAt: { type: DataTypes.DATE }, // if null, waiting closed, is `startedAt` === null, ignore
+  startedAt: { type: DataTypes.DATE, allowNull: true },
+  startedWaitingAt: { type: DataTypes.DATE, allowNull: true }, // if null, waiting closed, is `startedAt` === null, ignore
   isStarted: { type: DataTypes.VIRTUAL, get() { return !!this.get('startedAt'); } },
 
   isWaiting: { type: DataTypes.VIRTUAL, get() { return !!this.get('startedAt'); } },
 
-  scene: { type: DataTypes.STRING },
-  ActiveTeam: { type: DataTypes.INTEGER },
-  Dices: { type: DataTypes.INTEGER },
-  Drops: { type: DataTypes.INTEGER }, // like as []
-  TeamsByPlayerId: { type: DataTypes.INTEGER },
-  player1Id: { type: DataTypes.INTEGER },
-  player1Team: { type: DataTypes.VIRTUAL, get() { return this.get('TeamsByPlayerId') % 10; } },
-  player2Id: { type: DataTypes.INTEGER },
-  player2Team: { type: DataTypes.VIRTUAL, get() { return Math.ceil(this.get('TeamsByPlayerId') / 10); } },
+  scene: { type: DataTypes.STRING, allowNull: true },
+  ActiveTeam: { type: DataTypes.INTEGER, allowNull: true },
+  Dices: { type: DataTypes.INTEGER, allowNull: true },
+  Drops: { type: DataTypes.INTEGER, allowNull: true }, // like as []
+  player1Id: { type: DataTypes.INTEGER, allowNull: true },
+  player2Id: { type: DataTypes.INTEGER, allowNull: true },
 
 
-  isAvialable: { type: DataTypes.BOOLEAN },
+  isAvialable: { type: DataTypes.BOOLEAN, defaultValue:true },
 });
 /** list of completed games  */
 const BackgammonGamesHistory = sequelize.define('BackgammonGamesHistory', {
@@ -76,15 +86,21 @@ const BackgammonGamesHistory = sequelize.define('BackgammonGamesHistory', {
     allowNull: false,
     autoIncrement: true,
   },
-  bet: { type: DataTypes.INTEGER }, // if Backgammon Bets edited, we will save old value here.
+  bet: { type: DataTypes.FLOAT }, // if Backgammon Bets edited, we will save old value here.
   betId: { type: DataTypes.INTEGER, allowNull: false} , 
   roomId: { type: DataTypes.INTEGER, allowNull: false }, 
   startedAt: { type: DataTypes.DATE, allowNull: false, },
   finishedAt: { type: DataTypes.DATE, allowNull: false, },
   winnerId: { type: DataTypes.INTEGER }, 
   looserId: { type: DataTypes.INTEGER }, 
-  commision: { type: DataTypes.INTEGER },
+  commision: { type: DataTypes.FLOAT },
 });
+User.hasMany(BackgammonGamesHistory, {
+  foreignKey: 'winnerId'
+})
+User.hasMany(BackgammonGamesHistory, {
+  foreignKey: 'looserId'
+})
 
 
 const Stats = sequelize.define("stat", {
@@ -313,4 +329,5 @@ module.exports = {
   CurrencyRate,
   Payout,
   Deposit,
+  GamesSettings
 };

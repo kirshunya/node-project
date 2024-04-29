@@ -87,6 +87,7 @@ export const ConnectionStables = {
             );
             // if(location.hash !== '#backgammons-menu') location.hash = '#backgammons-menu';
             VisitorLabel.classList.toggle('hidden', true);
+            document.getElementById('DebugPanel')?.classList?.toggle('hidden', true);
             this.connectsended = this.Room = null;
             resetWSEventPool(EventsRoutes, BackgammonMenu.BackgammonsLobbyHub.WSEventsRoute);
         }
@@ -120,7 +121,7 @@ const EventsRoutes = ({
 
         // GamePool.InitGame(GameInitData, {userId:0,username:''}, ws)
 
-        window.TimersTurnButton = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
+        // window.TimersTurnButton = ({['on']:true, ['off']:false})[GameInitData.TimersTurn];
         // (async()=>TimersTurnDebugButton.value = `timers: ${window.TimersTurn?'on':'off'}`)()
     },
     async ['TimersTurn'](initData){
@@ -161,6 +162,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     outbtn.addEventListener('click', ()=>{
         ConnectionStables.disconnect();
         VisitorLabel.classList.toggle('hidden', true);
+        document.getElementById('DebugPanel')?.classList?.toggle('hidden', true);
     })
 });
 export function onnewmsg(msg) {

@@ -1,6 +1,7 @@
 import * as impHttp from "../http.js";
 import * as impPopup from "./popup.js";
 import * as impDominoNavigation from "../domino/domino-navigation.js";
+import { BetsLoaded } from "../backgammons/syncronous.js";
 
 export function createAdminButton() {
   // create button in profile
@@ -449,16 +450,15 @@ export async function redirectToAdminPage() {
         </div>
       </div>
     </div>
-    </div>
     <div class="date-stats-table-wrapper">
-    <h2>Домино телефон</h2>
+      <h2>Домино телефон</h2>
 
-    <div class="date-stats-domino-telephone-table">
-      <div class="date-stats-header">
-        <p class="date-stats-item bold">Ставка</p>
-        <p class="date-stats-item bold">Общее кол-во игроков</p>
-        <p class="date-stats-item bold">Собранная комиссия</p>
-      </div>
+      <div class="date-stats-domino-telephone-table">
+        <div class="date-stats-header">
+          <p class="date-stats-item bold">Ставка</p>
+          <p class="date-stats-item bold">Общее кол-во игроков</p>
+          <p class="date-stats-item bold">Собранная комиссия</p>
+        </div>
       
         <div class='date-stats-body-domino'>
           <div class="date-stats-item date-stats-item-1">
@@ -489,8 +489,23 @@ export async function redirectToAdminPage() {
         </div>
       </div>
     </div>
+    <div class="date-stats-table-wrapper">
+      <h2>Нардинские</h2>
+
+      <div class="date-stats-nards-table">
+        <div class="date-stats-header">
+          <p class="date-stats-item bold">Ставка</p>
+          <p class="date-stats-item bold">Кол-во игр</p>
+          <p class="date-stats-item bold">Собранная комиссия</p>
+        </div>
+      
+        <div class='date-stats-body-nards'>
+          downloading...
+        </div>
+      </div>
     </div>
   </div>
+</div>
 </section>
   `;
   await getAdminSettings();
@@ -596,19 +611,20 @@ async function addDateGamesFunctions() {
   let dateInput = document.querySelector(".admin-date-stats-input");
   const submitDateButton = document.querySelector(".admin-date-stats-submit");
   dateInput.value = new Date().toISOString().slice(0, 10);
-  const gamesData = await formDateGameData();
-  insertDataInTable(gamesData);
 
-  const dominoGamesData = await formDateDominoGameData();
-  insertDominoDataInTables(dominoGamesData);
+  async function fillTables() {
+    // const gamesData = await formDateGameData();
+    // insertDataInTable(gamesData);
 
-  submitDateButton.addEventListener("click", async () => {
-    const gamesData = await formDateGameData();
-    insertDataInTable(gamesData);
+    // const dominoGamesData = await formDateDominoGameData();
+    // insertDominoDataInTables(dominoGamesData);
 
-    const dominoGamesData = await formDateDominoGameData();
-    insertDominoDataInTables(dominoGamesData);
-  });
+    const backgammonsGamesData = await formDateBackgammonsGameData();
+    insertBackgammonsDataInTables(backgammonsGamesData);
+    
+  }
+  submitDateButton.addEventListener("click", fillTables);
+  fillTables()
 
   async function formDateDominoGameData() {
     dateInput = document.querySelector(".admin-date-stats-input");
@@ -705,6 +721,14 @@ async function addDateGamesFunctions() {
     return gamesData;
   }
 
+  async function formDateBackgammonsGameData() {
+    dateInput = document.querySelector(".admin-date-stats-input");
+    const date = dateInput.value;
+
+    const { data: playedGames } = await impHttp.getPlayedBackgammonsGamesByDate(date);
+
+    return playedGames;
+  }
   async function formDateGameData() {
     dateInput = document.querySelector(".admin-date-stats-input");
     const date = dateInput.value;
@@ -868,4 +892,32 @@ function getRoomCommisionInfo(roomId) {
     fullBet,
     tokens,
   };
+}
+
+/** @param {{bet:number, commision_sum:numberm games_count}[]} gamesData  */
+async function insertBackgammonsDataInTables(gamesData=[]) {
+    const tableBody = document.querySelector(".date-stats-body-nards");
+    const loadedBets = gamesData.map(({bet})=>+bet);
+    const nullBaseList = (await BetsLoaded).BackgammonsBETS.filter(betInfo=>betInfo).map(({bet})=>{
+      if(loadedBets.includes(+bet)) return undefined;
+      return {bet, commision_sum:0, games_count:0}
+    }).filter(line=>line);
+    nullBaseList.push(...gamesData);
+    tableBody.innerHTML = nullBaseList.sort(({bet:bet1}, {bet:bet2})=>bet1-bet2).map(({bet, commision_sum, games_count})=>`
+          <div class="date-stats-item">
+            <p class="date-stats-field">${bet.toFixed(2)}₼</p>
+            <p class="date-stats-field"><span class="date-stats-field-players">${games_count}</span></p>
+            <p class="date-stats-field"><span class="date-stats-field-earned-commision">${commision_sum.toFixed(2)}</span>₼</p>
+          </div>
+    `).join(' ');
+    // const tableItems = tableBody.querySelectorAll(".date-stats-item");
+    // tableItems.forEach((item) => {
+    //   const roomId = item.classList[1].split("-")[3];
+    //   const gameData = gamesData[gameMode].find((game) => game.id == roomId);
+    //   item.querySelector(".date-stats-field-players").innerHTML =
+    //     gameData.playersAmount;
+    //   item.querySelector(".date-stats-field-earned-commision").innerHTML = `${(
+    //     gameData.commissionTwoPlayers + gameData.commissionFourPlayers
+    //   ).toFixed(2)}`;
+    // });
 }

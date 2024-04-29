@@ -67,6 +67,33 @@ export function htmltext(tag, classList, innerHTML, attributes, dataset, events)
 //   }
 //   return element;
 // }
+/** @param {HTMLCollection} collection */
+function HTMLCollectionToDocFrag(collection) {
+  const returnedDocFrag = document.createDocumentFragment();
+  returnedDocFrag.replaceChildren(...collection);
+  return returnedDocFrag;
+}
+/** @param {string} string @param {...(HTMLElement|DocumentFragment|Element|Node|string)} values  */
+export function pdom(string, ...values) {
+  const tempContainer = document.createElement('div');
+  function isHTMLContent(value) {
+    return (value instanceof HTMLElement) || (value instanceof DocumentFragment) || (value instanceof Element) || (value instanceof Node);
+  }
+  function isCollection(value) {
+    return (value instanceof HTMLCollection) || (value instanceof NodeList);
+  }
+  debugger;
+  tempContainer.innerHTML = string.map((stringpath, valueId)=>`${stringpath}${
+            (isHTMLContent(values[valueId])||isCollection(values[valueId]))?'<div class="templated-Element-replacable-0001"></div>'
+                                                                            :values[valueId]===undefined?'':values[valueId]}`).join('');
+  values.map((value, valueId)=>{
+    if(!(isHTMLContent(value) || isCollection(value))) return;
+    const [tempElement] = tempContainer.getElementsByClassName('templated-Element-replacable-0001');
+    isHTMLContent(value)&&tempElement.parentNode.replaceChild(value, tempElement);
+    isCollection(value)&&tempElement.parentNode.replaceChild(HTMLCollectionToDocFrag(value), tempElement);
+  });
+  return HTMLCollectionToDocFrag(tempContainer.children);
+}
 /**
  *
  * @param {HTMLElement} element

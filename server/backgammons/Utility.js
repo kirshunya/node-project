@@ -121,4 +121,6 @@ module.exports.MProvider = class MProvider {
             }
         })
     }
-}
+};
+const timestamp = () => Date.now();
+module.exports.timestamp = timestamp;

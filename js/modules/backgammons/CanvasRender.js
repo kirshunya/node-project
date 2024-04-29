@@ -727,7 +727,7 @@ export class BoardCanvas extends CanvasFunctions {
         }
         const self = this;
         const scale = 230/130;
-        const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
+        const sideleft = +BordersByX[0]+((ActiveTeam===(this.reverse&&BLACK.id||WHITE.id))?BoardSidesSize[0]+BordersByX[1]:0)
         const dicesize = scale*328; const space = -55*2;
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
 

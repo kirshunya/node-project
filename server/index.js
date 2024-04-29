@@ -23,7 +23,8 @@ const AdminLotoService = require("./service/loto-admin-service");
 const gameService = require("./service/game-service");
 const lotoAdminService = require("./service/loto-admin-service");
 const roomsFunctions = require("./service/loto-rooms-functions");
-
+const backgammons = require("./backgamons");
+const backgammonwss = backgammons.WSSConnection(aWss);
 const PORT = process.env.PORT || 5001;
 
 app.use(express.json());
@@ -35,6 +36,8 @@ app.use(
   })
 );
 app.use("/api", router);
+app.use("/api", backgammons.UsersRouter);
+app.use("/api", backgammons.AdminsRouter);
 // app.use('/static/avatar/', express.static(__dirname+'/static/avatar/'))
 app.use('/', express.static(__dirname+'/../'))
 app.use(errorMiddleware);
@@ -80,6 +83,7 @@ const start = async () => {
     // setTimeout(async () => {
     //   await getCurrency();
     // }, 1000 * 60 * 60 * 24);
+    backgammons.createRooms();
     if(process.argv.includes('--init')) {
         for (let i = 0; i < 90; i++) {
           // const randomUserdata = await axios.get(
@@ -146,7 +150,6 @@ const timeouts = [
   { roomId: 5, timeoutId: null, timeoutStarted: false },
 ];
 
-const backgammonwss = require("./backgamons").WSSConnection(aWss);
 app.ws("/backgammons", backgammonwss);
 // web sockets для подключения к играм
 app.ws("/game", (ws, req) => {

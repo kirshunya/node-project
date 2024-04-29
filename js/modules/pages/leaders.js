@@ -127,7 +127,7 @@ export async function openLeadersPage(gameType) {
           </div>
         </div>
         <p class="leader-table__winsum">
-          ${userObject.gamesWon}
+          ${userObject.gamesWon||userObject.moneyWon}
         </p>
         <p class="leader-table__bonuses">
           <img
