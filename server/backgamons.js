@@ -259,7 +259,7 @@ const AdminsRouter = new Router();
 AdminsRouter.get('/played-backgammons-games', async function(req, res, next) {
     try{
         console.log('/played-backgammons-games', req.query);
-        return res.json(await getBackgammonsGeneralInfo(query.date));
+        return res.json(await getBackgammonsGeneralInfo(req.query.date));
     } catch(e) {
         next(e)
     }
@@ -278,7 +278,8 @@ AdminsRouter.post('/backgammons-status', async function(req, res, next) {
 });
 AdminsRouter.post('/editBets', async function(req, res, next) {
     try{
-        const body = req.body;
+        /** @type {{[betId:number]:import('./backgammons/BetsInfo.js').BetInfo}} */
+        const newBetsList = req.body;
         return res.status(200).json({});
     } catch(e) {
         next(e)
