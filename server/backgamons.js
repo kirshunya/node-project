@@ -168,10 +168,14 @@ const WSPipelineCommands = {
         return {event, slots: Game.Slots, state: Game.info};
     },
     sendEmoji(ctx, msg) {
-        GamesLobby.getGameByID(ctx.GameID).event('emoji', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
+        const Game = GamesLobby.getGameByID(ctx.GameID);
+        if(Game.players.map(({userId})=>userId).includes(ctx.user.userId))
+            Game.event('emoji', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
     },
     sendPhrase(ctx, msg) {
-        GamesLobby.getGameByID(ctx.GameID).event('phrase', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
+        const Game = GamesLobby.getGameByID(ctx.GameID);
+        if(Game.players.map(({userId})=>userId).includes(ctx.user.userId))
+            Game.event('phrase', Object.assign(msg, {userId:ctx.user.userId, username:ctx.user.username}));
     },
     /**
      * Debug function, restart game
