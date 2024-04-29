@@ -333,7 +333,7 @@ class WaitingState extends RoomState(0) {
     /** @type {ctxHandlerT<void|true>} */
     disconnect(ctx) {
         if(this.players.length === 1 && this.players[0].userId === ctx.user.userId) 
-            return ((this.players.length = 0), waitingCancelAtRoom(this.Room.GameID), this.bet = null, this.Room.onexit.send(), true);
+            return ((this.players.length = 0), waitingCancelAtRoom(this.Room.GameID), this.bet = null, this.Room.events.onexit.send(), true);
         else console.log('Гонка запросов, сначала апгрейд комнаты до лаунча, а потом дисконнет, это при двух егроках');
     }
     json() { return { RoomState: this.RoomState, players: this.players} }

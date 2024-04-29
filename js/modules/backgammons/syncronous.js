@@ -13,8 +13,9 @@ export const siteLanguageInited = new RewritablePromiseEmit();
 siteLanguageInited.then(log('siteLanguage'));
 /** @returns {Promise.<BetsInfoList>} */
 const loadBetsInfo = ()=>fetch("./json/bets.json").then(localize=>localize.json()).then(BetsInfo=>{
-    BetsInfo.BackgammonsBETS = new Map(Object.entries(BetsInfo.BackgammonsBETS));
-    // BetsInfo.mapPairs = (CB)=>Object.entries(BetsInfo.BackgammonsBETS).map(([betId, BetsInfo])=>CB(BetsInfo, +betId, BetsInfo.BackgammonsBETS));
+    // BetsInfo.BackgammonsBETS = new Map(Object.entries(BetsInfo.BackgammonsBETS));
+    BetsInfo.BackgammonsBETS.mapPairs = (CB)=>Object.entries(BetsInfo.BackgammonsBETS).map(([betId, BetsInfo])=>CB(BetsInfo, +betId, BetsInfo.BackgammonsBETS));
+    BetsInfo.BackgammonsBETS.get = (betId)=>BetsInfo.BackgammonsBETS[betId];
     return BetsInfo;
 })
 export const BetsLoaded = loadBetsInfo();
@@ -42,10 +43,10 @@ axiosloaded.then(log('axios'));
  * @property {number} comission
  */
 /**
- * @typedef {{[betId:number]:BetInfo, mapPairs:(CB:(betInfo:BetInfo, betId:number, BetsInfoList:BackgammonsBETSContainer)=>any)=>any[]}} BackgammonsBETSContainer
+ * @typedef {{[betId:number]:BetInfo, mapPairs:(CB:(betInfo:BetInfo, betId:number, BetsInfoList:BackgammonsBETSContainer)=>any)=>any[], get(betId:number)=>BetInfo}} BackgammonsBETSContainer
  */
 /** 
  * @typedef BetsInfoList
- * @property {Map.<string, BetInfo>} BackgammonsBETS
+ * @property {BackgammonsBETSContainer} BackgammonsBETS
  * @property {{[betId:number]:BetInfo}} DominoBETS
  */

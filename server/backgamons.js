@@ -18,7 +18,8 @@ const GamesLobby = new class extends WSListeners {
     Games = []
     constructor() {
         super('likey');
-        this.Games = BackgammonsBETS.mapPairs((betInfo, betId)=>rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId]))))
+        this.Games = {};
+        BackgammonsBETS.mapPairs((betInfo, betId)=>this.Games[betId]=rangebyvals(1, 7, (roomId=>this.createGame([+betId, +roomId]))))
         delete this.Games[0];
     }
     createGame(GameID) {
@@ -66,7 +67,7 @@ const GamesLobby = new class extends WSListeners {
     getGameByID(GameID) {
         const [betId, roomId] = GameID;
         if(this.Games[betId][roomId] === undefined)
-            this.Games[GameID] = new TGame(); 
+            this.Games[GameID] = new TGame(GameID); 
         return this.Games[betId][roomId];//probe
     }
 }

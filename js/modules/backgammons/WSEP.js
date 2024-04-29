@@ -62,11 +62,11 @@ export const ConnectionStables = {
 
     connectsended: null,
     connectToRoom([betId, roomId], fromLobby=false) {
+        if(this.connectsended) return false;
         //emiting browser history
         fromLobby&&history.replaceState({}, null, '#gamemode-choose');
         fromLobby&&history.pushState({}, null, '#backgammons-menu');
         location.hash = `#backgammon-room-table/${betId}/${roomId}`;
-        if(this.connectsended) return false;
         window.ws.send(
             JSON.stringify({
               method: "backgammons/connect",

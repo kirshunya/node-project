@@ -312,7 +312,7 @@ const getRoomManagementData = async () => {
 };
 async function addNardRoomsControls(div) {
   const betCash = {};
-  [...(await BetsLoaded).BackgammonsBETS.entries()].map(([betId, betInfo])=>betInfo&&(betCash[betId]=betInfo));
+  (await BetsLoaded).BackgammonsBETS.mapPairs((betInfo, betId)=>betInfo&&(betCash[betId]=betInfo));
 
   div.addEventListener('click', ({target})=>{
     if(target.classList.contains("toggleBackgammons")) {

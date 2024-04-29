@@ -132,7 +132,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
         const swipers = [];
         const inited = BetsLoaded.then(({BackgammonsBETS})=>htmlcontainer(
                 container, [
-                ...[...BackgammonsBETS.entries()].map(([betId, {bet}])=>(this.RoomsMap[betId] = [],
+                ...BackgammonsBETS.mapPairs(({bet}, betId)=>(this.RoomsMap[betId] = [],
                         htmlcontainer(
                             htmlelement(
                                     'div', 
