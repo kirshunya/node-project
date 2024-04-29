@@ -161,6 +161,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     const [outbtn] = VisitorLabel.getElementsByClassName('domino-waiting-popup__button')
     outbtn.addEventListener('click', ()=>{
         ConnectionStables.disconnect();
+        window.history.go(-1);
         VisitorLabel.classList.toggle('hidden', true);
         document.getElementById('DebugPanel')?.classList?.toggle('hidden', true);
     })
