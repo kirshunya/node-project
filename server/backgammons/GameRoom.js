@@ -173,6 +173,7 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
     }
 }
 const { timestamp } = require("./Utility.js");
+const BetsInfo = require("./BetsInfo.js");
 class TGame extends SharedRoom0 {
     // /** @type {TPlayer.PlayersContainer} */
     // Players = new TPlayer.PlayersContainer(this)
@@ -242,7 +243,7 @@ class TGame extends SharedRoom0 {
         return this.RoomState.stepIfValid?.(...arguments);
     }
     json() {
-        return Object.assign(this.RoomState.json(), {GameID:this.GameID, RoomState:this.RoomState.RoomState, TimersTurn:Debug.TimersTurn})
+        return Object.assign(this.RoomState.json(), {GameID:this.GameID, RoomState:this.RoomState.RoomState, TimersTurn:Debug.TimersTurn, betInfo:this.betInfo})
     }
     minjson() {
         return [this.RoomState.players, this.RoomState.RoomState, this.RoomState.startedAt]
@@ -325,6 +326,7 @@ class WaitingState extends RoomState(0) {
         console.log('userbalance', userbalance);
         if(userbalance < this.Room.bet) { return ctx.event('inConnectionBalanceError', {bet:this.Room.bet, balance:userbalance}); }
         const connres = this.players.push(ctx.user)<=2;
+        if(this.players.length === 1) this.Room.betInfo = BetsInfo.BackgammonsBETS.get(this.Room.betId);
         if(this.players.length >= 2) 
             ((this.players.length = 2), this.upgrade(LaunchingState.fromWaitingState(this)), true);
         else waitingStartAtRoom(this.Room.GameID, ctx.user.userId);
@@ -628,7 +630,7 @@ class WinState extends RoomState(4) {
             this.upgrade(new WaitingState(lstate));
             this.Room.events.onfinish.send();
         })
-        completeGame(this.Room.GameID, winner, loser);
+        completeGame(this.Room.GameID, winner, loser, this.Room.betInfo);
     }
     /** @param {GameStarted} lstate */
     static fromGameStarted(lstate, winner, loser) {
