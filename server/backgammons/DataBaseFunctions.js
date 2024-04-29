@@ -37,7 +37,7 @@ function logInvalidTransaction(userId, balanceDifferncial, e) {
 // ======== SimpleOperations ========
 async function logGameStatsToHistory([betId, roomId], startedAt, winnerId, looserId, commision){
   return await BackgammonGamesHistory.create({
-      bet: BackgammonsBETS[betId].bet
+      bet: BackgammonsBETS.get(betId).bet
     , betId: betId
     , roomId: roomId
     , startedAt: startedAt
@@ -93,7 +93,7 @@ async function setGameSettingValue(settingName, value) {
 }
 // ======== Usefull Operations ========
 async function BackgammonsBalanceTravers(winner, loser, betId) {
-  const bet = BackgammonsBETS[betId];
+  const bet = BackgammonsBETS.get(betId);
   const comission = bet.bet*bet.comission*2; // comission from 2 players
   const lose = bet.bet;
   const prize = bet.bet-comission; // prize with comission

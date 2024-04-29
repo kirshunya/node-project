@@ -317,7 +317,7 @@ export async function InitGame(GameInitData, localUser, ws) {
             promisableinitables.SlotsNDropsComplete.resolve([Slots, Drops]);
           }
           BetsLoaded.then(({BackgammonsBETS})=>{
-            const bet = BackgammonsBETS[betId];
+            const bet = BackgammonsBETS.get(betId);
             const comission = bet.comission*2; // comission from 2 players
             const lose = bet.bet;
             const prize = bet.bet - comission; // prize with comission

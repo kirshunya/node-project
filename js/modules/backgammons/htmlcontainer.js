@@ -125,7 +125,7 @@ export class waitingPopup extends showablePopup {
   constructor(betId, players=[]) {
     super();
     this.firstready = siteLanguageInited.then(async (siteLanguage)=>{
-      const bet = (await BetsLoaded).BackgammonsBETS[betId].bet;
+      const bet = (await BetsLoaded).BackgammonsBETS.get(betId).bet;
       const popupElement = this.htmlelement = document.createElement("div");
       popupElement.classList.add("popup", "domino-waiting-popup-wrapper");
       popupElement.innerHTML = /* html */`
@@ -253,7 +253,7 @@ export class BackgammonsLaunchingPopup extends showablePopup {
   constructor(betId, players, timeval=[5000, Date.now()]) {
     super();
     this.firstready = siteLanguageInited.then(async siteLanguage=>{
-      const { bet } = (await BetsLoaded).BackgammonsBETS[betId];
+      const { bet } = (await BetsLoaded).BackgammonsBETS.get(betId);
 
       const popupElement = this.htmlelement = document.createElement("div");
       popupElement.classList.add("popup");

@@ -178,7 +178,7 @@ class TGame extends SharedRoom0 {
     // Players = new TPlayer.PlayersContainer(this)
     get betId() { return this.GameID[0]; }
     betInfo = null;
-    get bet() { return this.betInfo?.bet||BackgammonsBETS[this.betId].bet; }
+    get bet() { return this.betInfo?.bet||BackgammonsBETS.get(this.betId).bet; }
     get players() {return this.RoomState.players; }
     /** @type { WaitingState | LaunchingState | DiceTeamRollState | GameStarted | WinState } */
     RoomState = new WaitingState(this);
@@ -214,7 +214,7 @@ class TGame extends SharedRoom0 {
     disconnect(ctx) {
         super.disconnect(ctx.user, ctx, ctx.ws);
         if(this.RoomState.disconnect?.(ctx)) 
-            return (this.event('backgammons::room::disconnect', ctx.user.userId), this.betInfo = BackgammonsBETS[this.betId], true);
+            return (this.event('backgammons::room::disconnect', ctx.user.userId), this.betInfo = BackgammonsBETS.get(this.betId), true);
     }
     /** @param {TeXRoomState} newState */
     upgradeState(newState) {
