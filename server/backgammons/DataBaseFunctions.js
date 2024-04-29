@@ -80,13 +80,13 @@ async function RoomInfo([betId, roomId]) {
 
 async function createRooms(){
   getGameSettingValue('BackgammonsStatus').then((res)=>{
-    if(res === null) setGameSettingValue('BackgammonsStatus', {status:'active', code:200});//Я хз чё здесь писать, пхе
+    if(res === null || res === undefined) setGameSettingValue('BackgammonsStatus', {status:'active', code:200});//Я хз чё здесь писать, пхе
   });
   await BackgammonsRooms.destroy({ where: {}, truncate: true })
   return Promise.all(BackgammonsBETS.mapPairs((betInfo, betId)=>(range(1, 7)).map(async roomId=>BackgammonsRooms.create({ betId, roomId }))).flat(3))
 }
 async function getGameSettingValue(settingName) {
-  return GamesSettings.findByPk(settingName).then(({dataValues:{value}})=>value);
+  return GamesSettings.findByPk(settingName).then((res)=>res&&res.dataValues.value);
 }
 async function setGameSettingValue(settingName, value) {
   return GamesSettings.upsert({name:settingName, value})
