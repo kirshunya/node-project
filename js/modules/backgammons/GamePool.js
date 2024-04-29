@@ -18,10 +18,6 @@ const TeamFromTeamId = {
   [BoardConstants.WHITE.id]: BoardConstants.WHITE,
   [BoardConstants.BLACK.id]: BoardConstants.BLACK
 }
-popupsinited.then(()=>{
-  window.openEmojiPopup = openEmojiPopup;
-  window.openPhrasesPopup = openTextPopup;
-})
 
 export const timestamp = ()=>Date.now();//moveTo Utilities
 
@@ -222,6 +218,21 @@ export async function InitGame(GameInitData, localUser, ws) {
           userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
           oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
           oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+      },
+      inited: false, isVisitor: false,
+      initUI(isVisitor) {
+        if(this.inited) return;
+        const [restart, sound, autodice] = document.getElementById('TopPan')
+                                              .getElementsByClassName('buttons')[0].children;
+        isVisitor||restart.addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
+        isVisitor||sound.addEventListener('click', ()=>setGameSoundsAllowed(turnSound()));
+        popupsinited.then(()=>{
+          const probe = ()=>{};
+          window.openEmojiPopup = isVisitor&&probe||openEmojiPopup;
+          window.openPhrasesPopup = isVisitor&&probe||openTextPopup;
+        })
+        this.inited = true;
+        this.isVisitor = isVisitor;
       }
     }
     function turnSound() {
@@ -229,10 +240,6 @@ export async function InitGame(GameInitData, localUser, ws) {
         localStorage.setItem('sounds-game', {true:`false`, false:`true`}[soundAllowed])
         return {true:false, false:true}[soundAllowed]
     }
-    const [restart, sound, autodice] = document.getElementById('TopPan')
-                                          .getElementsByClassName('buttons')[0].children;
-    restart.addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
-    sound.addEventListener('click', ()=>setGameSoundsAllowed(turnSound()));
     const __playerById = ([firstPlayer, secondPlayer])=>({[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer});
     /** @type {showablePopup} */
     let elcaPopup = null;
@@ -253,7 +260,7 @@ export async function InitGame(GameInitData, localUser, ws) {
           isVisitor(initData.players);
       }, [2](initData) { // DiceTeamRolling
           if(prevState === 2) new Toast({title:'Переброс камней', text:'У вас камни были одинаковые, поэтому вы перебрасываете', autohide: true})
-          isVisitor(initData.players);
+          UsersPanUI.initUI(isVisitor(initData.players));
           /** @type {{players:[]}} */
           const {players, timeval} = initData;
           UsersPanUI.initAvatars(players[0], players[1]);
@@ -275,7 +282,7 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ Timers.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [3](initData) { // GameStarted
-          isVisitor(initData.players);
+          UsersPanUI.initUI(isVisitor(initData.players));
           const localPlayer = __playerById(initData.players)[localUser.userId];
           if(localPlayer) {
             localUser.team = TeamFromTeamId[+(localPlayer?.team||0)];
@@ -306,8 +313,7 @@ export async function InitGame(GameInitData, localUser, ws) {
 
           onChange = ()=>{ TimersByTeam.map(timer=>timer.enable(false)); resetTimersIntervals(); }
       }, [4]({Slots, Drops, players, winner, loser, timeval}) { // Win // here's started timer to emojis send on Win
-          
-          isVisitor(players);
+          UsersPanUI.initUI(false);isVisitor(players)
           if(!prevState) { // если только перезагрузили или открыли страницу
             const [firstPlayer, secondPlayer] = players;
             const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
@@ -398,9 +404,9 @@ export async function InitGame(GameInitData, localUser, ws) {
         return activetimerind;
     }
     function isVisitor([player1, player2]) {
-      const isVisitor = player1?.userId === localUser.userId || player2?.userId === localUser.userId
-      VisitorLabel.classList.toggle('hidden', isVisitor);
+      const isPlayer = player1?.userId === localUser.userId || player2?.userId === localUser.userId
+      VisitorLabel.classList.toggle('hidden', isPlayer);
       document.getElementById('DebugPanel')?.classList?.toggle('hidden', false);
-      return isVisitor;
+      return !isPlayer;
     }
 }
