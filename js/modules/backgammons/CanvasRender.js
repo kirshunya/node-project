@@ -895,6 +895,7 @@ export class BoardCanvas extends CanvasFunctions {
     }
 }
 function CanvasCoordinates(reverse, index) {
+    if(index === WHITE.over || index === BLACK.over) return index;
     return reverse?(+index+12)%24:+index
 }
 
