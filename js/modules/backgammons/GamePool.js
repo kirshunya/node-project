@@ -4,15 +4,18 @@ import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
-import { BackgammonsLaunchingPopup, BackgammonsLosePopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
+import { BackgammonsLaunchingPopup, BackgammonsLosePopup, BackgammonsRestartConfirmPopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
 import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
 import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
 import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
-import { playBckgGameStart, playLose, playWin, setGameSoundsAllowed } from '../audio.js';
+import { getBckgSoundValue, playBckgGameStart, playLose, playWin, setGameSoundsAllowed, toggleBckgSound } from '../audio.js';
 
+const probe = ()=>{};
+window.openEmojiPopup = probe
+window.openPhrasesPopup = probe
 const TeamFromTeamId = {
   [BoardConstants.EMPTY.id]: BoardConstants.EMPTY,
   [BoardConstants.WHITE.id]: BoardConstants.WHITE,
@@ -209,6 +212,11 @@ export async function InitGame(GameInitData, localUser, ws) {
     let TimersByTeam
     /** @type {int} */
     let activetimerind;
+    const __playerById = ([firstPlayer, secondPlayer])=>({[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer});
+    /** @type {showablePopup} */
+    let elcaPopup = null;
+    function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
+    function hidePopups() { elcaPopup&&elcaPopup.close(true); }
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
       get oppPan() { return document.getElementById('BottomPan') },
@@ -224,27 +232,26 @@ export async function InitGame(GameInitData, localUser, ws) {
         if(this.inited) return;
         const [restart, sound, autodice] = document.getElementById('TopPan')
                                               .getElementsByClassName('buttons')[0].children;
-        isVisitor||restart.addEventListener('click', ()=>confirm('Вы хотите сдаться?')&&req({method:'restart__'}));
-        isVisitor||sound.addEventListener('click', ()=>setGameSoundsAllowed(turnSound()));
-        popupsinited.then(()=>{
-          const probe = ()=>{};
-          window.openEmojiPopup = isVisitor&&probe||openEmojiPopup;
-          window.openPhrasesPopup = isVisitor&&probe||openTextPopup;
-        })
+        if(!isVisitor) {
+          restart.addEventListener('click', async()=>{
+            const restartPopup = new BackgammonsRestartConfirmPopup();
+            showNewPopup(restartPopup);
+            if(await restartPopup.confirm) req({method:'restart__'})
+          });
+          // sound.addEventListener('click', ()=>setGameSoundsAllowed(turnSound()));
+          sound.classList.toggle('active', getBckgSoundValue());
+          sound.addEventListener('click', ()=>{
+            sound.classList.toggle('active', toggleBckgSound());
+          });
+          popupsinited.then(()=>{
+            window.openEmojiPopup = openEmojiPopup;
+            window.openPhrasesPopup = openTextPopup;
+          })
+        }
         this.inited = true;
         this.isVisitor = isVisitor;
       }
     }
-    function turnSound() {
-        const soundAllowed = localStorage.getItem(`sounds-game`);
-        localStorage.setItem('sounds-game', {true:`false`, false:`true`}[soundAllowed])
-        return {true:false, false:true}[soundAllowed]
-    }
-    const __playerById = ([firstPlayer, secondPlayer])=>({[firstPlayer.userId]:firstPlayer, [secondPlayer.userId]:secondPlayer});
-    /** @type {showablePopup} */
-    let elcaPopup = null;
-    function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
-    function hidePopups() { elcaPopup&&elcaPopup.close(true); }
     let curState = GameInitData.RoomState, prevState = null;
     document.getElementById('TimersTurnButton').innerHTML = `Timers ${GameInitData.TimersTurn?'ON':'OFF'}`
     const RoomStatesInitRouter = {
@@ -324,9 +331,9 @@ export async function InitGame(GameInitData, localUser, ws) {
           }
           BetsLoaded.then(({BackgammonsBETS})=>{
             const bet = BackgammonsBETS.get(betId);
-            const comission = bet.comission*2; // comission from 2 players
+            const comission = bet.bet*bet.comission*2; // comission from 2 players
             const lose = bet.bet;
-            const prize = bet.bet - comission; // prize with comission
+            const prize = bet.bet*2 - comission; // prize with comission
 
             if(winner.userId === localUser.userId) (playWin(), showNewPopup(new BackgammonsWinPopup(betId, winner, prize)));
             else if(loser.userId === localUser.userId) (playLose(), showNewPopup(new BackgammonsLosePopup(betId, winner)));

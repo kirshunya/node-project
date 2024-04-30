@@ -405,8 +405,10 @@ class DiceTeamRollState extends RoomState(2) {
         // for(const player of players) {
         //     this.rollDice({user:player}, false);
         // }
-        if(this.Dices[0] !== this.Dices[1]) this.startNextState();
-        else this.restartState()
+        while(this.Dices[0] === this.Dices[1]) {
+            this.Dices = randdice();
+        }
+        this.startNextState();
     }
     /** @param {LaunchingState} wstate  */
     static fromLaunchingState(lstate) {

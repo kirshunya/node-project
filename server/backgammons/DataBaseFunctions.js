@@ -111,12 +111,11 @@ async function completeGame([betId, roomId], winner, loser, betInfo) {
   ]).then(([winnerStats, loserStats])=>{
     winnerStats.update({
       moneyNardsWon: winnerStats.moneyNardsWon+prize,
-      nardsTokens: winnerStats.nardsTokens+2,
+      nardsTokens: winnerStats.nardsTokens+betInfo.tokens,
       gameNardsPlayed: winnerStats.gameNardsPlayed+1,
     })
     loserStats.update({
       moneyNardsLost: loserStats.moneyNardsLost+lose,
-      nardsTokens: loserStats.nardsTokens-1,
       gameNardsPlayed: loserStats.gameNardsPlayed+1,
     })
   })

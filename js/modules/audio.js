@@ -135,6 +135,9 @@ export const playPlaceTile = () => {
 }
 
 /* ======== BACKGAMMONS ======== */
+var BckgsSoundActive = true;
+export const getBckgSoundValue = () => BckgsSoundActive;
+export const toggleBckgSound = () => BckgsSoundActive = !BckgsSoundActive;
 export const playLose = () => {
   try{
     AudioBackgammonsLose.play();
@@ -157,7 +160,7 @@ export const playWin = () => {
 }
 export const playDices = () => {
   try{
-    AudioBackgammonsDices.play();
+    BckgsSoundActive&&AudioBackgammonsDices.play();
     // const placeTile = new Audio(`${path}/backgammons/dices.mp3`);
     // placeTile.volume = gameVolume;
     // placeTile.play();
@@ -167,7 +170,7 @@ export const playDices = () => {
 }
 export const playStep = () => {
   try{
-    AudioBackgammonsSteps.play();
+    BckgsSoundActive&&AudioBackgammonsSteps.play();
     // const placeTile = new Audio(`${path}/backgammons/xodba.mp3`);
     // placeTile.volume = gameVolume;
     // placeTile.play();

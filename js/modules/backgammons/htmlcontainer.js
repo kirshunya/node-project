@@ -454,3 +454,36 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
     });
   }
 }
+
+export class BackgammonsRestartConfirmPopup extends showablePopup {
+  constructor(betId) {
+    super();
+    const self = this;
+    this.confirm = FCPromise();
+    this.ready = this.firstready = siteLanguageInited.then(async siteLanguage=>{
+      let popupElement = this.htmlelement = document.createElement("div");
+      popupElement.classList.add("popup");
+      popupElement.innerHTML = /*html*/`
+              <div class="popup__body exit-room-popup">
+              <div class="popup__content">
+                <div class="popup__img">
+                  <img src="img/popup-alert.png" alt="" />
+                </div>
+                <div class="popup__text">
+                  Вы хотите сдаться?
+                </div>
+                <div class="popup__buttons">
+                  <button class="popup__button popup__submit-button red">${siteLanguage.words.yes}</button>
+                  <button class="popup__button close-popup green">${siteLanguage.words.no}</button>
+                </div>
+              </div>
+            </div>`;
+      await sleep(10);
+      const [enter, exit] = popupElement.getElementsByClassName('popup__button');
+      this.onclose(()=>this.confirm.resolve(false));
+      enter.addEventListener('click', ()=>(this.confirm.resolve(true),this.close(true)));
+      exit.addEventListener('click', ()=>this.close());
+      // document.body.appendChild(popupElement);
+    });
+  }
+}
