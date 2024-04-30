@@ -93,6 +93,11 @@ export function pdom(string, ...values) {
   });
   return HTMLCollectionToDocFrag(tempContainer.children);
 }
+pdom.simpleemit = (htmlcontent)=>{
+  const tempContainer = document.createElement('div');
+  tempContainer.innerHTML = htmlcontent;
+  return HTMLCollectionToDocFrag(tempContainer.children);
+};
 /**
  *
  * @param {HTMLElement} element

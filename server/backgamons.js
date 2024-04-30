@@ -271,8 +271,8 @@ AdminsRouter.get('/played-backgammons-games', async function(req, res, next) {
 AdminsRouter.post('/backgammons-status', async function(req, res, next) {
     try{
         const info = {
-            get on() { return {status:'active', code:200}; },
-            get off() { return {status:'disabled', code:500}; }
+            get 200() { return {status:'active', code:200}; },
+            get 500() { return {status:'disabled', code:500}; }
         }[req.query.status];
         setGameSettingValue('BackgammonsStatus', info);
         return res.status(200).json({});

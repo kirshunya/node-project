@@ -454,6 +454,27 @@ export async function getPlayedBackgammonsGamesByDate(date) {
     return await e.response;
   }
 }
+export async function toggleBackgammonsStatus(statusCode) {
+  try {
+    return await $api.post(`/backgammons-status?status=${statusCode}`)
+  } catch (e) {
+    console.log(e.response);
+    return await e.response;
+  }
+}
+/**
+ * 
+ * @param {{[betId:number]:{bet:number, commision:number, tokens:int}}} betsList 
+ * @returns 
+ */
+export async function editBackgammonsBets(betsList) {
+  try {
+    return await $api.post(`/editBets`, betsList)
+  } catch (e) {
+    console.log(e.response);
+    return await e.response;
+  }
+}
 export async function getBackgammonsStatus() {
   try {
     const response = await $api.get(`/backgammons-status`);

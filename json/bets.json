@@ -2,23 +2,28 @@
     "BackgammonsBETS": {
         "1":{
             "bet": 1,
-            "comission": 0.1
+            "comission": 0.1,
+            "tokens": 2
         },
         "2":{
             "bet": 3,
-            "comission": 0.1
+            "comission": 0.1,
+            "tokens": 5
         },
         "3":{
             "bet": 5,
-            "comission": 0.1
+            "comission": 0.1,
+            "tokens": 10
         },
         "4":{
             "bet": 10,
-            "comission": 0.1
+            "comission": 0.1,
+            "tokens": 50
         },
         "5":{
             "bet": 20,
-            "comission": 0.1
+            "comission": 0.1,
+            "tokens": 100
         }
     },
     "DominoBETS": []
