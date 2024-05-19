@@ -126,6 +126,8 @@ const Stats = sequelize.define("stat", {
   gameNardsPlayed: { type: DataTypes.INTEGER, defaultValue: 0 },
   deposited: { type: DataTypes.FLOAT, defaultValue: 0 },
   withdrawn: { type: DataTypes.FLOAT, defaultValue: 0 },
+  NardsWon: { type: DataTypes.FLOAT, defaultValue: 0 },
+  NardsLost: { type: DataTypes.FLOAT, defaultValue: 0 },
 });
 
 const BotStats = sequelize.define("botstat", {

@@ -167,6 +167,7 @@ class UserService {
             username: user.user.username,
             moneyWon: user.moneyNardsWon,
             tokens: user.nardsTokens,
+            gamesWon: user.NardsWon,
           };
           nardsStats.push(userDto);
         }

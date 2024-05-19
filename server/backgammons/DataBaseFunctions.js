@@ -8,7 +8,7 @@ const { BackgammonsBETS } = require('./BetsInfo.js');
 
 // ======== UNIFIC ? ========
 async function getUser(userId) { return await User.findOne({ where: { id: userId }, }); }
-async function getStatsOf(userId) { return await Stats.findOne({ where: { id: userId }, }); }
+//async function getStatsOf(userId) { return await Stats.findOne({ where: { id: userId }, }); }
 /** @returns {FLOAT} */
 async function getUserBalance(userId) { return (await getUser(userId)).balance; }
 async function balanceTransaction(userId, balanceDifferncial) {
@@ -93,7 +93,7 @@ async function setGameSettingValue(settingName, value) {
 }
 // ======== Usefull Operations ========
 async function BackgammonsBalanceTravers(winner, loser, betInfo) {
-  // const betInfo = BackgammonsBETS.get(betId);
+  //const betInfo = BackgammonsBETS.get(betId);
   const comission = betInfo.bet*betInfo.comission*2; // comission from 2 players
   const lose = betInfo.bet;
   const prize = betInfo.bet-comission; // prize with comission
@@ -106,21 +106,66 @@ async function BackgammonsBalanceTravers(winner, loser, betInfo) {
 async function completeGame([betId, roomId], winner, loser, betInfo) {
   const room = await RoomInfo([betId, roomId]);
   const [bet, comission, lose, prize] = await BackgammonsBalanceTravers(winner, loser, betInfo);
-  Promise.all([
-    getStatsOf(winner.userId), getStatsOf(loser.userId)
-  ]).then(([winnerStats, loserStats])=>{
-    winnerStats.update({
-      moneyNardsWon: winnerStats.moneyNardsWon+prize,
-      nardsTokens: winnerStats.nardsTokens+betInfo.tokens,
-      gameNardsPlayed: winnerStats.gameNardsPlayed+1,
-    })
-    loserStats.update({
-      moneyNardsLost: loserStats.moneyNardsLost+lose,
-      gameNardsPlayed: loserStats.gameNardsPlayed+1,
-    })
-  })
+
+  try {
+    const [winnerStats, loserStats] = await Promise.all([
+      getStatsOf(winner.userId),
+      getStatsOf(loser.userId)
+    ]);
+
+    const defaultWinnerStats = {
+      moneyNardsWon: prize,
+      nardsTokens: 1,
+      gameNardsPlayed: 1,
+      userId: winner.userId,
+      NardsWon: 1
+    };
+
+    const defaultLoserStats = {
+      moneyNardsLost: lose,
+      gameNardsPlayed: 1,
+      userId: loser.userId,
+      NardsLost: 1
+    };
+
+    if (winnerStats) {
+      await winnerStats.update({
+        moneyNardsWon: winnerStats.moneyNardsWon + prize,
+        nardsTokens: winnerStats.nardsTokens + betInfo.tokens,
+        gameNardsPlayed: winnerStats.gameNardsPlayed + 1,
+        NardsWon: winnerStats.NardsWon + 1
+      });
+    } else {
+      defaultWinnerStats.moneyNardsWon = prize,
+      defaultWinnerStats.nardsTokens = betInfo.tokens,
+      defaultWinnerStats.gameNardsPlayed = 1,
+      defaultWinnerStats.NardsWon =  1
+      await Stats.create(defaultWinnerStats, { where: { userId: winner.userId } });
+    }
+
+    if (loserStats) {
+      await loserStats.update({
+        moneyNardsLost: loserStats.moneyNardsLost + lose,
+        gameNardsPlayed: loserStats.gameNardsPlayed + 1,
+        NardsLost: loserStats.NardsLost + 1
+      });
+    } else {
+      defaultLoserStats.moneyNardsLost = lose;
+      defaultLoserStats.gameNardsPlayed = 1;
+      defaultLoserStats.NardsLost = 1;
+      await Stats.create(defaultLoserStats, { where: { userId: loser.userId } });
+    }
+  } catch (error) {
+    console.error('Error retrieving user statistics:', error);
+    return;
+  }
+
   await logGameStatsToHistory([betId, roomId], room.startedAt, winner.userId, loser.userId, comission);
   return finishRoom([betId, roomId]);
+}
+
+async function getStatsOf(userId) {
+  return await Stats.findOne({ where: { userId } });
 }
 /** @param {Date} fromdate @returns {{bet: number, comission_sum: number, games_count: int}[]} */
 async function getBackgammonsGeneralInfo(fromdate){

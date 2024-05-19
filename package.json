@@ -3,10 +3,15 @@
     "version": "1.0.0",
     "description": "",
     "main": "server/index.js",
-    "scripts": { "start": "node server/index.js" },
+    "scripts": {
+        "start": "node server/index.js"
+    },
     "authors": [
-        "sahivu", "...others"
+        "sahivu",
+        "...others"
     ],
-    "license": "ISC"
-  }
-  
+    "license": "ISC",
+    "dependencies": {
+        "fabric": "^5.3.0"
+    }
+}

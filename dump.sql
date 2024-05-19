@@ -456,6 +456,8 @@ CREATE TABLE `stats` (
   `gameDominoPlayed` int DEFAULT '0',
   `dominoTokens` float DEFAULT '0',
   `moneyNardsWon` float DEFAULT '0',
+  `NardsWon` float DEFAULT '0',
+  `NardsLost` float DEFAULT '0',
   `moneyNardsLost` float DEFAULT '0',
   `nardsTokens` float DEFAULT '0',
   `gameNardsPlayed` int DEFAULT '0',
@@ -488,6 +490,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+-- ALTER TABLE e24loto.tokens MODIFY COLUMN refreshToken VARCHAR(500);
 CREATE TABLE `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
   `userId` int DEFAULT NULL,

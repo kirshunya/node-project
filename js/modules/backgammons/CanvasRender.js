@@ -693,24 +693,25 @@ export class BoardCanvas extends CanvasFunctions {
     showAcceptDiceRollLabel(ActiveTeam, clickcallback) {
         const sideleft = +BordersByX[0]+(ActiveTeam===WHITE.id?BoardSidesSize[0]+BordersByX[1]:0)
         const currentSideSize = BoardSidesSize[ActiveTeam===BLACK.id?1:0]
-        const left = sideleft + currentSideSize/2;
-        const top = BoardHeight/2+checkerSize;
-        const text = new fabric.Text('Бросить кости', {
-            left, top,
-            fontSize: 110,
-            fill: 'red',
-            shadow: 'gray 5px 5px 3px',
-            hoverCursor: 'pointer',
-            backgroundColor: '#c49a26c2'
-            // originX: 'top',
-            // originY: 'top',
-        })
-        text.left -= text.width/2
-        text.on('mousedown', clickcallback? clickcallback :()=>{
-            this.gc.rollDices()
-            this.canvas.remove(text);
-        })
-        this.canvas.add(text);
+        const centerX = sideleft + currentSideSize/2;
+        const centerY = BoardHeight/2+checkerSize;
+
+        // Загрузка изображения кнопки
+        fabric.Image.fromURL('img/backgammons/Group 55 (1).png', (img) => {
+            // Установка размера и положения изображения
+            img.scale(1.5);
+            img.left = centerX - img.width / 2;
+            img.top = centerY - img.height / 2;
+
+            // Установка обработчика события mousedown
+            img.on('mousedown', clickcallback ? clickcallback : () => {
+                this.gc.rollDices()
+                this.canvas.remove(img);
+            });
+
+            // Добавление изображения на canvas
+            this.canvas.add(img);
+        });
     }
     /** @type {{diceNumber:int, img:fabricImage, remove:Function}} */
     _dices = []

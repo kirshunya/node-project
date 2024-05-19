@@ -93,6 +93,27 @@ export async function openLeadersPage(gameType) {
       createLeaderesTable(tableElement, lotoLeaders.data, tableElementWrapper);
     }
   }
+  /**
+   * Функция для получения количества выигранных нартсов пользователя по ID.
+   * @param {Object} userObject - Объект пользователя с полем id.
+   * @return {Promise<number>} Количество выигранных нартсов пользователя.
+   */
+  async function getNardsWonById(userObject) {
+    try {
+      // Находим статистику пользователя по ID
+      const userStat = await Stats.findOne({
+        where: {
+          userId: userObject.id
+        }
+      });
+
+      // Если пользователь найден, возвращаем количество выигранных нартсов, иначе 0
+      return userStat? userStat.NardsWon : 0;
+    } catch (error) {
+      console.error('Ошибка при получении статистики пользователя:', error);
+      return 0; // Возвращаем 0 в случае ошибки
+    }
+  }
 
   // создание победителей в таблицу
   function createLeaderesTable(table, data, tableElementWrapper) {
@@ -114,7 +135,7 @@ export async function openLeadersPage(gameType) {
 
     for (let index = 0; index < dataLength; index++) {
       const userObject = data[index];
-
+      //const wins = getNardsWonById(userObject);
       let userElement = document.createElement("div");
       userElement.classList.add("leader-page__table-item");
       userElement.innerHTML = `
@@ -127,7 +148,7 @@ export async function openLeadersPage(gameType) {
           </div>
         </div>
         <p class="leader-table__winsum">
-          ${userObject.gamesWon||userObject.moneyWon}
+          ${userObject.gamesWon}
         </p>
         <p class="leader-table__bonuses">
           <img
@@ -160,13 +181,17 @@ export async function openLeadersPage(gameType) {
     }
 
     let localUser = localStorage.getItem("user");
+    let userStats = localStorage.getItem("stats");
     if (localUser) {
       localUser = JSON.parse(localUser);
+    }
+    if (userStats) {
+      userStats = JSON.parse(userStats);
     }
     let clientUsername = localUser.username;
 
     data.forEach((user, index) => {
-      if (clientUsername == user.username) {
+      if (clientUsername == user.username && user.id == userStats.userId) {
         if (index > 100) {
           let userElement = document.createElement("div");
           userElement.classList.add("leader-page__table-item", "leader-fixed");

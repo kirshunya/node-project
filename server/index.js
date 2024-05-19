@@ -85,14 +85,22 @@ const start = async () => {
     // }, 1000 * 60 * 60 * 24);
     backgammons.createRooms();
     if(process.argv.includes('--init')) {
-        for (let i = 0; i < 90; i++) {
-          // const randomUserdata = await axios.get(
-          //   "https://random-data-api.com/api/v2/users"
-          // );
-          // const randomUserdata = JSON.parse(`{"id":${9884+i},"uid":"37eaf673-fee7-478b-bb4b-23ba61bf750b","password":"F0kH3hJ8ep","first_name":"Marcus","last_name":"Schoen","username":"marcus.schoen","email":"marcus.schoen@email.com","avatar":"https://robohash.org/sunteumipsum.png?size=300x300\u0026set=set1","gender":"Genderqueer","phone_number":"+378 387.370.9776 x025","social_insurance_number":"129696480","date_of_birth":"1965-04-13","employment":{"title":"Legacy Healthcare Supervisor","key_skill":"Fast learner"},"address":{"city":"Krystinaborough","street_name":"Willy Neck","street_address":"447 Louise Isle","zip_code":"45988","state":"Oklahoma","country":"United States","coordinates":{"lat":66.14120766730511,"lng":-142.24832865015776}},"credit_card":{"cc_number":"6771-8939-8212-2998"},"subscription":{"plan":"Student","status":"Active","payment_method":"Paypal","term":"Payment in advance"}}`)
-          // const username = randomUserdata.data.first_name;
-          await Bot.create({ username:`visitor${i}`, lotoTokens: 1 });
-        }
+          //циккл создания ботов
+          //   for (let i = 0; i < 90; i++) {
+          //     try {
+          //       const randomUserdata = await axios.get("https://random-data-api.com/api/v2/users");
+          //       const username = randomUserdata.data.first_name;
+          //       await Bot.create({ username, lotoTokens: 1 });
+          //       // Добавляем задержку в 1 секунду перед следующим запросом
+          //       await new Promise(resolve => setTimeout(resolve, 2000));
+          //     } catch (error) {
+          //       console.error(`Ошибка при создании пользователя: ${error.message}`);
+          //       break; // Выход из цикла в случае ошибки
+          //     }
+          //   }
+          //
+          // createRandomUsers().then(() => console.log('Создание пользователей завершено'));
+          //}
 
         await LotoGame.update(
           {
@@ -126,19 +134,20 @@ const start = async () => {
           });
         }
 
-        for (let i = 1; i <= 10; i++) {
-          if (i !== 3) {
-            await Stats.create({
-              userId: i,
-            });
-          }
+      for (let i = 1; i <= 10; i++) {
+        if (i !== 3) {
+          await Stats.create({
+            userId: i,
+          });
         }
+      }
     }
     app.listen(PORT, () => console.log(`Server started on PORT = ${PORT}`));
   } catch (e) {
     console.log(e);
   }
 };
+
 
 start();
 
