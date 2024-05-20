@@ -13,6 +13,8 @@ import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
 import { getBckgSoundValue, playBckgGameStart, playLose, playWin, setGameSoundsAllowed, toggleBckgSound } from '../audio.js';
 
+
+
 const probe = ()=>{};
 window.openEmojiPopup = probe
 window.openPhrasesPopup = probe
@@ -40,7 +42,10 @@ export function lightstepbutton(active=true) {
 export function ShowGameTable(localUser, GameID) {
     debugPan.install()
     const main = document.getElementsByTagName('main')[0];
-    // let localUser = JSON.parse(localStorage.getItem("user"));
+    // const whiteFishIconPath = 'img/backgammons/whitepcell.png';
+    // const blackFishIconPath = 'img/backgammons/blackpcell.png';
+
+    //let localUser = JSON.parse(localStorage.getItem("user"));
     main.innerHTML = html`
     <div class="main__container footer__padding" style="max-width: 100vw">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
@@ -54,7 +59,9 @@ export function ShowGameTable(localUser, GameID) {
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
-                    <span><span class="turkeyFlag"></span> lvl: 45</span>
+                      <img src="${localUser.team === BoardConstants.WHITE? whiteFishIconPath : blackFishIconPath}" alt="User Fish Color Icon">
+                      <p>${siteLanguage.profilePage.mainButtons.balanceBtnText}</p>
+                      <span>Баланс:</span><span class="Balance"> ₼ </span>
                   </div>
                 </div>
               </div>
@@ -110,7 +117,9 @@ export function ShowGameTable(localUser, GameID) {
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
-                    <span><span class="turkeyFlag"></span> lvl: 45</span>
+                      <img src="${localUser.team === BoardConstants.WHITE? whiteFishIconPath : blackFishIconPath}" alt="User Fish Color Icon">
+                      <p>${siteLanguage.profilePage.mainButtons.balanceBtnText}</p>
+                      <span>Баланс:</span><span class="Balance"> ₼ </span>
                   </div>
                 </div>
               </div>
@@ -188,12 +197,6 @@ export async function InitGame(GameInitData, localUser, ws) {
     const req = msg=>ws.send(JSON.stringify(msg));
     const sendstep = async(step)=>req({method:'step', step, code:gencode()});
     const betId = GameInitData.GameID[0];
-    // GameInitData in Waiting = [waiter, waiter], visiters
-    // GameInitData in Launching = [player, player], visiters, timeval = 5
-    // GameInitData in DiceTeamRoll = [player, player], visiters, timeval = 20 -> sets Teams
-    // GameInitData in GameStarted = [player, player], visiters, Slots, Drops, [timeval = 60, timestamp = 0][2], Dices, ActiveTeam
-    // GameInitData in WIN = [player, player], visiters, Slots, Drops, [timeval = 60, timestamp = 0][2], Dices, WinnerTeam
-    // const {slots, dropped, players, state} = GameInitData;
 
     // const Drops = [[0,0], ...Object.entries(GameInitData.dropped)]
     //         .reduce((acc, [overname, overcount])=>(acc[+(overname===BoardConstants.BLACK.over)]=overcount, acc));
@@ -217,21 +220,36 @@ export async function InitGame(GameInitData, localUser, ws) {
     let elcaPopup = null;
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
+
+    const userColorClass = localUser.team === BoardConstants.WHITE? 'fish-white' : 'fish-black';
+    const userNickElement = document.querySelector('.Nickname');
+    userNickElement.classList.add(userColorClass);
+
+    // Вставляем соответствующее изображение рядом с никнеймом
+    const userFishIconSrc = localUser.team === BoardConstants.WHITE? 'path/to/whiteFishIcon.png' : 'path/to/blackFishIcon.png';
+    const userFishIcon = document.createElement('img');
+    userFishIcon.src = userFishIconSrc;
+    userFishIcon.className = 'user-fish-icon';
+    userNickElement.parentNode.insertBefore(userFishIcon, userNickElement.nextSibling);
+
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
       get oppPan() { return document.getElementById('BottomPan') },
       initAvatars(user, opponent) {
           const {userPan, oppPan} = this;
+
           userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
           userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
+          userPan.getElementsByClassName('Balance')[0].innerHTML =  user.balance;
+          //
           oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
           oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+          oppPan.getElementsByClassName('Balance')[0].innerHTML = opponent.balance;
       },
       inited: false, isVisitor: false,
       initUI(isVisitor) {
         if(this.inited) return;
-        const [restart, sound, autodice] = document.getElementById('TopPan')
-                                              .getElementsByClassName('buttons')[0].children;
+        const [restart, sound, autodice] = document.getElementById('TopPan').getElementsByClassName('buttons')[0].children;
         if(!isVisitor) {
           restart.addEventListener('click', async()=>{
             const restartPopup = new BackgammonsRestartConfirmPopup();

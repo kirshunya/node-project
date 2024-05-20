@@ -81,7 +81,7 @@ const WSPipelineCommands = {
     async ['connectGeneral'](ctx, msg) {
         const {clientId, userId, username} = msg
         const user = await User.findOne({ where: { id: userId } });
-        ctx.user = {clientId, userId, username, avatar:user.avatar}
+        ctx.user = {clientId, userId, username, avatar:user.avatar, balance:user.balance}
     },
     ['backgammons/openLobby'](ctx, msg) {
         return GamesLobby.connect(ctx.user, ctx, this);

@@ -4,7 +4,6 @@ export function showUserInterface(user) {
     // let userName = document.querySelector(".header__name");
     // let userBalance = document.querySelector(".header__balance");
     let userBalances = document.querySelectorAll(".user__balance");
-
     // userName.innerHTML = user.username;
     userBalances.forEach((userBalance) => {
       if (userBalance) {
@@ -30,11 +29,12 @@ export function updateBalance(newBalance) {
  * @typedef TlocalUser
  * @property {int} userId 
  * @property {string} username
+ * @property {float} balance
  */
 /**
  * 
  * @param {localUser=>localUser>} CB 
- * @returns {any | {userId, username, }}
+ * @returns {any | {userId, username, balance}}
  */
 export function getLocalUser(CB=localUser=>localUser){
   const localUser = localStorage.getItem("user");
