@@ -446,7 +446,7 @@ export class GameProvider {
     onRollDicesClick = new EventProvider();
     /**
      * 
-     * @param {{User:{userId,username, balance}, Slots:int[], sendstep:Function, Drops:[Number, Number]}} BoardInits
+     * @param {{User:{userId,username, balance, team,}, Slots:int[], sendstep:Function, Drops:[Number, Number]}} BoardInits
      * @param {*} GameStateInits 
      */
     constructor(BoardInits, promisesInitList) {

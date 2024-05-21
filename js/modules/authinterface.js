@@ -34,7 +34,7 @@ export function updateBalance(newBalance) {
 /**
  * 
  * @param {localUser=>localUser>} CB 
- * @returns {any | {userId, username, balance}}
+ * @returns {any | {userId, username, }}
  */
 export function getLocalUser(CB=localUser=>localUser){
   const localUser = localStorage.getItem("user");

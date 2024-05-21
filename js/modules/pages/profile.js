@@ -1032,10 +1032,10 @@ async function openUserGames() {
       game.casks = JSON.parse(game.casks);
       let gameitem = document.createElement("div");
       gameitem.classList.add(
-        "user-game__item",
-        "game-item",
-        `${game.isWinner ? "won" : "lose"}`,
-        `game-item-${index}`
+          "user-game__item",
+          "game-item",
+          `${game.isWinner ? "won" : "lose"}`,
+          `game-item-${index}`
       );
       gameitem.setAttribute("date", game.createdAt);
 
@@ -1061,47 +1061,47 @@ async function openUserGames() {
         </div>
         <div class="game-item__row game-item__isWon">
           ${siteLanguage.profilePage.myGamesPage.statsItem.resultText}: <span>${
-        game.isWinner
-          ? siteLanguage.profilePage.myGamesPage.statsItem.winGameText
-          : siteLanguage.profilePage.myGamesPage.statsItem.loseGameText
+          game.isWinner
+              ? siteLanguage.profilePage.myGamesPage.statsItem.winGameText
+              : siteLanguage.profilePage.myGamesPage.statsItem.loseGameText
       }</span>
         </div>
         <div class="game-item__row game-item__winSum">
           ${
-            siteLanguage.profilePage.myGamesPage.statsItem.sumWinText
-          }: <span>${game.winSum.toFixed(2)}</span> ₼
+          siteLanguage.profilePage.myGamesPage.statsItem.sumWinText
+      }: <span>${game.winSum.toFixed(2)}</span> ₼
         </div>
         <div class="game-item__row game-item__last-index">
           ${
-            siteLanguage.profilePage.myGamesPage.statsItem.winSumText
-          }: <span class="game-item__last-index-num">${game.winIndex}</span>
+          siteLanguage.profilePage.myGamesPage.statsItem.winSumText
+      }: <span class="game-item__last-index-num">${game.winIndex}</span>
         </div>
         <div class="game-item__row game-item__jackpotWon">
           ${siteLanguage.profilePage.myGamesPage.statsItem.winJackpotText}:
           <span class="game-item__jackpotWon-status">${
-            game.isJackpotWon
+          game.isJackpotWon
               ? siteLanguage.profilePage.myGamesPage.statsItem
                   .jackpotStatusWinText
               : siteLanguage.profilePage.myGamesPage.statsItem
                   .jackpotStatusLoseText
-          }</span>
+      }</span>
         </div>
         <div class="game-item__row game-item__price">
           ${
-            siteLanguage.profilePage.myGamesPage.statsItem.ticketPriceText
-          }: <span class="game-item__price-sum">${game.bet.toFixed(2)}</span> ₼
+          siteLanguage.profilePage.myGamesPage.statsItem.ticketPriceText
+      }: <span class="game-item__price-sum">${game.bet.toFixed(2)}</span> ₼
         </div>
         <div class="game-item__row game-item__bet">
           ${
-            siteLanguage.profilePage.myGamesPage.statsItem.ticketBetText
-          }: <span class="game-item__bet-sum">${(
-        game.bet * game.tickets.length
+          siteLanguage.profilePage.myGamesPage.statsItem.ticketBetText
+      }: <span class="game-item__bet-sum">${(
+          game.bet * game.tickets.length
       ).toFixed(2)}</span> ₼
         </div>
         <div class="game-item__row game-item__bank">
           ${
-            siteLanguage.profilePage.myGamesPage.statsItem.bankText
-          }: <span class="game-item__bank-sum">${game.bank.toFixed(2)}</span> ₼
+          siteLanguage.profilePage.myGamesPage.statsItem.bankText
+      }: <span class="game-item__bank-sum">${game.bank.toFixed(2)}</span> ₼
         </div>
       `;
 
@@ -1109,7 +1109,7 @@ async function openUserGames() {
 
       let gameItem = document.querySelector(`.game-item-${index}`);
       let ticketsBodyBlock = gameItem.querySelector(
-        ".game-item__tickets-block"
+          ".game-item__tickets-block"
       );
       if (ticketsBodyBlock) {
         createHistoryUserTickets(ticketsBodyBlock, lotoGames[index].tickets);
@@ -1126,10 +1126,10 @@ async function openUserGames() {
     dominoGames.forEach((game, index) => {
       let gameitem = document.createElement("div");
       gameitem.classList.add(
-        "user-game__item",
-        "game-item",
-        `${game.isWinner ? "won" : "lose"}`,
-        `game-item-${index}`
+          "user-game__item",
+          "game-item",
+          `${game.isWinner ? "won" : "lose"}`,
+          `game-item-${index}`
       );
       gameitem.setAttribute("date", game.createdAt);
 
@@ -1169,44 +1169,44 @@ async function openUserGames() {
         <p>${siteLanguage.statsPage.menuHeader.gameBackgamonsText}</p>
         <p class="game-item__isWon">${
           siteLanguage.profilePage.myGamesPage.statsItem.game
-        } <span> ${
-        game.isWinner
-          ? siteLanguage.profilePage.myGamesPage.statsItem.won
-          : siteLanguage.profilePage.myGamesPage.statsItem.lost
+      } <span> ${
+          game.isWinner
+              ? siteLanguage.profilePage.myGamesPage.statsItem.won
+              : siteLanguage.profilePage.myGamesPage.statsItem.lost
       }!</span></p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.room}: ${
-        game.roomId
+          game.roomId
       }</p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.table}: ${
-        game.tableId
+          game.tableId
       }</p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.playersAmount}: ${
-        game.playerMode
+          game.playerMode
       }</p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.gameMode}: ${
-        game.gameMode == "CLASSIC"
-          ? siteLanguage.profilePage.myGamesPage.statsItem.classic
-          : siteLanguage.profilePage.myGamesPage.statsItem.telephone
+          game.gameMode == "CLASSIC"
+              ? siteLanguage.profilePage.myGamesPage.statsItem.classic
+              : siteLanguage.profilePage.myGamesPage.statsItem.telephone
       }</p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.bet}: ${bet.toFixed(
-        2
+          2
       )}₼</p>
         ${
           game.isWinner
-            ? `<p>${
-                siteLanguage.profilePage.myGamesPage.statsItem.pureWin
+              ? `<p>${
+                  siteLanguage.profilePage.myGamesPage.statsItem.pureWin
               }: ${game.winSum.toFixed(2)}₼</p>
               <p>${
-                siteLanguage.profilePage.myGamesPage.statsItem.winCommission
+                  siteLanguage.profilePage.myGamesPage.statsItem.winCommission
               }: ${(game.winSum + bet).toFixed(2)}₼</p>
               `
-            : `${siteLanguage.profilePage.myGamesPage.statsItem.totalBank}: ${(
-                bet * game.playerMode
+              : `${siteLanguage.profilePage.myGamesPage.statsItem.totalBank}: ${(
+                  bet * game.playerMode
               ).toFixed(2)}₼`
-        }
+      }
         <p>${
           siteLanguage.profilePage.myGamesPage.statsItem.roomCommission
-        }: 15%</p>
+      }: 15%</p>
       `;
 
       mainBlock.insertBefore(gameitem, mainBlock.firstChild);
@@ -1217,7 +1217,7 @@ async function openUserGames() {
     games = [...games];
     games.sort((a, b) => {
       return (
-        new Date(b.getAttribute("date")) - new Date(a.getAttribute("date"))
+          new Date(b.getAttribute("date")) - new Date(a.getAttribute("date"))
       );
     });
     games.forEach((game) => {
@@ -1560,7 +1560,7 @@ async function openPayments() {
           user.username
         }</div>
         <div class="user-withdraw-item__item item-games">${
-          user.stat.gameLotoPlayed + user.stat.gameDominoPlayed
+          user.stat.gameLotoPlayed + user.stat.gameDominoPlayed + user.stat.gameNardsPlayed
         }</div>
         <div class="user-withdraw-item__item item-topup">${
           user.stat.deposited

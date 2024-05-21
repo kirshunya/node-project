@@ -63,6 +63,7 @@ wssend.call(ws, ...args);
         userId: localUser.userId,
         method: "connectGeneral",
         balance: localUser.balance,
+        team: localUser.team,
       })
     );
 

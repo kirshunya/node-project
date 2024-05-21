@@ -13,8 +13,6 @@ import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
 import { getBckgSoundValue, playBckgGameStart, playLose, playWin, setGameSoundsAllowed, toggleBckgSound } from '../audio.js';
 
-
-
 const probe = ()=>{};
 window.openEmojiPopup = probe
 window.openPhrasesPopup = probe
@@ -25,6 +23,37 @@ const TeamFromTeamId = {
 }
 
 export const timestamp = ()=>Date.now();//moveTo Utilities
+
+export class ImageHandler {
+    constructor(team) {
+        this.team = team;
+    }
+
+    // Метод для определения пути к изображению на основе team
+    getImagePath() {
+        const basePath = 'img/backgammons/';
+        switch (this.team) {
+            case BoardConstants.WHITE.id:
+                return `${basePath}whitepcell.png`; // Предположим, что это путь к белому изображению
+            case BoardConstants.BLACK.id:
+                return `${basePath}blackpcell.png`; // Предположим, что это путь к черному изображению
+            default:
+                throw new Error(`Неверное значение team: ${this.team}`);
+        }
+    }
+
+    // Метод для отображения изображения в HTML
+    displayInHtml(elementId, imgAltText) {
+        const imgElement = document.getElementById(elementId);
+        if (!imgElement) {
+            console.error(`Элемент с ID "${elementId}" не найден.`);
+            return;
+        }
+        imgElement.src = this.getImagePath();
+        imgElement.alt = imgAltText;
+    }
+}
+
 
 var GameInitData = null;//deprec
 export function setGameInitData(data) {
@@ -42,6 +71,7 @@ export function lightstepbutton(active=true) {
 export function ShowGameTable(localUser, GameID) {
     debugPan.install()
     const main = document.getElementsByTagName('main')[0];
+    const imageHandler = new ImageHandler(localUser.team);
     // const whiteFishIconPath = 'img/backgammons/whitepcell.png';
     // const blackFishIconPath = 'img/backgammons/blackpcell.png';
 
@@ -59,7 +89,7 @@ export function ShowGameTable(localUser, GameID) {
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
-                      <img src="${localUser.team === BoardConstants.WHITE? whiteFishIconPath : blackFishIconPath}" alt="User Fish Color Icon">
+                      <img id="myImageElementTop" alt="" width="10" height="10"/>
                       <p>${siteLanguage.profilePage.mainButtons.balanceBtnText}</p>
                       <span>Баланс:</span><span class="Balance"> ₼ </span>
                   </div>
@@ -117,7 +147,7 @@ export function ShowGameTable(localUser, GameID) {
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
-                      <img src="${localUser.team === BoardConstants.WHITE? whiteFishIconPath : blackFishIconPath}" alt="User Fish Color Icon">
+                      <img id="myImageElementBottom" alt="" width="10" height="10"/>
                       <p>${siteLanguage.profilePage.mainButtons.balanceBtnText}</p>
                       <span>Баланс:</span><span class="Balance"> ₼ </span>
                   </div>
@@ -221,22 +251,17 @@ export async function InitGame(GameInitData, localUser, ws) {
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
 
-    const userColorClass = localUser.team === BoardConstants.WHITE? 'fish-white' : 'fish-black';
-    const userNickElement = document.querySelector('.Nickname');
-    userNickElement.classList.add(userColorClass);
 
-    // Вставляем соответствующее изображение рядом с никнеймом
-    const userFishIconSrc = localUser.team === BoardConstants.WHITE? 'path/to/whiteFishIcon.png' : 'path/to/blackFishIcon.png';
-    const userFishIcon = document.createElement('img');
-    userFishIcon.src = userFishIconSrc;
-    userFishIcon.className = 'user-fish-icon';
-    userNickElement.parentNode.insertBefore(userFishIcon, userNickElement.nextSibling);
 
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
       get oppPan() { return document.getElementById('BottomPan') },
       initAvatars(user, opponent) {
           const {userPan, oppPan} = this;
+          if (userPan.team && oppPan.team != null )
+          {
+
+          }
 
           userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
           userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
@@ -322,6 +347,10 @@ export async function InitGame(GameInitData, localUser, ws) {
           }
 
           const [firstPlayer, secondPlayer] = initData.players;
+            const imageHandlerFP = new ImageHandler(firstPlayer.team);
+            const imageHandlerSP = new ImageHandler(secondPlayer.team);
+            imageHandlerFP.displayInHtml('myImageElementTop', '');
+            imageHandlerSP.displayInHtml('myImageElementBottom', '');
           const [whiteplayer, blackplayer] = firstPlayer.team === 1 ? [firstPlayer, secondPlayer] : [secondPlayer, firstPlayer];
           UsersPanUI.initAvatars(whiteplayer, blackplayer);
 
