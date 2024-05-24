@@ -193,7 +193,7 @@ const LotoCard = sequelize.define("card", {
   isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
-const LotoGame = sequelize.define("lotoGame", {
+const LotoGame = sequelize.define("lotoGame ", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

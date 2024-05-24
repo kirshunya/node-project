@@ -997,8 +997,9 @@ async function openUserGames() {
   let main = document.querySelector(".main__container");
   if (main) {
     const { data } = await impHttp.getUserGames();
-    const { lotoGames, dominoGames } = data;
-    // // console.log(data, lotoGames);
+    const { lotoGames, dominoGames} = data;
+    console.log(data);
+    console.log("ABOBABABABABABABABABABABA");
     main.innerHTML = `
       <div class="main__container">
         <section class="user-game-history">
@@ -1026,7 +1027,7 @@ async function openUserGames() {
     }
 
     let mainBlock = document.querySelector(".user-game-history__main");
-    lotoGames.forEach((game, index) => {
+    data.forEach((game, index) => {
       // создаем игру с истории юзера
       game.tickets = JSON.parse(game.tickets);
       game.casks = JSON.parse(game.casks);
@@ -1112,7 +1113,7 @@ async function openUserGames() {
           ".game-item__tickets-block"
       );
       if (ticketsBodyBlock) {
-        createHistoryUserTickets(ticketsBodyBlock, lotoGames[index].tickets);
+        createHistoryUserTickets(ticketsBodyBlock, data[index].tickets);
       }
 
       // убираем навигацию сайта
