@@ -36,7 +36,7 @@ let pingIntervals = [];
 export const connectWebsocketFunctions = () => {
   // const ws = new WebSocket(`wss://app.24loto.com/game`);
   // const ws = new WebSocket(`wss://loto-server-new.onrender.com/game`);
-  const ws = new WebSocket(`${API_URL_PART}/game`);
+  const ws = new WebSocket(`ws${API_URL_PART}/game`);
   // const ws = new WebSocket(`wss://lotogame.onrender.com/game`);
   window.ws = ws;
 
