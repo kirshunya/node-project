@@ -33,5 +33,8 @@
     },
     "keywords": [],
     "author": "",
-    "description": ""
+    "description": "",
+    "engines": {
+        "node": "22.1.0"
+    }
 }
