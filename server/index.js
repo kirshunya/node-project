@@ -92,7 +92,7 @@ const start = async () => {
                 const username = randomUserdata.data.first_name;
                 await Bot.create({ username, lotoTokens: 1 });
                 // Добавляем задержку в 1 секунду перед следующим запросом
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 2500));
               } catch (error) {
                 console.error(`Ошибка при создании пользователя: ${error.message}`);
                 break; // Выход из цикла в случае ошибки
