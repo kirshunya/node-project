@@ -84,21 +84,21 @@ const start = async () => {
     //   await getCurrency();
     // }, 1000 * 60 * 60 * 24);
     backgammons.createRooms();
-    //if(process.argv.includes('--init')) {
+    if(process.argv.includes('--init')) {
           //циккл создания ботов
-            for (let i = 0; i < 20; i++) {
-              try {
-                const randomUserdata = await axios.get("https://random-data-api.com/api/v2/users");
-                const username = randomUserdata.data.first_name;
-                await Bot.create({ username, lotoTokens: 1 });
-                // Добавляем задержку в 1 секунду перед следующим запросом
-                await new Promise(resolve => setTimeout(resolve, 2500));
-              } catch (error) {
-                console.error(`Ошибка при создании пользователя: ${error.message}`);
-                break; // Выход из цикла в случае ошибки
-              }
-            }
-
+          //   for (let i = 0; i < 90; i++) {
+          //     try {
+          //       const randomUserdata = await axios.get("https://random-data-api.com/api/v2/users");
+          //       const username = randomUserdata.data.first_name;
+          //       await Bot.create({ username, lotoTokens: 1 });
+          //       // Добавляем задержку в 1 секунду перед следующим запросом
+          //       await new Promise(resolve => setTimeout(resolve, 2000));
+          //     } catch (error) {
+          //       console.error(`Ошибка при создании пользователя: ${error.message}`);
+          //       break; // Выход из цикла в случае ошибки
+          //     }
+          //   }
+          //
           // createRandomUsers().then(() => console.log('Создание пользователей завершено'));
           //}
 
@@ -141,7 +141,7 @@ const start = async () => {
           });
         }
       }
-   // }
+    }
     app.listen(PORT, () => console.log(`Server started on PORT = ${PORT}`));
   } catch (e) {
     console.log(e);
