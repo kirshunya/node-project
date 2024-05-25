@@ -97,10 +97,10 @@ export function ShowGameTable(localUser, GameID) {
               </div>
               <div class="pcontrs">
                 <div class="buttons">
-                  <div style="background-image: url('img/flags.png');"></div>
-                  <div style="background-image: url('img/volume.png');
+<!--                  <div style="background-image: url('img/flags.png');"></div>-->
+<!--                  <div style="background-image: url('img/volume.png');-->
                               background-size: 57%;"></div>
-                  <div style="background-image: url('img/dice.png');" class="autostep active"></div>
+<!--                  <div style="background-image: url('img/dice.png');" class="autostep active"></div>-->
                 </div>
                 <div class="line" style="position: relative;">
                   <!-- <div style="flex-grow: 1;" class="dp"></div>
@@ -123,8 +123,8 @@ export function ShowGameTable(localUser, GameID) {
             <div id="BottomPan" class="TopLink">
               <div class="pcontrs">
                 <div class="buttons">
-                  <div id="smileChat" onclick="window.openEmojiPopup()" style="background-image: url('img/icons8-smile-chat-100.png');"></div>
-                  <div id="phraseChat" onclick="window.openPhrasesPopup()" style="background-image: url('img/chat50.png');"></div>
+<!--                  <div id="smileChat" onclick="window.openEmojiPopup()" style="background-image: url('img/icons8-smile-chat-100.png');"></div>-->
+<!--                  <div id="phraseChat" onclick="window.openPhrasesPopup()" style="background-image: url('img/chat50.png');"></div>-->
                 </div>
                 <div class="line" style="position: relative;">
                   <!-- <div style="flex-grow: 1;" class="dp"></div>
@@ -181,7 +181,7 @@ export function ShowGameTable(localUser, GameID) {
 /** @type {Number} in seconds*/
 const STEPTIME = 25;
 function ServerTimeStampCompinsationUser(timestamp, setter) {
-  return ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
+  // return ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
 }
 class Timer {
   constructor(Element, value, _STEPTIME = STEPTIME, red=false) {

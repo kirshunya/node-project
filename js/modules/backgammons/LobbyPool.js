@@ -185,7 +185,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                             // centeredSlides: true,
                             spaceBetween: 20,
                             grabCursor: true,
-                            slidesPerView: 3,
+                            //slidesPerView: 3,
                             allowTouchMove: true,
                             scrollbar: {
                             el: ".swiper-scrollbar",
