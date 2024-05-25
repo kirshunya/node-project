@@ -86,7 +86,7 @@ const start = async () => {
     backgammons.createRooms();
     //if(process.argv.includes('--init')) {
           //циккл создания ботов
-            for (let i = 0; i < 90; i++) {
+            for (let i = 0; i < 20; i++) {
               try {
                 const randomUserdata = await axios.get("https://random-data-api.com/api/v2/users");
                 const username = randomUserdata.data.first_name;
