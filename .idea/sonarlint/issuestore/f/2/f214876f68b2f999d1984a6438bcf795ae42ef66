@@ -1,43 +1,43 @@
 
-gjavascript:S125("Remove this commented out code.(£ÇíÏ8€ªµşú1J$0fe481f6-4ec8-497c-a35a-734374ff27de
-gjavascript:S125:"Remove this commented out code.(ßùè8ªµşú1J$90ba7bf2-bfe5-40ac-ab17-45cf6db38a89
-gjavascript:S125P"Remove this commented out code.(¸†‘Ÿ8ªµşú1J$a0a48a95-7257-4bf4-a74d-32408d970ae4
-javascript:S3776V"TRefactor this function to reduce its Cognitive Complexity from 99 to the 15 allowed.(´…±Ë8ªµşú1J$9ea61569-3b36-49d5-ac79-f6249e570f7a
-gjavascript:S125\"Remove this commented out code.(ìòêÍ8ªµşú1J$1b6fbe20-39d8-4591-b4af-254a0063c27a
-javascript:S1479]"BReduce the number of non-empty switch cases from 56 to at most 30.(ÂİÅøÿÿÿÿ8ªµşú1J$d7cf28df-0671-4a7f-94ec-9e6e806f724c
-{javascript:S6836h"-Unexpected lexical declaration in case block.(ÜÊ‰‡øÿÿÿÿ8ªµşú1J$04a3d7a7-205d-49f3-948e-e81ed6aceae3
-…javascript:S1125É"6Refactor the code to avoid using this boolean literal.(ïÃ‡·úÿÿÿÿ8ªµşú1J$dcaddcdf-3031-4c4a-8812-a06487415a6e
-|javascript:S6836Í"-Unexpected lexical declaration in case block.(—²½”ûÿÿÿÿ8ªµşú1J$24005300-9e1f-406f-a660-f1f86ac33559
-|javascript:S6836Î"-Unexpected lexical declaration in case block.(ª»ª€ÿÿÿÿÿ8ªµşú1J$0a89382e-1231-40da-a456-2797ca8daff6
-hjavascript:S125İ"Remove this commented out code.(ŠâÈÄ8ªµşú1J$8b793533-bafa-474c-bcee-3a4c72992d84
-…javascript:S1125à"6Refactor the code to avoid using this boolean literal.(°İ®úşÿÿÿÿ8ªµşú1J$7d9c0190-ffb8-48ac-9fc1-68a5e0a6e4fd
-|javascript:S6836ç"-Unexpected lexical declaration in case block.(¤±Ü»ùÿÿÿÿ8ªµşú1J$d2728873-1a68-4de5-8fdf-be7de16f44d3
-wjavascript:S6836ñ"-Unexpected lexical declaration in case block.(à¯‘è8ªµşú1J$539866e2-2f70-4e3b-8a6c-e1f7858509c1
-mjavascript:S125ƒ"Remove this commented out code.(ç‡Ô›úÿÿÿÿ8ªµşú1J$23525b7e-0fa5-4ac8-b31a-111a3a45ad4d
-mjavascript:S125²"Remove this commented out code.(÷ãİŠşÿÿÿÿ8ªµşú1J$76e09527-f88b-492b-ad7b-473fb5313aa1
-mjavascript:S125é"Remove this commented out code.(ÅåâÔúÿÿÿÿ8ªµşú1J$269adc9f-19a3-473d-8fdc-e975478a32f2
-mjavascript:S125ë"Remove this commented out code.(şğÌºıÿÿÿÿ8ªµşú1J$712017f9-d550-4c94-a293-a3951547badf
-|javascript:S6836í"-Unexpected lexical declaration in case block.(Š„ß³ûÿÿÿÿ8ªµşú1J$6add47c6-c698-4e35-b842-e8a86f65469a
-hjavascript:S125÷"Remove this commented out code.(’ÊË8ªµşú1J$5b846374-8d9f-4b18-9617-fadabade56eb
-|javascript:S6836ÿ"-Unexpected lexical declaration in case block.(‰•¼Îşÿÿÿÿ8ªµşú1J$594b6f48-c3a3-42e0-bedc-0f1cbc436924
-javascript:S2589ˆ"@This always evaluates to truthy. Consider refactoring this code.(ÄµÅ‹ÿÿÿÿÿ8ªµşú1J$ca8f2da5-a20c-4a66-9943-39efecd1f32a
-€javascript:S1125¥"6Refactor the code to avoid using this boolean literal.(øøçô8ªµşú1J$1e20b150-fd51-4711-8b4b-6d6a12379a31
-|javascript:S6836®"-Unexpected lexical declaration in case block.(†©òùÿÿÿÿ8ªµşú1J$139f288e-ea67-40c5-b3d7-b17b94ecb07e
-wjavascript:S6836¯"-Unexpected lexical declaration in case block.(÷Ş8ªµşú1J$3a843572-8123-4ec9-bea0-4df33cb7f9e7
-€javascript:S1125Ø"6Refactor the code to avoid using this boolean literal.(‚ºû¬8ªµşú1J$aae1d614-bc92-4fe7-beeb-9837459af117
-mjavascript:S125é"Remove this commented out code.(š‘Éúÿÿÿÿ8ªµşú1J$a7338d45-4692-46ff-bc0f-7b575028724b
-mjavascript:S125ş"Remove this commented out code.(ñüÊ¬øÿÿÿÿ8ªµşú1J$7910cff5-dca7-4cf2-8a07-1efa62d675d6
-hjavascript:S125†"Remove this commented out code.(²é½¾8ªµşú1J$e6020077-f204-47e8-bbe2-d3dbcf274a5f
-javascript:S1125"6Refactor the code to avoid using this boolean literal.(á¯æ=8ªµşú1J$1a3bd7be-1d84-44bd-a75b-22e8f7621174
-…javascript:S1125“"6Refactor the code to avoid using this boolean literal.(ô½ü¨şÿÿÿÿ8ªµşú1J$fa562284-1de0-4ebc-9a3f-a610324af12d
-…javascript:S1125œ"6Refactor the code to avoid using this boolean literal.(¢ÊÎŞùÿÿÿÿ8ªµşú1J$dcae2e77-c765-4759-a4d1-622a69ce2b54
-mjavascript:S125À"Remove this commented out code.(ÄÄ¡¢ıÿÿÿÿ8ªµşú1J$3b9c16d2-64f8-4da1-9212-6f089b385bfa
-hjavascript:S125Ò"Remove this commented out code.(²é½¾8ªµşú1J$6e564c63-db7f-416f-8705-75009ecccea2
-mjavascript:S125ß"Remove this commented out code.(÷”ºûÿÿÿÿ8ªµşú1J$b35865f7-bc0f-4ed9-b940-52583146a67d
-hjavascript:S125í"Remove this commented out code.(ŒÔ…Ü8ªµşú1J$8a2d197e-194e-4445-88f5-c1cc2692b061
-mjavascript:S125ï"Remove this commented out code.(¢ÂÖæúÿÿÿÿ8ªµşú1J$cf370c89-1761-4699-9fa0-b410ee9cb261
-|javascript:S6836ş"-Unexpected lexical declaration in case block.(”§Ôƒÿÿÿÿÿ8ªµşú1J$ce6772a4-1efe-4deb-9c29-36e6ec338622
-wjavascript:S6836ÿ"-Unexpected lexical declaration in case block.(”î±¡8ªµşú1J$ee11932f-f912-455c-a0b0-f9471af96513
-wjavascript:S6836…"-Unexpected lexical declaration in case block.(æ·û8ªµşú1J$41849a93-71e8-4099-86a9-8741c4541158
-javascript:S3776æ"TRefactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed.(ş¼ã8ªµşú1J$a066ee8e-68f7-4a1f-a40c-f6c6d6b25452
-hjavascript:S125ç"Remove this commented out code.(×Ó»”8ªµşú1J$1abb24aa-2bc4-48dd-b8da-5b39621a80da
+gjavascript:S125("Remove this commented out code.(£ÇíÏ8€ªµşú1J$63f99417-cddd-48b9-a34f-0c8a2c694120
+gjavascript:S125:"Remove this commented out code.(ßùè8ªµşú1J$4409a0c9-d903-4dcb-ab1b-03e5e99a5943
+gjavascript:S125P"Remove this commented out code.(¸†‘Ÿ8ªµşú1J$12417a87-9b29-4833-85a2-bca8d6840115
+javascript:S3776V"TRefactor this function to reduce its Cognitive Complexity from 99 to the 15 allowed.(´…±Ë8ªµşú1J$0c9b07b4-f8ad-4a93-ba3b-74945107c24e
+gjavascript:S125\"Remove this commented out code.(ìòêÍ8ªµşú1J$7f255ade-c37e-4bb3-9661-e2a234395e8d
+javascript:S1479]"BReduce the number of non-empty switch cases from 56 to at most 30.(ÂİÅøÿÿÿÿ8ªµşú1J$13cb8d6a-34de-4813-ad49-891a66b83d02
+{javascript:S6836h"-Unexpected lexical declaration in case block.(ÜÊ‰‡øÿÿÿÿ8ªµşú1J$9a21688f-6c22-4211-ab8c-aed8da69a624
+…javascript:S1125É"6Refactor the code to avoid using this boolean literal.(ïÃ‡·úÿÿÿÿ8ªµşú1J$3b17d2f5-99ad-4e99-b6be-40dc52a27880
+|javascript:S6836Í"-Unexpected lexical declaration in case block.(—²½”ûÿÿÿÿ8ªµşú1J$dfaf9c56-eb93-4224-9126-8a2ba2840beb
+|javascript:S6836Î"-Unexpected lexical declaration in case block.(ª»ª€ÿÿÿÿÿ8ªµşú1J$899468dc-ac17-475c-b985-036e27164ba6
+hjavascript:S125İ"Remove this commented out code.(ŠâÈÄ8ªµşú1J$478ae9d9-24f2-43c8-a71d-caae8ad91bf4
+…javascript:S1125à"6Refactor the code to avoid using this boolean literal.(°İ®úşÿÿÿÿ8ªµşú1J$fa636752-a6a6-4e13-b413-06bf739634aa
+|javascript:S6836ç"-Unexpected lexical declaration in case block.(¤±Ü»ùÿÿÿÿ8ªµşú1J$d639b65d-bb95-4286-9afe-fc003c8ab606
+wjavascript:S6836ñ"-Unexpected lexical declaration in case block.(à¯‘è8ªµşú1J$efc00ed3-3b6f-4503-98ea-37cbc0cc51a0
+mjavascript:S125ƒ"Remove this commented out code.(ç‡Ô›úÿÿÿÿ8ªµşú1J$2d07d0e4-26b3-4325-8027-31c4b1683b4d
+mjavascript:S125²"Remove this commented out code.(÷ãİŠşÿÿÿÿ8ªµşú1J$5285ba5e-ca7a-4011-a513-2e478a1b418b
+mjavascript:S125é"Remove this commented out code.(ÅåâÔúÿÿÿÿ8ªµşú1J$f0c2ba5b-a71e-4525-a2c8-f7dbfd4b7375
+mjavascript:S125ë"Remove this commented out code.(şğÌºıÿÿÿÿ8ªµşú1J$011be89e-640b-4702-baf3-13132f0b8f21
+|javascript:S6836í"-Unexpected lexical declaration in case block.(Š„ß³ûÿÿÿÿ8ªµşú1J$41185d4b-9b0b-4cd4-990f-5a6422d0261d
+hjavascript:S125÷"Remove this commented out code.(’ÊË8ªµşú1J$74033524-40f1-44d9-8b45-af5a735d0edc
+|javascript:S6836ÿ"-Unexpected lexical declaration in case block.(‰•¼Îşÿÿÿÿ8ªµşú1J$a3738f12-e31b-4bbd-bf4f-a79769c3304d
+javascript:S2589ˆ"@This always evaluates to truthy. Consider refactoring this code.(ÄµÅ‹ÿÿÿÿÿ8ªµşú1J$26efb650-bfd6-4b73-9fb6-f5527d28d8fa
+€javascript:S1125¥"6Refactor the code to avoid using this boolean literal.(øøçô8ªµşú1J$990db000-7c0c-4f53-aa1c-b9f57dcb17b2
+|javascript:S6836®"-Unexpected lexical declaration in case block.(†©òùÿÿÿÿ8ªµşú1J$9f4bbcfd-553f-4dbc-b2d2-ba2c755721a9
+wjavascript:S6836¯"-Unexpected lexical declaration in case block.(÷Ş8ªµşú1J$8e385f27-24cf-4b42-b9e5-1bab3650b99e
+€javascript:S1125Ø"6Refactor the code to avoid using this boolean literal.(‚ºû¬8ªµşú1J$041c0ae7-6913-4447-9cf1-5c5a234b1f46
+mjavascript:S125é"Remove this commented out code.(š‘Éúÿÿÿÿ8ªµşú1J$ff48e553-aee9-4372-b952-314d3b7e736a
+mjavascript:S125ş"Remove this commented out code.(ñüÊ¬øÿÿÿÿ8ªµşú1J$53f8e611-0117-4ca8-bcff-0ede26dc6c00
+hjavascript:S125†"Remove this commented out code.(²é½¾8ªµşú1J$730f514f-6c2d-49c5-bd19-ce299c7bd856
+javascript:S1125"6Refactor the code to avoid using this boolean literal.(á¯æ=8ªµşú1J$13018a01-8602-444e-8e10-0ad795e9f3b3
+…javascript:S1125“"6Refactor the code to avoid using this boolean literal.(ô½ü¨şÿÿÿÿ8ªµşú1J$2b88ed10-e154-409d-be5d-fa239f251748
+…javascript:S1125œ"6Refactor the code to avoid using this boolean literal.(¢ÊÎŞùÿÿÿÿ8ªµşú1J$868c9a5c-0c45-4520-b7ee-575cf6572d65
+mjavascript:S125À"Remove this commented out code.(ÄÄ¡¢ıÿÿÿÿ8ªµşú1J$ecd2fbb4-d2e1-47ea-8593-2861af1a0a7d
+hjavascript:S125Ò"Remove this commented out code.(²é½¾8ªµşú1J$2ae51bc4-c17a-4fda-9471-96389f80767d
+mjavascript:S125ß"Remove this commented out code.(÷”ºûÿÿÿÿ8ªµşú1J$71a852b3-9086-44a7-a39f-faacb5cdc63d
+hjavascript:S125í"Remove this commented out code.(ŒÔ…Ü8ªµşú1J$51f56cf4-354f-42b9-9a74-7bc7d03c1540
+mjavascript:S125ï"Remove this commented out code.(¢ÂÖæúÿÿÿÿ8ªµşú1J$21982857-197a-488a-beb1-39e1ea40befb
+|javascript:S6836ş"-Unexpected lexical declaration in case block.(”§Ôƒÿÿÿÿÿ8ªµşú1J$873e1c38-5d59-45ec-ae31-cc39adc490bf
+wjavascript:S6836ÿ"-Unexpected lexical declaration in case block.(”î±¡8ªµşú1J$80e41488-6b7d-4b03-b36d-3150f2cf1a33
+wjavascript:S6836…"-Unexpected lexical declaration in case block.(æ·û8ªµşú1J$32d514e9-75cd-424b-ab58-545fb9ade5b3
+javascript:S3776æ"TRefactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed.(ş¼ã8ªµşú1J$1888bd2f-39e1-4fff-b083-2eef4a3a58ef
+hjavascript:S125ç"Remove this commented out code.(×Ó»”8ªµşú1J$28d45c8b-f29c-4597-9649-2c54ea97f01a
