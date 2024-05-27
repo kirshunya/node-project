@@ -102,3 +102,9 @@ B
 js/modules/time.js,f\4\f48f688957a0047586a7630c05ed7fe97f916b81
 N
 server/service/game-service.js,b\8\b8785664ed5d34d80186e66f6f2b3d49affc5251
+N
+server/service/mail-service.js,8\5\85b8c9fa3c7d2a58415edbb6afd3c523ca4dbf34
+P
+ js/modules/connect-general-ws.js,b\e\be33c92541744c3d703f9cdf4ad9e0f3703aaa22
+R
+"js/modules/loto/loto-navigation.js,d\b\dbaa31aea866d7e6605e4a6b77e01eb64e868cd3

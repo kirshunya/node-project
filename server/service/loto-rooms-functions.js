@@ -23,7 +23,7 @@ class RoomsService {
       room5: 0,
     };
     for (let room = 1; room <= 5; room++) {
-      const game = games[room - 1];
+      //const game = games[room - 1];
       const roomId = room;
       // get every room online
       let roomOnline = 0;
@@ -33,7 +33,7 @@ class RoomsService {
         }
       });
 
-      //const game = await LotoGame.findOne({ where: { gameLevel: roomId } });
+      const game = await LotoGame.findOne({ where: { gameLevel: roomId } });
       roomOnline += game.bots;
 
       rooms[`room${roomId}`] = roomOnline;

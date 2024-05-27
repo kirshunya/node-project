@@ -1,36 +1,38 @@
 
-Ajavascript:S125R"Remove this commented out code.(ığı„8š¬µşú1
-Vjavascript:S6836­"-Unexpected lexical declaration in case block.(‡©¥êùÿÿÿÿ8š¬µşú1
-Vjavascript:S6836®"-Unexpected lexical declaration in case block.(É‡ˆúÿÿÿÿÿ8š¬µşú1
-Gjavascript:S125²"Remove this commented out code.(Ñºƒüÿÿÿÿ8š¬µşú1
-Vjavascript:S6836µ"-Unexpected lexical declaration in case block.(»ÛÌ®üÿÿÿÿ8š¬µşú1
-Qjavascript:S6836·"-Unexpected lexical declaration in case block.(¨Í¨8š¬µşú1
-Qjavascript:S6836¿"-Unexpected lexical declaration in case block.(¿®î³8š¬µşú1
-Pjavascript:S6836À"-Unexpected lexical declaration in case block.(ë¶¨r8š¬µşú1
-Gjavascript:S125Ä"Remove this commented out code.(ë¢—çşÿÿÿÿ8š¬µşú1
-Pjavascript:S6836Ç"-Unexpected lexical declaration in case block.(¿…š8š¬µşú1
-Qjavascript:S6836È"-Unexpected lexical declaration in case block.(ü©¨±8š¬µşú1
-Bjavascript:S125Ì"Remove this commented out code.(»¦öÓ8¦¬µşú1
-Qjavascript:S6836Ñ"-Unexpected lexical declaration in case block.(•çî8¦¬µşú1
-Vjavascript:S6836Ó"-Unexpected lexical declaration in case block.(¿¦úÿÿÿÿ8¦¬µşú1
-Bjavascript:S125×"Remove this commented out code.(•´‡8¦¬µşú1
-Vjavascript:S6836Ü"-Unexpected lexical declaration in case block.(Ù³¦Äûÿÿÿÿ8¦¬µşú1
-Qjavascript:S6836Ş"-Unexpected lexical declaration in case block.(Á’‡„8¦¬µşú1
-Ajavascript:S125â"Remove this commented out code.(Ã×è28¦¬µşú1
-Vjavascript:S6836é"-Unexpected lexical declaration in case block.(ôŸ·ÿøÿÿÿÿ8¦¬µşú1
-Vjavascript:S6836î"-Unexpected lexical declaration in case block.(´Î–ııÿÿÿÿ8¦¬µşú1
-Qjavascript:S6836ó"-Unexpected lexical declaration in case block.(çûòØ8¦¬µşú1
-Qjavascript:S6836ù"-Unexpected lexical declaration in case block.(†ô8¦¬µşú1
-Qjavascript:S6836ÿ"-Unexpected lexical declaration in case block.(Â‰Š‹8¦¬µşú1
-Qjavascript:S6836‘"-Unexpected lexical declaration in case block.( Ñé8¦¬µşú1
-Qjavascript:S6836š"-Unexpected lexical declaration in case block.(®åñ•8¦¬µşú1
-Gjavascript:S125¡"Remove this commented out code.(–ıáÊùÿÿÿÿ8¦¬µşú1
-Bjavascript:S125¤"Remove this commented out code.(¨Ïò†8¦¬µşú1
-Gjavascript:S125®"Remove this commented out code.(ÿóª®ıÿÿÿÿ8¦¬µşú1
-Gjavascript:S125´"Remove this commented out code.(Ö°ãòùÿÿÿÿ8¦¬µşú1
-bjavascript:S1301Å"9"switch" statements should have at least 3 "case" clauses(ÂİÅøÿÿÿÿ8ª¬µşú1
-Pjavascript:S6836Î"-Unexpected lexical declaration in case block.(ŒÔŸ^8ª¬µşú1
-^javascript:S1481Î";Remove the declaration of the unused 'roomOnline' variable.(ŒÔŸ^8ª¬µşú1
-[javascript:S1854Î"8Remove this useless assignment to variable "roomOnline".(ŒÔŸ^8ª¬µşú1
-Gjavascript:S125Š"Remove this commented out code.(ô®Ÿ‰øÿÿÿÿ8ª¬µşú1
-‰javascript:S2703£"`Add the "let", "const" or "var" keyword to this declaration of "roomOnline" to make it explicit.(›–‚ãüÿÿÿÿ8ª¬µşú1
+¢javascript:S3776?"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(¼Ê±Çøÿÿÿÿ8†áŸáû1J$b16339ad-b049-4581-9275-b09987a6df79
+gjavascript:S125R"Remove this commented out code.(ığı„8š¬µşú1J$1aaba984-1973-4f78-bf29-7eabdfdcd0b8
+fjavascript:S125e"Remove this commented out code.(è»»_8İÑ™áû1J$4c6252dd-b34a-4c55-856a-59ee999f473b
+|javascript:S6836­"-Unexpected lexical declaration in case block.(‡©¥êùÿÿÿÿ8š¬µşú1J$b0f49a3d-8167-41ee-a0b6-f8fdc4b17997
+|javascript:S6836®"-Unexpected lexical declaration in case block.(É‡ˆúÿÿÿÿÿ8š¬µşú1J$6a38c120-b447-455d-9ed4-28b9a8b10f14
+mjavascript:S125²"Remove this commented out code.(Ñºƒüÿÿÿÿ8š¬µşú1J$e1e4c78c-96a4-4e4e-ad77-ab33b5220b85
+|javascript:S6836µ"-Unexpected lexical declaration in case block.(»ÛÌ®üÿÿÿÿ8š¬µşú1J$e2795048-80bd-4195-972a-77e0619d4502
+wjavascript:S6836·"-Unexpected lexical declaration in case block.(¨Í¨8š¬µşú1J$b5bb61cd-e512-465a-9721-5bf58f57148b
+wjavascript:S6836¿"-Unexpected lexical declaration in case block.(¿®î³8š¬µşú1J$0e239003-8a4a-467e-a09b-ed2e463bad6c
+vjavascript:S6836À"-Unexpected lexical declaration in case block.(ë¶¨r8š¬µşú1J$cf82afdb-e358-42d9-8c6f-bfeb9274d194
+mjavascript:S125Ä"Remove this commented out code.(ë¢—çşÿÿÿÿ8š¬µşú1J$35e3eef6-9394-415b-9df6-3d09abff560c
+vjavascript:S6836Ç"-Unexpected lexical declaration in case block.(¿…š8š¬µşú1J$8f7e8987-8fb6-4576-b1d3-098101fcc79f
+wjavascript:S6836È"-Unexpected lexical declaration in case block.(ü©¨±8š¬µşú1J$ec3664f7-e472-4ca8-8751-38ccd2f8ab16
+hjavascript:S125Ì"Remove this commented out code.(»¦öÓ8¦¬µşú1J$f9d54245-3a3f-42ba-9fab-339584b6a9c5
+wjavascript:S6836Ñ"-Unexpected lexical declaration in case block.(•çî8¦¬µşú1J$adfb1749-167a-41a3-8aed-4ffe497c68fe
+|javascript:S6836Ó"-Unexpected lexical declaration in case block.(¿¦úÿÿÿÿ8¦¬µşú1J$174c9de6-3084-4d80-b93c-941b9bd3c0af
+hjavascript:S125×"Remove this commented out code.(•´‡8¦¬µşú1J$dc72401c-49f7-4660-876e-0beb6c066e1b
+|javascript:S6836Ü"-Unexpected lexical declaration in case block.(Ù³¦Äûÿÿÿÿ8¦¬µşú1J$4d430de1-a8d0-4a1e-a0a9-4f67b3632344
+wjavascript:S6836Ş"-Unexpected lexical declaration in case block.(Á’‡„8¦¬µşú1J$774afa4a-5d84-4187-9a5e-2f0f9c2b574f
+gjavascript:S125â"Remove this commented out code.(Ã×è28¦¬µşú1J$3da1393b-c8e8-4330-b289-ee83066d1680
+|javascript:S6836é"-Unexpected lexical declaration in case block.(ôŸ·ÿøÿÿÿÿ8¦¬µşú1J$127e779d-a406-4a36-a403-dcf2ff5a9139
+|javascript:S6836î"-Unexpected lexical declaration in case block.(´Î–ııÿÿÿÿ8¦¬µşú1J$729b15bb-159a-4e09-a7b4-2d20d286b55f
+wjavascript:S6836ó"-Unexpected lexical declaration in case block.(çûòØ8¦¬µşú1J$af9e11f6-3aa3-40ed-9560-d609e4ecd8f1
+wjavascript:S6836ù"-Unexpected lexical declaration in case block.(†ô8¦¬µşú1J$6dc24404-804c-43af-b410-c8a7df5e2509
+wjavascript:S6836ÿ"-Unexpected lexical declaration in case block.(Â‰Š‹8¦¬µşú1J$a1b2dbd7-a6d6-4875-a962-6f69fc7de60b
+wjavascript:S6836‘"-Unexpected lexical declaration in case block.( Ñé8¦¬µşú1J$139a77c8-648c-4aa0-bcde-f3c4b09a2b28
+wjavascript:S6836š"-Unexpected lexical declaration in case block.(®åñ•8¦¬µşú1J$e3eb43c3-532c-46aa-a7c0-5c30109a8d09
+mjavascript:S125¡"Remove this commented out code.(–ıáÊùÿÿÿÿ8¦¬µşú1J$25e1bee7-a9e1-4010-bd49-47596eae8a25
+hjavascript:S125¤"Remove this commented out code.(¨Ïò†8¦¬µşú1J$0bcceeb4-b872-455b-a26e-afd945e32a17
+mjavascript:S125®"Remove this commented out code.(ÿóª®ıÿÿÿÿ8¦¬µşú1J$9022bd79-a33c-44cb-835e-9181c30ce1f7
+mjavascript:S125´"Remove this commented out code.(Ö°ãòùÿÿÿÿ8¦¬µşú1J$737aa879-b034-49ad-8612-3714f9a59094
+ˆjavascript:S1301Å"9"switch" statements should have at least 3 "case" clauses(ÂİÅøÿÿÿÿ8ª¬µşú1J$afead909-ce4f-43d0-a371-029ab8e9a05a
+vjavascript:S6836Î"-Unexpected lexical declaration in case block.(ŒÔŸ^8ª¬µşú1J$f1ad0519-0bd9-4bae-b42a-7e770b34cdd3
+„javascript:S1481Î";Remove the declaration of the unused 'roomOnline' variable.(ŒÔŸ^8ª¬µşú1J$2d8defae-b021-42a9-b8a7-dc0e34706d63
+javascript:S1854Î"8Remove this useless assignment to variable "roomOnline".(ŒÔŸ^8ª¬µşú1J$9a6ae881-1137-4577-b995-d85d863c01b0
+mjavascript:S125Š"Remove this commented out code.(ô®Ÿ‰øÿÿÿÿ8ª¬µşú1J$165b841d-c0ce-4d46-b825-3779f295fa48
+¯javascript:S2703£"`Add the "let", "const" or "var" keyword to this declaration of "roomOnline" to make it explicit.(›–‚ãüÿÿÿÿ8ª¬µşú1J$82cbc62e-61fd-4a0b-ae41-b2351f65259e
