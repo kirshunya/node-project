@@ -1,14 +1,14 @@
 
-qjavascript:S101,"VRename class "dominoWsNavService" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(ÿÑâé
-pjavascript:S3776."TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(ÿÖºæ
-:javascript:S1251"Remove this commented out code.(ìòêÍ
-Ijavascript:S68366"-Unexpected lexical declaration in case block.(À ÀŠ
-Njavascript:S6836I"-Unexpected lexical declaration in case block.(Õîöÿÿÿÿÿ
-Njavascript:S6836M"-Unexpected lexical declaration in case block.(§•ü¯şÿÿÿÿ
-Rjavascript:S1125|"6Refactor the code to avoid using this boolean literal.(ÙÆ¶û
-;javascript:S125¢"Remove this commented out code.(ìòêÍ
-;javascript:S125¨"Remove this commented out code.(ìòêÍ
-Jjavascript:S6836©"-Unexpected lexical declaration in case block.(ÅÕä
-Jjavascript:S6836Ê"-Unexpected lexical declaration in case block.(ŒÅî…
-hjavascript:S107ú"LAsync method 'startTurn' has too many parameters (10). Maximum allowed is 7.(ÊÅ²
-^javascript:S2430Í"<A constructor name should not start with a lowercase letter.(Ş®‚‹ûÿÿÿÿ
+—javascript:S101,"VRename class "dominoWsNavService" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(ÿÑâéJ$380c305e-6994-4cdd-afd3-fd23e5e4b05e
+–javascript:S3776."TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(ÿÖºæJ$f312b909-88c3-4d58-9cf5-6895a0ad5928
+`javascript:S1251"Remove this commented out code.(ìòêÍJ$ed79f41a-dca8-41e7-a931-25de107a554a
+ojavascript:S68366"-Unexpected lexical declaration in case block.(À ÀŠJ$5104d358-5397-4b0f-97ca-dd11d97a320c
+tjavascript:S6836I"-Unexpected lexical declaration in case block.(ÕîöÿÿÿÿÿJ$508a5e6e-c510-4f72-b39c-b7b474391da8
+tjavascript:S6836M"-Unexpected lexical declaration in case block.(§•ü¯şÿÿÿÿJ$baa764db-799f-49f4-ab6a-8430539fd78e
+xjavascript:S1125|"6Refactor the code to avoid using this boolean literal.(ÙÆ¶ûJ$b605d64e-703c-4839-9e72-f432abac2ed9
+ajavascript:S125¢"Remove this commented out code.(ìòêÍJ$592efda8-d6ba-4dc5-b24c-85fd14c0a531
+ajavascript:S125¨"Remove this commented out code.(ìòêÍJ$66e7d41f-42b4-43c3-b90e-983e2b2cdbb9
+pjavascript:S6836©"-Unexpected lexical declaration in case block.(ÅÕäJ$c90acbca-1764-4af3-804d-37e908913fc6
+pjavascript:S6836Ê"-Unexpected lexical declaration in case block.(ŒÅî…J$ab2414d4-397d-40c6-94b1-48135e1ace5e
+javascript:S107ú"LAsync method 'startTurn' has too many parameters (10). Maximum allowed is 7.(ÊÅ²J$83905908-9d7f-4992-a6bf-fafb3a7dd050
+„javascript:S2430Í"<A constructor name should not start with a lowercase letter.(Ş®‚‹ûÿÿÿÿJ$203457c7-a1ad-44ee-8bb8-a0c6407b1608
