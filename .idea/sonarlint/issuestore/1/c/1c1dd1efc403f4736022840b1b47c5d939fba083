@@ -1,0 +1,14 @@
+
+qjavascript:S101,"VRename class "dominoWsNavService" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(ÿÑâé
+pjavascript:S3776."TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(ÿÖºæ
+:javascript:S1251"Remove this commented out code.(ìòêÍ
+Ijavascript:S68366"-Unexpected lexical declaration in case block.(À ÀŠ
+Njavascript:S6836I"-Unexpected lexical declaration in case block.(Õîöÿÿÿÿÿ
+Njavascript:S6836M"-Unexpected lexical declaration in case block.(§•ü¯şÿÿÿÿ
+Rjavascript:S1125|"6Refactor the code to avoid using this boolean literal.(ÙÆ¶û
+;javascript:S125¢"Remove this commented out code.(ìòêÍ
+;javascript:S125¨"Remove this commented out code.(ìòêÍ
+Jjavascript:S6836©"-Unexpected lexical declaration in case block.(ÅÕä
+Jjavascript:S6836Ê"-Unexpected lexical declaration in case block.(ŒÅî…
+hjavascript:S107ú"LAsync method 'startTurn' has too many parameters (10). Maximum allowed is 7.(ÊÅ²
+^javascript:S2430Í"<A constructor name should not start with a lowercase letter.(Ş®‚‹ûÿÿÿÿ

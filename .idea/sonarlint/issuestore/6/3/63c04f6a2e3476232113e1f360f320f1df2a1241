@@ -1,0 +1,11 @@
+
+ƒjavascript:S1481";Remove the declaration of the unused 'exitButton' variable.(π„“|8ƒΜ—‰ω1J$33f3796f-d2e2-405b-a124-ff71d37f6add
+€javascript:S1854"8Remove this useless assignment to variable "exitButton".(π„“|8ƒΜ—‰ω1J$f504b13c-b8e8-4e13-820f-f0e10c65d998
+javascript:S1481%"7Remove the declaration of the unused 'roomId' variable.(²’•o8ƒΜ—‰ω1J$4475ac5c-46b4-4a11-8c35-eb7a30be3c49
+|javascript:S1854%"4Remove this useless assignment to variable "roomId".(²’•o8ƒΜ—‰ω1J$9d9faf23-e726-449d-a34e-8506fba0c401
+„javascript:S1125'"6Refactor the code to avoid using this boolean literal.(ζ²β«ÿÿÿÿÿ8…Μ—‰ω1J$d87c9a05-721e-4210-9a7a-1a3f1d43b4d7
+javascript:S1481ί"9Remove the declaration of the unused 'response' variable.(‘ή’ρύÿÿÿÿ8‡Μ—‰ω1J$0682bda8-dd0c-4542-b109-70174a653dca
+…javascript:S1854ί"6Remove this useless assignment to variable "response".(‘ή’ρύÿÿÿÿ8‡Μ—‰ω1J$0dbf3fd3-02dc-4a24-aadc-a2f8f32867bf
+javascript:S2004ω"ARefactor this code to not nest functions more than 4 levels deep.(Ò¥ΟD8‰Μ—‰ω1J$a71cd403-fc97-4de6-b2dd-e8ff481f4136
+javascript:S2004†"ARefactor this code to not nest functions more than 4 levels deep.(Ò¥ΟD8‰Μ—‰ω1J$80db89eb-e476-4c13-8fdb-6c0fca36b4ac
+¦javascript:S4043"WMove this array "sort" operation to a separate statement or replace it with "toSorted".(§¬Δ¥ϊÿÿÿÿ8΄¥ ‰ω1J$9e28990a-fce1-4add-98e4-de7b6edd97d1

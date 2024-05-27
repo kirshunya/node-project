@@ -1,0 +1,32 @@
+
+Ajavascript:S125"Remove this commented out code.(ÀßâÇ8Ä®µşú1
+ajavascript:S1128"9Remove this unused import of 'localThisProvideComponent'.(œ·Í±şÿÿÿÿ8Ä®µşú1
+Sjavascript:S1128"0Remove this unused import of 'WSEventPoolReady'.(ãí€¨8Ä®µşú1
+sjavascript:S3863"P'D:\Proj from git\js\modules\backgammons\syncronous.js' imported multiple times.(ãí€¨8Ä®µşú1
+vjavascript:S3863"S'D:\Proj from git\js\modules\backgammons\htmlcontainer.js' imported multiple times.(¡Ã£½8Ä®µşú1
+xjavascript:S3863"P'D:\Proj from git\js\modules\backgammons\syncronous.js' imported multiple times.(ä‰Ûöûÿÿÿÿ8Ä®µşú1
+Ljavascript:S1128"$Remove this unused import of 'html'.(Ô¡ÒÛøÿÿÿÿ8Ä®µşú1
+{javascript:S3863"S'D:\Proj from git\js\modules\backgammons\htmlcontainer.js' imported multiple times.(Ô¡ÒÛøÿÿÿÿ8Ä®µşú1
+Yjavascript:S3800"6Refactor this function to always return the same type.( ğ§à8Ä®µşú1
+Fjavascript:S125"Remove this commented out code.(¥‰‘Œşÿÿÿÿ8Ä®µşú1
+_javascript:S4624"7Refactor this code to not use nested template literals.(”à®ÿÿÿÿÿ8Ä®µşú1
+_javascript:S4624"7Refactor this code to not use nested template literals.(”à®ÿÿÿÿÿ8Ä®µşú1
+Jjavascript:S1788!""Default parameters should be last.(ş©øøÿÿÿÿ8Ä®µşú1
+hjavascript:S11211"@Extract the assignment of "this._$players" from this expression.(¨ïÔäøÿÿÿÿ8Ä®µşú1
+Cjavascript:S8788"!Unexpected use of comma operator.(›î…°8Ä®µşú1
+^javascript:S11259"6Refactor the code to avoid using this boolean literal.(ä¼ºÔøÿÿÿÿ8Ä®µşú1
+@javascript:S2432="Setter cannot return a value.(§¼Éç8Ä®µşú1
+@javascript:S2432B"Setter cannot return a value.(§¼Éç8Ä®µşú1
+@javascript:S2432H"Setter cannot return a value.(§¼Éç8Ä®µşú1
+gjavascript:S1121Q"?Extract the assignment of "this.eyelabel" from this expression.(ì–Ú­üÿÿÿÿ8Ä®µşú1
+gjavascript:S1121T"DExtract the assignment of "this.tableparts[0]" from this expression.(ÍÂ­†8Ä®µşú1
+fjavascript:S1121U"DExtract the assignment of "this.tableparts[1]" from this expression.(Ÿ¾q8Ä®µşú1
+cjavascript:S1121Y"AExtract the assignment of "this.timerlabel" from this expression.(í˜Ğd8Ä®µşú1
+ejavascript:S1121Z"BExtract the assignment of "this.playersinfo" from this expression.(­÷³É8Ä®µşú1
+djavascript:S6644l"AUnnecessary use of conditional expression for default assignment.(Õş¡8Ä®µşú1
+Djavascript:S878‡"!Unexpected use of comma operator.(ü ¢É8Ä®µşú1
+wjavascript:S1121œ"NExtract the assignment of "this.RoomsMap[betId][roomId]" from this expression.(íÚˆÎøÿÿÿÿ8Ä®µşú1
+ejavascript:S1121Ü"AExtract the assignment of "this.__initvals" from this expression.(–îè†8Ä®µşú1
+Sjavascript:S3796İ"*Add a "return" statement to this callback.(±‚µûÿÿÿÿÿ8Ä®µşú1
+Sjavascript:S3796ß"*Add a "return" statement to this callback.(ç•ñğşÿÿÿÿ8Ó®µşú1
+Gjavascript:S125†"Remove this commented out code.(Œ‹úÇüÿÿÿÿ8Ó®µşú1
