@@ -1,33 +1,0 @@
-
-ljavascript:S101"QRename class "timersnapshot" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(óžËû
-]javascript:S24304"<A constructor name should not start with a lowercase letter.(ïŽ•èÿÿÿÿÿ
-_javascript:S1121B">Extract the assignment of "snap.waiting" from this expression.(Ê¡»¡ÿÿÿÿÿ
-Bjavascript:S1940C"&Use the opposite operator (<) instead.(–½„¨
-:javascript:S125["Remove this commented out code.(ÆÍ”È
-?javascript:S125^"Remove this commented out code.(ÔÐÒÁþÿÿÿÿ
-?javascript:S125k"Remove this commented out code.(Èïæ«úÿÿÿÿ
-9javascript:S2432{"Setter cannot return a value.(¥ìÊÝ
-Qjavascript:S1135‰"4Complete the task associated to this "TODO" comment.(ãï¸ß
-Sjavascript:S3800·"6Refactor this function to always return the same type.(ÀÜÐ
-1javascript:S6647Ä"Useless constructor.(³Æ¶ 
-;javascript:S125°"Remove this commented out code.(³ÌÉ
-@javascript:S125·"Remove this commented out code.(”À±ùÿÿÿÿ
-gjavascript:S905Ë"FExpected an assignment or function call and instead saw an expression.(°´Œ–ûÿÿÿÿ
-djavascript:S1481ç"BRemove the declaration of the unused 'PausableDecorator' variable.(åµÜÉüÿÿÿÿ
-ajavascript:S1854ç"?Remove this useless assignment to variable "PausableDecorator".(åµÜÉüÿÿÿÿ
-]javascript:S1121ç";Extract the assignment of "Timer._CB" from this expression.(åµÜÉüÿÿÿÿ
-\javascript:S1121ë"?Extract the assignment of "this._stopped" from this expression.(§×”Û
-vjavascript:S2703ï"YAdd the "let", "const" or "var" keyword to this declaration of "res" to make it explicit.(Ö è‘
-:javascript:S125”"Remove this commented out code.(‘Šù
-;javascript:S125§"Remove this commented out code.(Š‘ûŠ
-;javascript:S125«"Remove this commented out code.(žö÷¦
-;javascript:S125´"Remove this commented out code.(’–ôÃ
-@javascript:S125ì"Remove this commented out code.(ˆ–²Åúÿÿÿÿ
-Xjavascript:S3800ò"6Refactor this function to always return the same type.(Ó¢Ûýÿÿÿÿ
-Sjavascript:S1481ó"6Remove the declaration of the unused 'Dices' variable.(·†«Ü
-Pjavascript:S1854ó"3Remove this useless assignment to variable "Dices".(·†«Ü
-@javascript:S125½"Remove this commented out code.(µ†ÜÒýÿÿÿÿ
-?javascript:S2432Ò"Setter cannot return a value.(·è¬Òùÿÿÿÿ
-_javascript:S1121Ò"=Extract the assignment of "this.ref[1]" from this expression.(·è¬Òùÿÿÿÿ
-?javascript:S2432Ô"Setter cannot return a value.(–…Î×ûÿÿÿÿ
-_javascript:S1121Ô"=Extract the assignment of "this.ref[0]" from this expression.(–…Î×ûÿÿÿÿ

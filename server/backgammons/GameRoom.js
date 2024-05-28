@@ -36,7 +36,7 @@ class timersnapshot {
  * pause to pause
  * resume to resume or complete timer if not success
  * success to decline completing on resume
- * 
+ *
  */
 const Timer = class {
     /** @type {int} in seconds*/
@@ -66,7 +66,7 @@ const Timer = class {
                 if(snap.pending) return snap.waiting = startUserTimer;
                 if(!(snap.actual() >= Timer.userTime))
                     console.log('timer in backgammons/GameRoom.js completed byt userTime bigger than skipped time..',
-                                '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
+                        '   || but we finished game(maybe)', ` diff=${snap.actual()}s`, ` userTime = ${Timer.userTime}s`)
                 finish();
             }, Timer.userTime*SecondInMilliseconds - snap.actualms())
         }
@@ -139,13 +139,13 @@ class SharedRoom0 extends serializable { // deprec // TODO: extends from WSListe
 
     constructor(GameID=[-1,-1]) {
         super();
-        this.GameID = GameID; 
+        this.GameID = GameID;
     }
     /**
-     * 
-     * @param {TUser} user 
-     * @param {ConnectionContext} ctx 
-     * @param {WebSocket} ws 
+     *
+     * @param {TUser} user
+     * @param {ConnectionContext} ctx
+     * @param {WebSocket} ws
      */
     connect(user, ctx, ws) {
         const rikey = ctx.rikey = `${user.clientId}-${user.userId}-${getRandomInt(-10,100)}`;
@@ -195,9 +195,9 @@ class TGame extends SharedRoom0 {
     /** @param {[Number, Number]} GameID */
     constructor(GameID) { super(GameID); }
     /**
-     * 
-     * @param {int} userId 
-     * @param {boolean} value 
+     *
+     * @param {int} userId
+     * @param {boolean} value
      */
     setAutostep(userId, value) {
         const player = this.RoomState?.getPlayerByID?.(userId);
@@ -214,7 +214,7 @@ class TGame extends SharedRoom0 {
     /** @type {ctxHandlerT<void|true>} */
     disconnect(ctx) {
         super.disconnect(ctx.user, ctx, ctx.ws);
-        if(this.RoomState.disconnect?.(ctx)) 
+        if(this.RoomState.disconnect?.(ctx))
             return (this.event('backgammons::room::disconnect', ctx.user.userId), this.betInfo = BackgammonsBETS.get(this.betId), true);
     }
     /** @param {TeXRoomState} newState */
@@ -295,15 +295,15 @@ class TGame extends SharedRoom0 {
     // }
 }
 module.exports.TGame = TGame;
-class TeXRoomState extends serializable { 
-    /** @type {TGame}*/ 
-    Room; 
+class TeXRoomState extends serializable {
+    /** @type {TGame}*/
+    Room;
     /** @param {TGame | TeXRoomState} input */
     constructor(input) {
         super();
         // console.log('TeXRoomState init', input);
         if(input instanceof TGame) this.Room = input
-        else if(input instanceof TeXRoomState) this.Room = input.Room; 
+        else if(input instanceof TeXRoomState) this.Room = input.Room;
         else if(input.Room) this.Room = input.Room;
         else this.Room = input;
     }
@@ -327,14 +327,14 @@ class WaitingState extends RoomState(0) {
         if(userbalance < this.Room.bet) { return ctx.event('inConnectionBalanceError', {bet:this.Room.bet, balance:userbalance}); }
         const connres = this.players.push(ctx.user)<=2;
         if(this.players.length === 1) this.Room.betInfo = BetsInfo.BackgammonsBETS.get(this.Room.betId);
-        if(this.players.length >= 2) 
+        if(this.players.length >= 2)
             ((this.players.length = 2), this.upgrade(LaunchingState.fromWaitingState(this)), true);
         else waitingStartAtRoom(this.Room.GameID, ctx.user.userId);
         return connres;
     }
     /** @type {ctxHandlerT<void|true>} */
     disconnect(ctx) {
-        if(this.players.length === 1 && this.players[0].userId === ctx.user.userId) 
+        if(this.players.length === 1 && this.players[0].userId === ctx.user.userId)
             return ((this.players.length = 0), waitingCancelAtRoom(this.Room.GameID), this.bet = null, this.Room.events.onexit.send(), true);
         else console.log('Гонка запросов, сначала апгрейд комнаты до лаунча, а потом дисконнет, это при двух егроках');
     }
@@ -345,7 +345,7 @@ class TimeVal { // TimeValTiro
     /** @type {Number}  */
     timeval
     /** @param {Number} ms  */
-    constructor(ms) { 
+    constructor(ms) {
         this.timeval = ms;
     }
     /** @param {Number} secs  */
@@ -364,7 +364,7 @@ class TimeVal { // TimeValTiro
     pauseWhile(CB) {
         const Timer = this;
         Timer._pause = true;
-        res = CB();
+        const res = CB();
         Timer._pause = false;
         if(Timer._CB) Timer._CB();
         return res;
@@ -397,10 +397,10 @@ class DiceTeamRollState extends RoomState(2) {
     Dices = randdice();
     timeval = TimeVal.SECONDS(30);
     getPlayerByID(_userId) { return this.players.filter(({userId})=>userId === _userId)[0]; }
-    
-    constructor(upgradable, players) { 
-        super(upgradable); 
-        this.players = players; 
+
+    constructor(upgradable, players) {
+        super(upgradable);
+        this.players = players;
         // this.timeval.start(this.timerlose());
         // for(const player of players) {
         //     this.rollDice({user:player}, false);
@@ -440,7 +440,7 @@ class DiceTeamRollState extends RoomState(2) {
         })
         this.red = 'red';
         this.Room.event('diceTeamRollCompletesLaunching', this.json());
-        
+
     }
     // rollDice(ctx, event=true) {
     //     for(const [index, player] of Object.entries(this.players)) {
@@ -477,9 +477,9 @@ class GameStarted extends RoomState(3) {
     get activeplayer() { return this.players.filter(({team})=>team === this.ActiveTeam)[0]; }
     get opponent() { return this.players.filter(({team})=>team !== this.ActiveTeam)[0]; }
 
-    constructor(upgradable, players, WhiteIsFirstPlayer) { 
+    constructor(upgradable, players, WhiteIsFirstPlayer) {
         super(upgradable);
-        this.players = players; 
+        this.players = players;
         players.map(player=>player.autodice = true);
         this.ActiveTeam = WhiteIsFirstPlayer?WHITEID:BLACKID;
         this.Timers.onfinish(()=>this.endGame(this.opponent.team, 'timer', 'timer'));
@@ -497,7 +497,7 @@ class GameStarted extends RoomState(3) {
     stepIfValid(user, step, code) {
         const result = this.Timers.curTimer.pauseWhile(()=>{//at the end ifn stopped/successed timer, this will be resumed;
             const {ActiveTeam, Dices} = this;
-            
+
             const player = this.getPlayerByID(user.userId);
             if(!player) return ((console.log('nope', this.Players), {result:'nope', user, player}))
             if(!(player.debugger || player.team === ActiveTeam)) return ((console.log('nope', this.Players), {result:'nope', user, player}))
@@ -511,7 +511,7 @@ class GameStarted extends RoomState(3) {
             this.Timers.curTimer.success();//if succes step
             return true;
         });
-        
+
         if(result===true) {
             const prevstate = { ActiveTeam:this.ActiveTeam, Dices:this.Dices };
             if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
@@ -541,11 +541,11 @@ class GameStarted extends RoomState(3) {
         console.log('restart__', this.players, user, ...arguments);
         /** @type {TPlayer[]} */
         const [player, opponent] = (p1.userId === user.userId
-             && [p1, p2]) || (p2.userId === user.userId && [p2, p1])
+            && [p1, p2]) || (p2.userId === user.userId && [p2, p1])
         if(player) {
             this.endGame(opponent.team, 'restart__', 2);
             return {result:'restart__'};
-        } 
+        }
         return {result:'nope'};
     }
     restartLate() {
