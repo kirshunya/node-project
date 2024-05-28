@@ -7,6 +7,8 @@ import { lobbyhubReady } from "./syncronous.js";
 import { html, ranged } from "./htmlcontainer.js";
 import { openErorPopup } from "../pages/popup.js";
 import { getLocalUser } from "../authinterface.js";
+import * as impPopup from "../pages/popup";
+import {addListeners} from "../navigation";
 
 const GlobalTimersList = {
     /** @type {{timestamp:int, label:HTMLElement, active:boolean}[]} */
@@ -205,6 +207,19 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                             },
                     },
             })));
+
+        let bckRules = document.querySelectorAll(
+            ".domino-room-header__rules"
+        );
+        if (bckRules) {
+            bckRules.forEach((dominoRulesButton) => {
+                dominoRulesButton.addEventListener("click", function () {
+                    impPopup.openRulesInfoPopup(gameMode);
+                });
+            });
+        }
+        addListeners(ws);
+
         this.__initvals&&this.resetLobbyTable(this.__initvals);
         this.updalist.map(([...args])=>this.updateTable(...args));
         GlobalTimersList.intervalid||GlobalTimersList.startLoop();
