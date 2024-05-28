@@ -1,53 +1,0 @@
-
-jjavascript:S1128"(Remove this unused import of 'impWSNav'.(’¨öJ$8cc706de-b853-47b0-aaec-28e5ebfb6a22
-ljavascript:S1128"*Remove this unused import of 'impLotoNav'.(’±¼äJ$012bd0e9-7e01-468b-9f56-cc52a5235bea
-ojavascript:S1128"-Remove this unused import of 'impDominoGame'.(â„îJ$c716b33c-7eeb-49ac-8f6e-ef76480d5c65
-ejavascript:S125q"Remove this commented out code.(¤ôİøÿÿÿÿJ$10de2c04-23ad-4eab-83d9-1a824e73491f
-~javascript:S1125…"6Refactor the code to avoid using this boolean literal.(ë¡¶‡úÿÿÿÿJ$89b3a8ca-b950-410e-948c-b502117c2d8e
-ajavascript:S125ö"Remove this commented out code.(æË’±J$5ac9216c-2eef-4d1a-8217-bc069f21b138
-ajavascript:S125ú"Remove this commented out code.(ãÀùÓJ$4e4f6781-3ba0-42cd-a603-2c12b4f8d17b
-qjavascript:S3504¢")Unexpected var, use let or const instead.(¸¬‚ºşÿÿÿÿJ$0738de48-f542-4dc3-8066-0984043196b2
-javascript:S1481¢"7Remove the declaration of the unused 'swiper' variable.(¸¬‚ºşÿÿÿÿJ$35f7d466-b2f4-4770-9bb7-b45ab10cfafa
-|javascript:S1854¢"4Remove this useless assignment to variable "swiper".(¸¬‚ºşÿÿÿÿJ$59beff2d-80df-4b44-afd8-35ce72b243f6
-yjavascript:S930Æ"7This function expects no arguments, but 1 was provided.(ş¾ÎÏJ$89d2fa50-04c2-4698-81f1-fd948be587a3
-qjavascript:S3504ø")Unexpected var, use let or const instead.(¸¬‚ºşÿÿÿÿJ$ed661177-b432-4b8a-83c9-6dcba5a0386f
-javascript:S1481ø"7Remove the declaration of the unused 'swiper' variable.(¸¬‚ºşÿÿÿÿJ$789649b6-52ee-4ee7-9852-5761dea34ac7
-|javascript:S1854ø"4Remove this useless assignment to variable "swiper".(¸¬‚ºşÿÿÿÿJ$6bd6fac9-79d7-49b3-8f53-2952f9da6b0d
-yjavascript:S930"7This function expects no arguments, but 1 was provided.(ş¾ÎÏJ$46406857-bc03-4d1c-85e8-593e1f433ba8
-fjavascript:S125Â"Remove this commented out code.(ÈöË¯úÿÿÿÿJ$7789c268-371b-4b1e-959f-38c126f05013
-fjavascript:S125É"Remove this commented out code.(‚¿ÊÇüÿÿÿÿJ$ae9f9f9b-ef70-46f8-8542-65b1fe22a9cb
-œjavascript:S3776ñ"TRefactor this function to reduce its Cognitive Complexity from 69 to the 15 allowed.(–¤ˆûÿÿÿÿJ$426050dc-0b6a-4ce6-ac62-7f4a168c3d2c
-ajavascript:S125†"Remove this commented out code.(¯ ­ïJ$d28f5d7e-a098-4430-aaf7-314a77f03ee5
-yjavascript:S1125û"6Refactor the code to avoid using this boolean literal.(ÅÀŒõJ$99073afc-fb0f-4027-802f-8a37270d1ff4
-~javascript:S1125ı"6Refactor the code to avoid using this boolean literal.(ÒÜç‡ÿÿÿÿÿJ$956d9453-2cff-47b8-9ceb-021a6da45cbb
-~javascript:S1125"6Refactor the code to avoid using this boolean literal.(¨úØúÿÿÿÿJ$ef8f001c-44c5-43ac-a3c0-852f4dc81589
-yjavascript:S1125’"6Refactor the code to avoid using this boolean literal.(ÅÀŒõJ$0e20c988-11a7-47de-8ccd-c5fbf70749f2
-~javascript:S1125–"6Refactor the code to avoid using this boolean literal.(ê€øûÿÿÿÿJ$b0f6ecac-9bf7-4d58-9768-f6b30382c8d1
-yjavascript:S1125Ö"6Refactor the code to avoid using this boolean literal.(íûëJ$0650fb89-8e5d-4f7f-8ca1-7e55ec2a853a
-—javascript:S3776"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(‰¸¤ÀJ$8dd46e42-c4b6-4950-9fb3-a0324379576a
-fjavascript:S125“"Remove this commented out code.(÷À‰ëúÿÿÿÿJ$3a4fd6ed-61ab-4493-bc69-ad40bed26ac6
-~javascript:S1854—"6Remove this useless assignment to variable "gameMode".(¥ğ²öøÿÿÿÿJ$6d40c16a-c260-49b6-95b2-7d15725bb614
-`javascript:S125˜"Remove this commented out code.(’Ú”FJ$356aed82-524e-4f45-9cc4-e21b23cd39b1
-«javascript:S4165"hReview this redundant assignment: "gameMode" already holds the assigned value along all execution paths.(²çØJ$61bdbff6-acd9-4184-8173-79f284860c20
-|javascript:S1854²"9Remove this useless assignment to variable "peopleItems".(ĞÑ–ÏJ$c73ee3c3-141a-426a-8274-7d77665f7749
-~javascript:S1125Æ"6Refactor the code to avoid using this boolean literal.(ŸßÄÚúÿÿÿÿJ$95be81fc-86bc-453a-a005-2b740327316e
-fjavascript:S125Ì"Remove this commented out code.(½·ÉŠûÿÿÿÿJ$5be444a7-766d-4fc5-9d0a-3eaf08609444
-}javascript:S1854Ù":Remove this useless assignment to variable "dominoRoomId".(¸¯Î€J$cdbd5493-59e4-4789-ace8-714b4cf72352
-}javascript:S1854Ú"5Remove this useless assignment to variable "tableId".(‹‰ÊƒùÿÿÿÿJ$8f79caa4-249e-4342-8d0e-33e42bb8b2f9
-€javascript:S1854Û"8Remove this useless assignment to variable "playerMode".(¦³£îüÿÿÿÿJ$c3990e00-af55-4314-a6cf-e8c463896af9
-ƒjavascript:S2589¿
-"@This always evaluates to truthy. Consider refactoring this code.( ÛóÀJ$3f9d1710-3354-49d5-8833-3c95106ac118
-œjavascript:S3776å
-"TRefactor this function to reduce its Cognitive Complexity from 31 to the 15 allowed.(»íœœıÿÿÿÿJ$2dbafaf9-c9ec-45bd-b54d-7dce6161dcb0
-‚javascript:S6660"?'If' statement should not be the only statement in 'else' block(£­ôíJ$9f851345-f70e-4336-8748-30dd3efe2aca
-fjavascript:S125š"Remove this commented out code.( Àí€ùÿÿÿÿJ$7a89ace0-0f64-44b8-bdd2-beba845b6c65
-ƒjavascript:S2589Å"@This always evaluates to truthy. Consider refactoring this code.( ÛóÀJ$70fc88da-101d-4f3f-83f2-c08aa4845ed1
-fjavascript:S125Ó"Remove this commented out code.(½‘©˜øÿÿÿÿJ$5c82edc8-caa9-4719-b519-2391f44a1a64
-€javascript:S1481ã"=Remove the declaration of the unused 'dominoRoomId' variable.(‹Ò½®J$48b5b97e-efeb-4f0f-9927-3b17cf7baf37
-}javascript:S1854ã":Remove this useless assignment to variable "dominoRoomId".(‹Ò½®J$8cb69515-6ecb-4d5d-9849-527ad92f3a0d
-{javascript:S1481ã"8Remove the declaration of the unused 'tableId' variable.(‹Ò½®J$4066953c-cefb-4a5f-b9e3-ba8fd948c2fd
-xjavascript:S1854ã"5Remove this useless assignment to variable "tableId".(‹Ò½®J$87309d42-006b-4e44-be79-401897cd0c02
-~javascript:S1481ã";Remove the declaration of the unused 'playerMode' variable.(‹Ò½®J$89164d6f-e503-4058-9d09-ef32a662e7c5
-{javascript:S1854ã"8Remove this useless assignment to variable "playerMode".(‹Ò½®J$20e48911-df48-4d68-a09a-edaf1df833cd
-|javascript:S1481ã"9Remove the declaration of the unused 'gameMode' variable.(‹Ò½®J$8d2d7789-58e8-4456-ac1c-52daae905e26
-yjavascript:S1854ã"6Remove this useless assignment to variable "gameMode".(‹Ò½®J$85f5d3f1-56a0-41bd-970c-7944614d93b8

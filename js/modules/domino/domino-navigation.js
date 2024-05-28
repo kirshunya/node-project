@@ -420,7 +420,7 @@ function formTwoPlayersMenu(main, main__container, ws, gameMode) {
     // centeredSlides: true,
     spaceBetween: 20,
     grabCursor: true,
-    slidesPerView: 3,
+    //slidesPerView: 3,
     allowTouchMove: true,
     scrollbar: {
       el: ".swiper-scrollbar",
@@ -634,7 +634,7 @@ function formFourPlayersMenu(main, main__container, ws, gameMode) {
     // centeredSlides: true,
     spaceBetween: 20,
     grabCursor: true,
-    slidesPerView: 3,
+    //slidesPerView: 3,
     allowTouchMove: true,
     scrollbar: {
       el: ".swiper-scrollbar",

@@ -108,3 +108,9 @@ P
  js/modules/connect-general-ws.js,b\e\be33c92541744c3d703f9cdf4ad9e0f3703aaa22
 R
 "js/modules/loto/loto-navigation.js,d\b\dbaa31aea866d7e6605e4a6b77e01eb64e868cd3
+P
+ js/modules/domino/domino-game.js,4\f\4f6e84a09fb1d58914b74e10c372552d7b187cb3
+M
+server/backgammons/Utility.js,d\4\d4e87325e224a11add5041794e9175a0b7f4afa7
+X
+(js/modules/backgammons/Configurations.js,7\a\7a9ad24890c1bd5354cb2e3b19dcf4d690476bf4
