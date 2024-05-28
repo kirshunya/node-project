@@ -40,64 +40,70 @@ const GlobalTimersList = {
     }
 }
 class TableElT {
-  /** @type {[HTMLElement, HTMLElement]} */
     tableparts = []
     timerlabel
     __playersinfo
     eyelabel
-    
+    scheme
+
     _$players = []
     get players() { return this._$players; }
     set players(players) {
-        this.playersinfo.innerHTML = ranged(this._$players = players)/* html */`
-                  <div class="domino-room-table-info__players-item">
-                      <img src="./img/domino-online-icon.png" alt="" />
-                  </div>
+        this.playersinfo.innerHTML = ranged(this._$players = players)
+            /* html */`
+              <div class="domino-room-table-info__players-item">
+                  <img src="./img/domino-online-icon.png" alt="" />
+              </div>
         `;
 
-        this.tableparts.map((part, ind)=>
-                (part.classList.toggle("filled", ind < players.length),
-                  (window.isAdmin == true) && 
-                    (part.innerHTML = /* html */`<div class="table-admin__userid-item">${players[ind]?.userId||''}</div>`)
-                        )
-        )
+        this.tableparts.forEach(part => {
+            part.classList.toggle("filled", this._$players.length > part.children.length);
+            if (window.isAdmin) {
+                part.innerHTML = `<div class="table-admin__userid-item">${this._$players[part.children.length - 1]?.userId || ''}</div>`;
+            }
+        });
         return true;
     }
     set enable(enable) {
-        this.eyelabel.firstChild.src = enable  ? 'img/backgammons/eyeh.png'
-                                               : 'img/backgammons/eyek.png'
+        this.eyelabel.firstChild.src = enable? 'img/backgammons/eyeh.png' : 'img/backgammons/eyek.png';
         return true;
     }
     _timer = null
     set timer(timestamp) {
-        if(timestamp === GlobalTimersList.timeroff && this._timer) this._timer.active = false;
+        if (timestamp === GlobalTimersList.timeroff && this._timer) this._timer.active = false;
         else this._timer = GlobalTimersList.pushTimer(timestamp, this.timerlabel);
         return true;
     }
-    
-    /** @param {[int, int]} GameID    */
+
     constructor(GameID) {
-        /** @type {[int, int]} */
         this.GameID = GameID;
-        const element = this.content = htmlcontainer(
-            htmlelement('div', 'domino-room-content__table swiper-slide', {tableId:GameID[1]}), [
-                this.eyelabel = htmltext('div', 'backgammons-visitor', '<img src="img/backgammons/eyek.png">'),
-                htmlcontainer(
-                    htmlelement('div', 'domino-room-content__table-image'), [
-                        this.tableparts[0] = htmlelement('div', 'domino-room-table-half domino-room-table-part'),
-                        this.tableparts[1] = htmlelement('div', 'domino-room-table-half domino-room-table-part')
-                    ]),
-                htmlcontainer(
-                    htmlelement('div', 'domino-room-content__table-info'), [
-                        this.timerlabel = htmltext('div', 'domino-room-table-info__timer', '00:00'),
-                        this.playersinfo = htmlelement('div', 'domino-room-table-info__players')
-                    ])
-            ]
-        )
+        const element = this.content = htmlcontainer(htmlelement('div', 'domino-room-content__table swiper-slide', {tableId: GameID[1]}), [
+            this.eyelabel = htmltext('div', 'backgammons-visitor', '<img src="img/backgammons/eyek.png">'),
+            htmlcontainer(htmlelement('div', 'domino-room-content__table-image'), [
+                this.tableparts[0] = htmlelement('div', 'domino-room-table-half domino-room-table-part'),
+                this.tableparts[1] = htmlelement('div', 'domino-room-table-half domino-room-table-part')
+            ]),
+            htmlcontainer(htmlelement('div', 'domino-room-content__table-info'), [
+                this.timerlabel = htmltext('div', 'domino-room-table-info__timer', '00:00'),
+                this.playersinfo = htmlelement('div', 'domino-room-table-info__players')
+            ])
+        ]);
+
+        const rulesIcon = this.content.querySelector('.domino-room-header__rules img');
+        if (rulesIcon) {
+            rulesIcon.addEventListener('click', () => {
+                console.log('Иконка правил была нажата');
+                // Здесь можно добавить дополнительную логику
+            });
+        }
+
         element.addEventListener('click', onclick.bind(null, GameID, this));
     }
+
     html() { return this.content; }
 }
+
+
 export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     /** @type {HTMLElement} */
     htmlview
@@ -208,17 +214,6 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                             },
                     },
             })));
-        let rulesButtons = document.querySelectorAll(
-            ".domino-room-header__rules"
-        );
-        if (rulesButtons) {
-            rulesButtons.forEach((rulesButtons) => {
-                rulesButtons.addEventListener("click", function () {
-                    impPopup.openRulesInfoPopup(gameMode);
-                });
-            });
-        }
-        addDominoListeners(ws);
         this.__initvals&&this.resetLobbyTable(this.__initvals);
         this.updalist.map(([...args])=>this.updateTable(...args));
         GlobalTimersList.intervalid||GlobalTimersList.startLoop();
