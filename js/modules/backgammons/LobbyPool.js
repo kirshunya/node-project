@@ -7,7 +7,9 @@ import { lobbyhubReady } from "./syncronous.js";
 import { html, ranged } from "./htmlcontainer.js";
 import { openErorPopup } from "../pages/popup.js";
 import { getLocalUser } from "../authinterface.js";
-import {openRulesInfoPopup} from "../pages/popup";
+import { addDominoListeners } from "../domino/domino-navigation";
+import * as impPopup from "../pages/popup";
+
 
 const GlobalTimersList = {
     /** @type {{timestamp:int, label:HTMLElement, active:boolean}[]} */
@@ -212,7 +214,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
         if (rulesButtons) {
             rulesButtons.forEach((rulesButtons) => {
                 rulesButtons.addEventListener("click", function () {
-                    openRulesInfoPopup(gameMode);
+                    impPopup.openRulesInfoPopup(gameMode);
                 });
             });
         }

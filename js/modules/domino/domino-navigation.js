@@ -669,7 +669,7 @@ function formFourPlayersMenu(main, main__container, ws, gameMode) {
   addDominoListeners(ws);
 }
 
-const addDominoListeners = () => {
+export const addDominoListeners = () => {
   const siteLanguage = window.siteLanguage;
   const dominoRooms = document.querySelectorAll(".domino-room");
   dominoRooms.forEach((room) => {
