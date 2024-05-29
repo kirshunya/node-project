@@ -1,0 +1,26 @@
+
+Fjavascript:S125&"Remove this commented out code.(ó‘µùÿÿÿÿ8¦Û ¬ü1
+mjavascript:S101,"LRename class "refToArr" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(©Ò¡b8§Û ¬ü1
+Ejavascript:S24323"Setter cannot return a value.(•à¿€ıÿÿÿÿ8§Û ¬ü1
+ejavascript:S11213"=Extract the assignment of "this.ref[1]" from this expression.(•à¿€ıÿÿÿÿ8§Û ¬ü1
+?javascript:S24329"Setter cannot return a value.(è›Ùr8§Û ¬ü1
+_javascript:S11219"=Extract the assignment of "this.ref[0]" from this expression.(è›Ùr8§Û ¬ü1
+njavascript:S101?"LRename class "slotinfo" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(Ï·Ãá8§Û ¬ü1
+Sjavascript:S6635K"+Unexpected return statement in constructor.(ë“ºãÿÿÿÿÿ8§Û ¬ü1
+_javascript:S2430T"<A constructor name should not start with a lowercase letter.(’â8¨Û ¬ü1
+ijavascript:S6644x"AUnnecessary use of conditional expression for default assignment.(Ù´ŠÈùÿÿÿÿ8¨Û ¬ü1
+gjavascript:S3358~"DExtract this nested ternary operation into an independent statement.(½»ß§8©Û ¬ü1
+gjavascript:S3358~"DExtract this nested ternary operation into an independent statement.(½»ß§8©Û ¬ü1
+]javascript:S1481‚"4Remove the declaration of the unused 'pos' variable.(Ï¦â¾øÿÿÿÿ8©Û ¬ü1
+Zjavascript:S1854‚"1Remove this useless assignment to variable "pos".(Ï¦â¾øÿÿÿÿ8©Û ¬ü1
+`javascript:S1481‚"7Remove the declaration of the unused 'isover' variable.(Ï¦â¾øÿÿÿÿ8©Û ¬ü1
+]javascript:S1854‚"4Remove this useless assignment to variable "isover".(Ï¦â¾øÿÿÿÿ8©Û ¬ü1
+jjavascript:S6644Š"AUnnecessary use of conditional expression for default assignment.(Ù´ŠÈùÿÿÿÿ8ªÛ ¬ü1
+hjavascript:S3358"DExtract this nested ternary operation into an independent statement.(½»ß§8ªÛ ¬ü1
+hjavascript:S3358"DExtract this nested ternary operation into an independent statement.(½»ß§8ªÛ ¬ü1
+]javascript:S1481”"4Remove the declaration of the unused 'pos' variable.(ÄÜ®íşÿÿÿÿ8ªÛ ¬ü1
+Zjavascript:S1854”"1Remove this useless assignment to variable "pos".(ÄÜ®íşÿÿÿÿ8ªÛ ¬ü1
+‚javascript:S101â"ZRename class "shadowPropertiesRecord" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(Àç¸òøÿÿÿÿ8ªÛ ¬ü1
+ejavascript:S2430õ"<A constructor name should not start with a lowercase letter.(®ÖÂôùÿÿÿÿ8ªÛ ¬ü1
+`javascript:S2430ö"<A constructor name should not start with a lowercase letter.(€Ê¸¥8«Û ¬ü1
+mjavascript:S3358ı"DExtract this nested ternary operation into an independent statement.(’Š´¨úÿÿÿÿ8«Û ¬ü1

@@ -1,0 +1,53 @@
+
+Kjavascript:S1128"(Remove this unused import of 'impWSNav'.(’¨ö8Éî ¬ü1
+Mjavascript:S1128"*Remove this unused import of 'impLotoNav'.(’±¼ä8Éî ¬ü1
+Pjavascript:S1128"-Remove this unused import of 'impDominoGame'.(â„î8Éî ¬ü1
+Fjavascript:S125q"Remove this commented out code.(¤ôİøÿÿÿÿ8Êî ¬ü1
+_javascript:S1125…"6Refactor the code to avoid using this boolean literal.(ë¡¶‡úÿÿÿÿ8Êî ¬ü1
+Bjavascript:S125ö"Remove this commented out code.(æË’±8Êî ¬ü1
+Bjavascript:S125ú"Remove this commented out code.(ãÀùÓ8Êî ¬ü1
+Rjavascript:S3504¢")Unexpected var, use let or const instead.(¸¬‚ºşÿÿÿÿ8Êî ¬ü1
+`javascript:S1481¢"7Remove the declaration of the unused 'swiper' variable.(¸¬‚ºşÿÿÿÿ8Êî ¬ü1
+]javascript:S1854¢"4Remove this useless assignment to variable "swiper".(¸¬‚ºşÿÿÿÿ8Êî ¬ü1
+Zjavascript:S930Æ"7This function expects no arguments, but 1 was provided.(ş¾ÎÏ8Ëî ¬ü1
+Rjavascript:S3504ø")Unexpected var, use let or const instead.(¸¬‚ºşÿÿÿÿ8Ëî ¬ü1
+`javascript:S1481ø"7Remove the declaration of the unused 'swiper' variable.(¸¬‚ºşÿÿÿÿ8Ëî ¬ü1
+]javascript:S1854ø"4Remove this useless assignment to variable "swiper".(¸¬‚ºşÿÿÿÿ8Ëî ¬ü1
+Zjavascript:S930"7This function expects no arguments, but 1 was provided.(ş¾ÎÏ8Ëî ¬ü1
+Gjavascript:S125Â"Remove this commented out code.(ÈöË¯úÿÿÿÿ8Ëî ¬ü1
+Gjavascript:S125É"Remove this commented out code.(‚¿ÊÇüÿÿÿÿ8Ìî ¬ü1
+}javascript:S3776ñ"TRefactor this function to reduce its Cognitive Complexity from 69 to the 15 allowed.(–¤ˆûÿÿÿÿ8Íî ¬ü1
+Bjavascript:S125†"Remove this commented out code.(¯ ­ï8Îî ¬ü1
+Zjavascript:S1125û"6Refactor the code to avoid using this boolean literal.(ÅÀŒõ8Îî ¬ü1
+_javascript:S1125ı"6Refactor the code to avoid using this boolean literal.(ÒÜç‡ÿÿÿÿÿ8Îî ¬ü1
+_javascript:S1125"6Refactor the code to avoid using this boolean literal.(¨úØúÿÿÿÿ8Îî ¬ü1
+Zjavascript:S1125’"6Refactor the code to avoid using this boolean literal.(ÅÀŒõ8Îî ¬ü1
+_javascript:S1125–"6Refactor the code to avoid using this boolean literal.(ê€øûÿÿÿÿ8Îî ¬ü1
+Zjavascript:S1125Ö"6Refactor the code to avoid using this boolean literal.(íûë8Îî ¬ü1
+xjavascript:S3776"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(‰¸¤À8Ïî ¬ü1
+Gjavascript:S125“"Remove this commented out code.(÷À‰ëúÿÿÿÿ8Ïî ¬ü1
+_javascript:S1854—"6Remove this useless assignment to variable "gameMode".(¥ğ²öøÿÿÿÿ8Ïî ¬ü1
+Ajavascript:S125˜"Remove this commented out code.(’Ú”F8Ïî ¬ü1
+Œjavascript:S4165"hReview this redundant assignment: "gameMode" already holds the assigned value along all execution paths.(²çØ8Ğî ¬ü1
+]javascript:S1854²"9Remove this useless assignment to variable "peopleItems".(ĞÑ–Ï8Ñî ¬ü1
+_javascript:S1125Æ"6Refactor the code to avoid using this boolean literal.(ŸßÄÚúÿÿÿÿ8Ñî ¬ü1
+Gjavascript:S125Ì"Remove this commented out code.(½·ÉŠûÿÿÿÿ8Ñî ¬ü1
+^javascript:S1854Ù":Remove this useless assignment to variable "dominoRoomId".(¸¯Î€8Ñî ¬ü1
+^javascript:S1854Ú"5Remove this useless assignment to variable "tableId".(‹‰Êƒùÿÿÿÿ8Ñî ¬ü1
+ajavascript:S1854Û"8Remove this useless assignment to variable "playerMode".(¦³£îüÿÿÿÿ8Ñî ¬ü1
+djavascript:S2589¿
+"@This always evaluates to truthy. Consider refactoring this code.( ÛóÀ8Óî ¬ü1
+}javascript:S3776å
+"TRefactor this function to reduce its Cognitive Complexity from 31 to the 15 allowed.(»íœœıÿÿÿÿ8Óî ¬ü1
+cjavascript:S6660"?'If' statement should not be the only statement in 'else' block(£­ôí8Ôî ¬ü1
+Gjavascript:S125š"Remove this commented out code.( Àí€ùÿÿÿÿ8Ôî ¬ü1
+djavascript:S2589Å"@This always evaluates to truthy. Consider refactoring this code.( ÛóÀ8Ôî ¬ü1
+Gjavascript:S125Ó"Remove this commented out code.(½‘©˜øÿÿÿÿ8Ôî ¬ü1
+ajavascript:S1481ã"=Remove the declaration of the unused 'dominoRoomId' variable.(‹Ò½®8Ôî ¬ü1
+^javascript:S1854ã":Remove this useless assignment to variable "dominoRoomId".(‹Ò½®8Ôî ¬ü1
+\javascript:S1481ã"8Remove the declaration of the unused 'tableId' variable.(‹Ò½®8Õî ¬ü1
+Yjavascript:S1854ã"5Remove this useless assignment to variable "tableId".(‹Ò½®8Õî ¬ü1
+_javascript:S1481ã";Remove the declaration of the unused 'playerMode' variable.(‹Ò½®8Õî ¬ü1
+\javascript:S1854ã"8Remove this useless assignment to variable "playerMode".(‹Ò½®8Õî ¬ü1
+]javascript:S1481ã"9Remove the declaration of the unused 'gameMode' variable.(‹Ò½®8Õî ¬ü1
+Zjavascript:S1854ã"6Remove this useless assignment to variable "gameMode".(‹Ò½®8Õî ¬ü1

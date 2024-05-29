@@ -1,13 +1,14 @@
 // import {    } from "../../../server/backgammons/Utility.js";
-import { getRandomInt, localThisProvideComponent, range } from "./Utilities.js";
+// import { openRulesInfoPopup } from "../pages/popup";
+import { getRandomInt,range } from "./Utilities.js";
 import { ConnectionStables } from "./WSEP.js";
-import { BetsLoaded, WSEventPoolReady } from './syncronous.js';
+import { BetsLoaded } from './syncronous.js';
 import { BackgammonsEnterAsVisitorPopup, htmlcontainer, htmlelement, htmltext } from "./htmlcontainer.js";
 import { lobbyhubReady } from "./syncronous.js";
-import { html, ranged } from "./htmlcontainer.js";
-import { openErorPopup } from "../pages/popup.js";
+import { ranged } from "./htmlcontainer.js";
+import {openErorPopup, openRulesInfoPopup} from "../pages/popup.js";
 import { getLocalUser } from "../authinterface.js";
-import * as impPopup from "../pages/popup";
+//
 
 
 const GlobalTimersList = {
@@ -87,16 +88,6 @@ class TableElT {
                 this.playersinfo = htmlelement('div', 'domino-room-table-info__players')
             ])
         ]);
-
-        const rulesIcon = this.content.querySelector('.domino-room-header__rules img');
-        if (rulesIcon) {
-            // Добавляем обработчик события клика к иконке
-            rulesIcon.addEventListener('click', () => {
-                // Вызываем функцию openRulesInfoPopup с параметром gameMode
-                impPopup.openRulesInfoPopup("CLASSIC"); // Пример с фиксированным значением gameMode, можно изменить его
-            });
-        }
-
         element.addEventListener('click', onclick.bind(null, GameID, this));
     }
 
@@ -140,19 +131,19 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
         const container = htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode});
         const swipers = [];
         const inited = BetsLoaded.then(({BackgammonsBETS})=>htmlcontainer(
-                container, [
+            container, [
                 ...BackgammonsBETS.mapPairs(({bet}, betId)=>(this.RoomsMap[betId] = [],
                         htmlcontainer(
                             htmlelement(
-                                    'div', 
-                                    'domino-room domino-room-players-2 domino-room-mode-classic',
-                                    { betId }, { betId }, []
+                                'div',
+                                'domino-room domino-room-players-2 domino-room-mode-classic',
+                                { betId }, { betId }, []
                             ), [
                                 htmlcontainer(
                                     htmlelement('div', 'domino-room-header'), [
                                         htmlelement('img', 'domino-room-header__img', {src:'./img/loto-room-card-logo.png', alt:' '}),
                                         htmltext('p', 'domino-room-header__title', ' Классическая '),
-                                        htmltext('div', 'domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="">'),
+                                        htmltext('div', 'domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="" />'),
                                     ]
                                 ),
                                 htmlcontainer(
@@ -166,65 +157,72 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                                                         )
                                                     ]
                                                 ),
-                                                htmltext('div', 'swiper-scrollbar domino-room-swiper-scrollbar swiper-scrollbar-horizontal', 
-                                                                    '<div class="swiper-scrollbar-drag"></div>')
+                                                htmltext('div', 'swiper-scrollbar domino-room-swiper-scrollbar swiper-scrollbar-horizontal',
+                                                    '<div class="swiper-scrollbar-drag"></div>')
                                             ]
                                         ),
                                         htmltext('div', "domino-room__info", `
-                                            <p class="domino-room-bet__text">
-                                                Цена комнаты:
-                                            </p>
-                                            <p class="domino-room-bet">${bet}₼</p>
-                                            <p class="domino-room-duration">
-                                                <span>Одна игра</span>
-                                                <span>Длительность игры: 5 минут</span>
-                                            </p>`
+                  <p class="domino-room-bet__text">
+                    Цена комнаты:
+                  </p>
+                  <p class="domino-room-bet">${bet}₼</p>
+                  <p class="domino-room-duration">
+                    <span>Одна игра</span>
+                    <span>Длительность игры: 5 минут</span>
+                  </p>`
                                         )
                                     ]
                                 )
                             ]
                         )
-                 ))
-                ]
-            ));
+                ))
+            ]
+        ));
+
         this.htmlview = container;
-        function    AddSwiperBehaviour(swiperEl) { return (swipers.push(swiperEl), swiperEl) };
+        function AddSwiperBehaviour(swiperEl) { return (swipers.push(swiperEl), swiperEl) };
         inited.then(()=>swipers.map(swiper=>new Swiper(swiper, {
-                            slidesPerView: 4,
-                            // centeredSlides: true,
-                            spaceBetween: 20,
-                            grabCursor: true,
-                            //slidesPerView: 3,
-                            allowTouchMove: true,
-                            scrollbar: {
-                            el: ".swiper-scrollbar",
-                            hide: false,
-                            draggable: true,
-                    },
-                    breakpoints: {
-                            // когда ширина экрана >= 320px
-                            320: {
-                                    spaceBetween: 10,
-                                    slidesPerView: 3,
-                            },
-                            // когда ширина экрана >= 480px
-                            480: {
-                                    spaceBetween: 20,
-                                    slidesPerView: 3,
-                            },
-                    },
-            })));
+            slidesPerView: 4,
+            spaceBetween: 20,
+            grabCursor: true,
+            allowTouchMove: true,
+            scrollbar: {
+                el: ".swiper-scrollbar",
+                hide: false,
+                draggable: true,
+            },
+            breakpoints: {
+                320: {
+                    spaceBetween: 10,
+                    slidesPerView: 3,
+                },
+                480: {
+                    spaceBetween: 20,
+                    slidesPerView: 3,
+                },
+            },
+        })));
+
         this.__initvals&&this.resetLobbyTable(this.__initvals);
         this.updalist.map(([...args])=>this.updateTable(...args));
         GlobalTimersList.intervalid||GlobalTimersList.startLoop();
+        this.attachRulesImageClickListener();
         return this.htmlview;
     }
-    __initvals;
-    /**
-     * 
-     * @param {[any[], int][][]} rooms 
-     * @returns 
-     */
+
+    attachRulesImageClickListener() {
+        setTimeout(() => {
+            const rulesImages = document.querySelectorAll('.domino-room-header__rules img');
+            rulesImages.forEach(image => {
+                image.addEventListener('click', () => {
+                   openRulesInfoPopup("CLASSIC");
+                    // Implement the action you want to perform on click here
+                    // For example, opening a popup with rules or navigating to a specific page
+                });
+            });
+        }, 100); // Use setTimeout to ensure the DOM is fully loaded
+    }
+
     resetLobbyTable(rooms) {
         if(!this.htmlview) return this.__initvals = rooms
         rooms.map((tables, betId)=>{
@@ -267,6 +265,8 @@ export function openBackgammonsMenuPage() {
  * @param {[int, int]} param0 
  * @param {TableElT} param1 
  */
+
+
 async function onclick([betId, tableId], {players}) {
         // const [room, table] = this;
         // alert([betId, tableId].join(', '));

@@ -181,7 +181,7 @@ export function ShowGameTable(localUser, GameID) {
 /** @type {Number} in seconds*/
 const STEPTIME = 25;
 function ServerTimeStampCompinsationUser(timestamp, setter) {
-  return ConnectionStables.diffsProm.then(diff=>tsamp+  =diff);
+  return ConnectionStables.diffsProm.then(diff=>tsamp+=diff);
 }
 class Timer {
   constructor(Element, value, _STEPTIME = STEPTIME, red=false) {

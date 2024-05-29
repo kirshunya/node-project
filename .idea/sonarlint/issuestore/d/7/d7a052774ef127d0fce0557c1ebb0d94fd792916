@@ -1,0 +1,24 @@
+
+Ijavascript:S1128"&Remove this unused import of 'impNav'.(’¨Â8÷è ¬ü1
+Ojavascript:S1128"'Remove this unused import of 'impHttp'.(÷¤×‘şÿÿÿÿ8÷è ¬ü1
+fjavascript:S6644">Unnecessary use of boolean literals in conditional expression.(‘ÑÒàûÿÿÿÿ8÷è ¬ü1
+_javascript:S1125’"6Refactor the code to avoid using this boolean literal.(»õ÷ûÿÿÿÿ8øè ¬ü1
+Bjavascript:S125§"Remove this commented out code.(–ÃĞ­8øè ¬ü1
+Mjavascript:S3504")Unexpected var, use let or const instead.(ˆ‘³8øè ¬ü1
+Rjavascript:S3504’")Unexpected var, use let or const instead.(œ×“×úÿÿÿÿ8øè ¬ü1
+Rjavascript:S3504¢")Unexpected var, use let or const instead.(“•‚ğÿÿÿÿÿ8øè ¬ü1
+ajavascript:S1481ï"=Remove the declaration of the unused 'siteLanguage' variable.(ì‚ªš8øè ¬ü1
+^javascript:S1854ï":Remove this useless assignment to variable "siteLanguage".(ì‚ªš8øè ¬ü1
+Bjavascript:S125ş"Remove this commented out code.(°íÿÒ8ùè ¬ü1
+Xjavascript:S1854¨"5Remove this useless assignment to variable "tableId".(£È`8ùè ¬ü1
+jjavascript:S6644‘"AUnnecessary use of conditional expression for default assignment.(ÊÚğûÿÿÿÿ8ùè ¬ü1
+[javascript:S1854ï"2Remove this useless assignment to variable "user".(…ë¬Çúÿÿÿÿ8ùè ¬ü1
+‚javascript:S4144›	"YUpdate this function so that its implementation is not identical to the one on line 1063.(‚İ€ùÿÿÿÿ8úè ¬ü1
+Bjavascript:S125ò
+"Remove this commented out code.(„È…Ù8úè ¬ü1
+Gjavascript:S125ı
+"Remove this commented out code.(Üÿ³Òùÿÿÿÿ8úè ¬ü1
+ajavascript:S1481Ê"=Remove the declaration of the unused 'siteLanguage' variable.(ì‚ªš8ûè ¬ü1
+^javascript:S1854Ê":Remove this useless assignment to variable "siteLanguage".(ì‚ªš8ûè ¬ü1
+Gjavascript:S125€"Remove this commented out code.(±Áş²øÿÿÿÿ8ûè ¬ü1
+Gjavascript:S125…"Remove this commented out code.(ª¼‡‘ûÿÿÿÿ8ûè ¬ü1

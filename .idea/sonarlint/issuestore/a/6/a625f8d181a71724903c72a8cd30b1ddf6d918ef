@@ -1,0 +1,70 @@
+
+Jjavascript:S1128"'Remove this unused import of '$myeval'.(éú¶Á8ïÙ ¬ü1
+Pjavascript:S1128"-Remove this unused import of 'EventProvider'.(éú¶Á8ğÙ ¬ü1
+Pjavascript:S1128"(Remove this unused import of 'slotinfo'.(Êû’Îùÿÿÿÿ8ğÙ ¬ü1
+|javascript:S3863"T'D:\Proj from git\js\modules\backgammons\BoardConstants.js' imported multiple times.(Êû’Îùÿÿÿÿ8ğÙ ¬ü1
+|javascript:S3863"T'D:\Proj from git\js\modules\backgammons\BoardConstants.js' imported multiple times.(ªÑ£ÿÿÿÿÿ8ğÙ ¬ü1
+Kjavascript:S3504")Unexpected var, use let or const instead.(×š§<8òÙ ¬ü1
+Qjavascript:S3504")Unexpected var, use let or const instead.(ë Äâúÿÿÿÿ8òÙ ¬ü1
+Yjavascript:S38002"6Refactor this function to always return the same type.(— ±Õ8òÙ ¬ü1
+Qjavascript:S2094?")Unexpected class with only a constructor.(ìä‰ ùÿÿÿÿ8óÙ ¬ü1
+Sjavascript:S6635A"+Unexpected return statement in constructor.(ƒ¶Ÿíúÿÿÿÿ8õÙ ¬ü1
+ijavascript:S6661A"AUse an object spread instead of `Object.assign` eg: `{ ...foo }`.(ƒ¶Ÿíúÿÿÿÿ8÷Ù ¬ü1
+Fjavascript:S125R"Remove this commented out code.(²””äùÿÿÿÿ8÷Ù ¬ü1
+Ujavascript:S6959c"-Add an initial value to this "reduce()" call.(Ÿ©¢•ıÿÿÿÿ8ùÙ ¬ü1
+Pjavascript:S6959d"-Add an initial value to this "reduce()" call.(ÑåÈ¦8ùÙ ¬ü1
+^javascript:S1481|";Remove the declaration of the unused 'BoardParts' variable.(îÚÉ8úÙ ¬ü1
+[javascript:S1854|"8Remove this useless assignment to variable "BoardParts".(îÚÉ8üÙ ¬ü1
+rjavascript:S101ˆ"ORename class "fabricImage" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(¥ƒÉñ8ıÙ ¬ü1
+Pjavascript:S1186‘"'Unexpected empty method 'applyFilters'.(”öò±øÿÿÿÿ8şÙ ¬ü1
+Jjavascript:S1186—"!Unexpected empty method 'moveTo'.(Êå şÿÿÿÿÿ8şÙ ¬ü1
+Mjavascript:S1186"$Unexpected empty method 'setCoords'.(œ©™÷ıÿÿÿÿ8ÿÙ ¬ü1
+^javascript:S6861Ÿ"5Exporting mutable 'var' binding, use 'const' instead.(Îõ“Úıÿÿÿÿ8€Ú ¬ü1
+Rjavascript:S3504Ÿ")Unexpected var, use let or const instead.(Îõ“Úıÿÿÿÿ8€Ú ¬ü1
+^javascript:S6861 "5Exporting mutable 'var' binding, use 'const' instead.(Ñ³Ğ¯ıÿÿÿÿ8€Ú ¬ü1
+Rjavascript:S3504 ")Unexpected var, use let or const instead.(Ñ³Ğ¯ıÿÿÿÿ8€Ú ¬ü1
+^javascript:S6861¡"5Exporting mutable 'var' binding, use 'const' instead.(°ùŸŞşÿÿÿÿ8Ú ¬ü1
+Rjavascript:S3504¡")Unexpected var, use let or const instead.(°ùŸŞşÿÿÿÿ8Ú ¬ü1
+Djavascript:S878µ"!Unexpected use of comma operator.(§ÍÃü8Ú ¬ü1
+Xjavascript:S1135Ç"4Complete the task associated to this "TODO" comment.(ß€Ô…8‚Ú ¬ü1
+kjavascript:S1121Ş"BExtract the assignment of "DropLunkCC.width" from this expression.(³ñüÿÿÿÿ8‚Ú ¬ü1
+ljavascript:S1121ß"CExtract the assignment of "DropLunkCC.height" from this expression.(ı£¾÷şÿÿÿÿ8‚Ú ¬ü1
+Gjavascript:S125ç"Remove this commented out code.(î²àûÿÿÿÿ8‚Ú ¬ü1
+Xjavascript:S1135è"4Complete the task associated to this "TODO" comment.(ÑØ Á8‚Ú ¬ü1
+Bjavascript:S125í"Remove this commented out code.(Â¤ë8ƒÚ ¬ü1
+Sjavascript:S6544ú"/Promise executor functions should not be async.(òÄÆØ8„Ú ¬ü1
+Djavascript:S878û"!Unexpected use of comma operator.(¯ÁÃ„8„Ú ¬ü1
+Gjavascript:S125×"Remove this commented out code.(â¥ùüÿÿÿÿ8„Ú ¬ü1
+Bjavascript:S125í"Remove this commented out code.(ûòµÕ8„Ú ¬ü1
+Bjavascript:S125õ"Remove this commented out code.(“ôÿ²8„Ú ¬ü1
+Gjavascript:S125€"Remove this commented out code.(ÀæÙ¡ûÿÿÿÿ8…Ú ¬ü1
+Bjavascript:S125"Remove this commented out code.(¿èé8…Ú ¬ü1
+Xjavascript:S1135•"4Complete the task associated to this "TODO" comment.(èØ»ã8…Ú ¬ü1
+Gjavascript:S125—"Remove this commented out code.(æôÛ§şÿÿÿÿ8…Ú ¬ü1
+Bjavascript:S125›"Remove this commented out code.(Ú¸8†Ú ¬ü1
+Ijavascript:S878Æ"!Unexpected use of comma operator.(ôÛı­ûÿÿÿÿ8†Ú ¬ü1
+Bjavascript:S125ê"Remove this commented out code.(ÇÕ³Ó8†Ú ¬ü1
+Bjavascript:S125ò"Remove this commented out code.(ÇÕ³Ó8†Ú ¬ü1
+[javascript:S1481"7Remove the declaration of the unused 'canvas' variable.(ıè’†8†Ú ¬ü1
+Xjavascript:S1854"4Remove this useless assignment to variable "canvas".(ıè’†8‡Ú ¬ü1
+Bjavascript:S125²"Remove this commented out code.(üÒó8‡Ú ¬ü1
+ijavascript:S1848¶"EEither remove this useless object instantiation of "Toast" or use it.(ÿóÔ…8ˆÚ ¬ü1
+ejavascript:S2004½"ARefactor this code to not nest functions more than 4 levels deep.(–†æŞ8‰Ú ¬ü1
+Sjavascript:S3796É"*Add a "return" statement to this callback.(ÆÏ”Åúÿÿÿÿ8ŠÚ ¬ü1
+Zjavascript:S930Í"7This function expects 2 arguments, but 4 were provided.(“ëæ›8ŒÚ ¬ü1
+Gjavascript:S125Ó"Remove this commented out code.(Ô×÷¢ùÿÿÿÿ8Ú ¬ü1
+ejavascript:S1481à"<Remove the declaration of the unused 'CanvasWidth' variable.(€³§²ıÿÿÿÿ8Ú ¬ü1
+bjavascript:S1854à"9Remove this useless assignment to variable "CanvasWidth".(€³§²ıÿÿÿÿ8Ú ¬ü1
+Gjavascript:S125â"Remove this commented out code.(ÅÄ‘•ûÿÿÿÿ8Ú ¬ü1
+Bjavascript:S125î"Remove this commented out code.(¬çå³8Ú ¬ü1
+Mjavascript:S1481ö")Remove unused function 'heightWithProfs'.(ÿ‚îº8Ú ¬ü1
+mjavascript:S3358ú"DExtract this nested ternary operation into an independent statement.(ğ›Ï”şÿÿÿÿ8Ú ¬ü1
+Ijavascript:S878•"!Unexpected use of comma operator.(Šïöıÿÿÿÿ8Ú ¬ü1
+jjavascript:S6644Ã"AUnnecessary use of conditional expression for default assignment.(éí…Šüÿÿÿÿ8Ú ¬ü1
+Gjavascript:S125í"Remove this commented out code.(Â¢Âæşÿÿÿÿ8Ú ¬ü1
+cjavascript:S6660¾"?'If' statement should not be the only statement in 'else' block(°—Î8‘Ú ¬ü1
+Kjavascript:S1788Ê""Default parameters should be last.(‚ƒ«éıÿÿÿÿ8‘Ú ¬ü1
+Kjavascript:S1788Ò""Default parameters should be last.(Öäì¡ÿÿÿÿÿ8‘Ú ¬ü1
+Gjavascript:S125å"Remove this commented out code.(áœ¬øÿÿÿÿ8‘Ú ¬ü1
+_javascript:S930é"7This function expects 2 arguments, but 4 were provided.(äÂ×âÿÿÿÿÿ8’Ú ¬ü1
+Gjavascript:S125‡"Remove this commented out code.(–Óÿÿÿÿÿ8’Ú ¬ü1

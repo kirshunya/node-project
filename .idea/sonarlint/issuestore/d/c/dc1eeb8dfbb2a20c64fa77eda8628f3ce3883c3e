@@ -1,0 +1,38 @@
+
+vjavascript:S1128"(Remove this unused import of 'impAudio'.(ßÕÄ°ûÿÿÿÿ8Êì£­ü1J$989399b0-b733-40fc-85c4-e8ec184e1d8b
+sjavascript:S1128"*Remove this unused import of 'impLeaders'.(ÕôÅ„8Íì£­ü1J$c1d62b65-2c91-4455-b506-db4a2c5aa266
+javascript:S3776"TRefactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed.(æ¦ë·8èì£­ü1J$206648ae-0fe5-47d9-9eda-f0ee2e4dec21
+ªjavascript:S6582"[Prefer using an optional chain expression instead, as it's more concise and easier to read.(šîüÿÿÿÿ8èì£­ü1J$46ec2a95-6645-4865-b307-a0cc8f6f18a9
+mjavascript:S125“"Remove this commented out code.(Æ¦Şšûÿÿÿÿ8èì£­ü1J$f988fed3-30fa-4357-adc8-acf399554df4
+mjavascript:S125º"Remove this commented out code.(™†Õºüÿÿÿÿ8èì£­ü1J$eed5a3bc-0a13-4c29-893e-d5f7204859ae
+mjavascript:S125Æ"Remove this commented out code.(¬Ÿûÿÿÿÿÿ8èì£­ü1J$9f94ccb0-c7c4-478b-8d9a-d37c9f0e8a70
+mjavascript:S125Ù"Remove this commented out code.(Æ¦Şšûÿÿÿÿ8èì£­ü1J$ca783504-46ff-4298-bc10-2954380fcb02
+‹javascript:S6353š"<Use concise character class syntax '\D' instead of '[^0-9]'.(±ÈŠÆøÿÿÿÿ8èì£­ü1J$abd00004-a5ca-4538-81f0-3bf44232e745
+‹javascript:S6353†"<Use concise character class syntax '\D' instead of '[^0-9]'.(È´î©úÿÿÿÿ8èì£­ü1J$036957e4-a0a3-485a-b6e1-dd9e642e4d49
+…javascript:S6353Ø";Use concise character class syntax '\d' instead of '[0-9]'.(¼íš8èì£­ü1J$1fb8f838-8113-415d-8187-f21383cd69ad
+…javascript:S6353Ø";Use concise character class syntax '\d' instead of '[0-9]'.(¼íš8èì£­ü1J$26e6daf2-b95f-401f-9faa-c09b8129046f
+javascript:S3776Û"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(Å—˜Ó8èì£­ü1J$8a91fa77-d1ad-4ceb-a9f4-2479c4569db3
+sjavascript:S3504Ç")Unexpected var, use let or const instead.(ÄŒàõ8èì£­ü1J$30104c4e-38d3-4c66-bc9e-130957f5d8ec
+zjavascript:S6035Ç"0Replace this alternation with a character class.(ÄŒàõ8èì£­ü1J$2a6a8920-74d7-4acc-b0bc-ad0eeb63320e
+ƒjavascript:S1481†"9Remove the declaration of the unused 'response' variable.(¾ºğÖ8èì£­ü1J$578a8cba-fd9f-4736-8eca-8f2e6016ff36
+€javascript:S1854†"6Remove this useless assignment to variable "response".(¾ºğÖ8èì£­ü1J$abcd4ffc-4fd8-4b2a-bfca-05303c001ee8
+„javascript:S1481è":Remove the declaration of the unused 'lotoGames' variable.(ïÿ8èì£­ü1J$871eed14-4469-4b2e-bbae-b15a48497248
+javascript:S1854è"7Remove this useless assignment to variable "lotoGames".(ïÿ8èì£­ü1J$bab6f27b-7a7e-4034-b41a-80ac9fb1ae49
+Šjavascript:S1481è"@Remove the declaration of the unused 'backgammonGames' variable.(ïÿ8…ô¦­ü1J$aafd3fda-4e55-4972-96e7-c760b137a752
+‡javascript:S1854è"=Remove this useless assignment to variable "backgammonGames".(ïÿ8…ô¦­ü1J$c160ab01-d045-473c-92a8-ee402dac4615
+‡javascript:S1481Í	"=Remove the declaration of the unused 'siteLanguage' variable.(ì‚ªš8èì£­ü1J$a58cf38f-9bfe-4e2b-a132-b7e20d2ae3d1
+„javascript:S1854Í	":Remove this useless assignment to variable "siteLanguage".(ì‚ªš8èì£­ü1J$3d89d976-542e-4daa-ac74-653a7f29b0a0
+hjavascript:S125Î	"Remove this commented out code.(€¼µˆ8èì£­ü1J$a0e19f07-af1d-498d-9e43-81dc51d888fc
+mjavascript:S125Û	"Remove this commented out code.(´Ö¦ıÿÿÿÿ8èì£­ü1J$84021fb3-9ba8-4b4c-ab4e-d9f70a24015e
+‹javascript:S6353¥
+"<Use concise character class syntax '\D' instead of '[^0-9]'.(ƒ½Àıÿÿÿÿ8èì£­ü1J$181ea19a-e3b5-4932-9561-f9b3930f00b4
+javascript:S3776¿
+"TRefactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.(£ã‡8èì£­ü1J$8f9bb476-78d3-4d88-beb3-2e6770fe95a3
+mjavascript:S125é
+"Remove this commented out code.(÷Æíúÿÿÿÿ8èì£­ü1J$ef4ba0e2-79e8-4732-a7c2-6e1974911d81
+mjavascript:S125‰"Remove this commented out code.(Û’öÚüÿÿÿÿ8èì£­ü1J$d60087e1-adca-4d88-94a4-67cc2502b437
+€javascript:S1125Ç"6Refactor the code to avoid using this boolean literal.(ïÍ»º8ïì£­ü1J$ce3d2568-132d-4b1e-b769-37fefcbb3b01
+hjavascript:S125¯"Remove this commented out code.(ÎŸØü8ïì£­ü1J$fd698489-18ca-48a2-99a2-e1d50f98b281
+€javascript:S3800·"6Refactor this function to always return the same type.(©Ê¸‘8ïì£­ü1J$07bcf928-531e-4b86-848f-b6406c707601
+hjavascript:S125¸"Remove this commented out code.(äÕ™Æ8ğì£­ü1J$8abc7675-2c74-437f-8414-19664efed769
+javascript:S6671æ"5Expected the Promise rejection reason to be an Error.(–øÊı8ğì£­ü1J$6c1ad561-05f1-46d4-aded-0d5d464b4d4e

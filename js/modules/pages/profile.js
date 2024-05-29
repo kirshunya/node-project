@@ -997,9 +997,7 @@ async function openUserGames() {
   let main = document.querySelector(".main__container");
   if (main) {
     const { data } = await impHttp.getUserGames();
-    const { lotoGames, dominoGames} = data;
-    console.log(data);
-    console.log("ABOBABABABABABABABABABABA");
+    const { lotoGames, dominoGames, backgammonGames} = data;
     main.innerHTML = `
       <div class="main__container">
         <section class="user-game-history">
