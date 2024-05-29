@@ -90,9 +90,10 @@ class TableElT {
 
         const rulesIcon = this.content.querySelector('.domino-room-header__rules img');
         if (rulesIcon) {
+            // Добавляем обработчик события клика к иконке
             rulesIcon.addEventListener('click', () => {
-                console.log('Иконка правил была нажата');
-                // Здесь можно добавить дополнительную логику
+                // Вызываем функцию openRulesInfoPopup с параметром gameMode
+                impPopup.openRulesInfoPopup("CLASSIC"); // Пример с фиксированным значением gameMode, можно изменить его
             });
         }
 
