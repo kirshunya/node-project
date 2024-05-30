@@ -122,3 +122,12 @@ F
 js/modules/localize.js,b\7\b799571b5858ff3b441ed7a50b48b940a6c63da8
 U
 %server/service/game-domino-service.js,8\1\81bd34d8246965974c9cc462e25d7def956b6ce0
+J
+style/choose-mode-menu.css,8\5\8536e1095367145bc787338831d0d19b37a611c0
+Q
+!js/modules/pages/rooms-control.js,9\2\92a34ae16a635fb84442d6e67d560fbed0ad1d5c
+]
+-server/controllers/lotosettings-controller.js,f\a\fa3733649a5c9156a570e120243c2ac4c8299d42
+:
+
+index.html,f\6\f6013a00b362253c64368d6eebc50ea2131754e2

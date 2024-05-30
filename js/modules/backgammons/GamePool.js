@@ -100,7 +100,7 @@ export function ShowGameTable(localUser, GameID) {
                   <div style="background-image: url('img/flags.png');"></div>
                   <div style="background-image: url('img/volume.png');
                               background-size: 57%;"></div>
-                 <div style="background-image: url('img/dice.png');" class="autostep active"></div>-->
+                 <div style="background-image: url('img/dice.png');" class="autostep active"></div>
                 </div>
                 <div class="line" style="position: relative;">
                   <div style="flex-grow: 1;" class="dp"></div>

@@ -56,10 +56,10 @@ class TableElT {
               </div>
         `;
 
-        this.tableparts.forEach(part => {
-            part.classList.toggle("filled", this._$players.length > part.children.length);
+        this.tableparts.forEach((part, index) => {
+            part.classList.toggle("filled", this._$players.length > index);
             if (window.isAdmin) {
-                part.innerHTML = `<div class="table-admin__userid-item">${this._$players[part.children.length - 1]?.userId || ''}</div>`;
+                part.innerHTML = `<div class="table-admin__userid-item">${this._$players[index]?.userId || ''}</div>`;
             }
         });
         return true;
