@@ -750,6 +750,36 @@ export const getDominoRoomBetInfo = (roomId) => {
   }
 };
 
+export const getBackgammonRoomBetInfo = (roomId) => {
+  switch (roomId) {
+    case 1:
+      return {
+        bet: 1,
+        commission: 0.2,
+      };
+    case 2:
+      return {
+        bet: 3,
+        commission: 0.15,
+      };
+    case 3:
+      return {
+        bet: 5,
+        commission: 0.45,
+      };
+    case 4:
+      return {
+        bet: 10,
+        commission: 0.75,
+      };
+    case 5:
+      return {
+        bet: 20,
+        commission: 1.5,
+      };
+  }
+};
+
 export async function addDominoRoomsInfo(msg) {
   const siteLanguage = window.siteLanguage;
   let { dominoInfo } = msg;

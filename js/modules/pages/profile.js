@@ -997,7 +997,11 @@ async function openUserGames() {
   let main = document.querySelector(".main__container");
   if (main) {
     const { data } = await impHttp.getUserGames();
-    const { lotoGames, dominoGames, backgammonGames} = data;
+    const  backgammonGames  = await impHttp.getUserBackgammonGames();
+    // const { lotoGames } = data;
+    //const { backgammonGames } = data;
+    console.log(data);
+    console.log(backgammonGames);
     main.innerHTML = `
       <div class="main__container">
         <section class="user-game-history">
@@ -1033,7 +1037,7 @@ async function openUserGames() {
       gameitem.classList.add(
           "user-game__item",
           "game-item",
-          `${game.isWinner ? "won" : "lose"}`,
+          `${game.isWinner? "won" : "lose"}`,
           `game-item-${index}`
       );
       gameitem.setAttribute("date", game.createdAt);
@@ -1122,31 +1126,22 @@ async function openUserGames() {
       }
     });
 
-    dominoGames.forEach((game, index) => {
+    const us = localStorage.getItem("user")
+    const userData = JSON.parse(us);
+    console.log(us);
+    console.log(userData.userId);
+
+    backgammonGames.forEach((game, index) => {
+
       let gameitem = document.createElement("div");
       gameitem.classList.add(
           "user-game__item",
           "game-item",
-          `${game.isWinner ? "won" : "lose"}`,
+           game.winnerId == userData.userId? "won" : "lose",
           `game-item-${index}`
       );
       gameitem.setAttribute("date", game.createdAt);
-
-      const { bet } = impDominoNav.getDominoRoomBetInfo(game.roomId);
-
-      // "game": "Игра",
-      // "won": "выиграна",
-      // "lost": "проиграна",
-      // "room": "Комната",
-      // "table": "Стол",
-      // "playersAmount": "Количество игроков",
-      // "gameMode": "Режим",
-      // "classic": "классический",
-      // "telephone": "телефон",
-      // "bet": "Ставка",
-      // "pureWin": "Чистый выигрыш",
-      // "totalBank": "Общий банк",
-      // "roomCommission": "Комиссия комнаты"
+      const { bet } = impDominoNav.getBackgammonRoomBetInfo(game.roomId);
 
       let dateTime = new Date(game.createdAt);
       dateTime = new Date(dateTime.toISOString().toLocaleString());
@@ -1163,53 +1158,131 @@ async function openUserGames() {
 
       gameitem.innerHTML = `
         <div class="game-item__date">
-        ${formattedDate} ${formattedTime} 
+        ${formattedDate} ${formattedTime}
         </div>
-        <p>${siteLanguage.statsPage.menuHeader.gameBackgamonsText}</p>
+        <p>${siteLanguage.statsPage.menuHeader.gameNardsText}</p>
         <p class="game-item__isWon">${
           siteLanguage.profilePage.myGamesPage.statsItem.game
       } <span> ${
-          game.isWinner
+          game.winnerId == userData.userId
               ? siteLanguage.profilePage.myGamesPage.statsItem.won
               : siteLanguage.profilePage.myGamesPage.statsItem.lost
       }!</span></p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.room}: ${
           game.roomId
       }</p>
-        <p>${siteLanguage.profilePage.myGamesPage.statsItem.table}: ${
-          game.tableId
-      }</p>
-        <p>${siteLanguage.profilePage.myGamesPage.statsItem.playersAmount}: ${
-          game.playerMode
-      }</p>
-        <p>${siteLanguage.profilePage.myGamesPage.statsItem.gameMode}: ${
-          game.gameMode == "CLASSIC"
-              ? siteLanguage.profilePage.myGamesPage.statsItem.classic
-              : siteLanguage.profilePage.myGamesPage.statsItem.telephone
-      }</p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.bet}: ${bet.toFixed(
           2
       )}₼</p>
         ${
-          game.isWinner
+          game.winnerId == userData.userId
               ? `<p>${
                   siteLanguage.profilePage.myGamesPage.statsItem.pureWin
-              }: ${game.winSum.toFixed(2)}₼</p>
+              }: ${2 * game.bet.toFixed(2) + 0.1 * game.bet.toFixed(2)}₼</p>
               <p>${
                   siteLanguage.profilePage.myGamesPage.statsItem.winCommission
-              }: ${(game.winSum + bet).toFixed(2)}₼</p>
+              }: ${(game.bet + bet).toFixed(2)}₼</p>
               `
               : `${siteLanguage.profilePage.myGamesPage.statsItem.totalBank}: ${(
-                  bet * game.playerMode
+                  game.bet * 2 - (0.1 * game.bet)
               ).toFixed(2)}₼`
       }
         <p>${
           siteLanguage.profilePage.myGamesPage.statsItem.roomCommission
-      }: 15%</p>
+      }: 10%</p>
       `;
 
       mainBlock.insertBefore(gameitem, mainBlock.firstChild);
     });
+
+    // dominoGames.forEach((game, index) => {
+    //   let gameitem = document.createElement("div");
+    //   gameitem.classList.add(
+    //       "user-game__item",
+    //       "game-item",
+    //       `${game.isWinner ? "won" : "lose"}`,
+    //       `game-item-${index}`
+    //   );
+    //   gameitem.setAttribute("date", game.createdAt);
+    //
+    //   const { bet } = impDominoNav.getDominoRoomBetInfo(game.roomId);
+    //
+    //   // "game": "Игра",
+    //   // "won": "выиграна",
+    //   // "lost": "проиграна",
+    //   // "room": "Комната",
+    //   // "table": "Стол",
+    //   // "playersAmount": "Количество игроков",
+    //   // "gameMode": "Режим",
+    //   // "classic": "классический",
+    //   // "telephone": "телефон",
+    //   // "bet": "Ставка",
+    //   // "pureWin": "Чистый выигрыш",
+    //   // "totalBank": "Общий банк",
+    //   // "roomCommission": "Комиссия комнаты"
+    //
+    //   let dateTime = new Date(game.createdAt);
+    //   dateTime = new Date(dateTime.toISOString().toLocaleString());
+    //
+    //   const day = ("0" + dateTime.getDate()).slice(-2); // Извлекаем день и добавляем ведущий ноль при необходимости
+    //   const month = ("0" + (dateTime.getMonth() + 1)).slice(-2); // Извлекаем месяц (нумерация месяцев начинается с 0)
+    //   const year = dateTime.getFullYear(); // Извлекаем год
+    //
+    //   const hours = ("0" + dateTime.getHours()).slice(-2); // Извлекаем часы и добавляем ведущий ноль при необходимости
+    //   const minutes = ("0" + dateTime.getMinutes()).slice(-2); // Извлекаем минуты и добавляем ведущий ноль при необходимости
+    //
+    //   const formattedDate = `${day}.${month}.${year}`; // Форматируем дату в требуемый формат
+    //   const formattedTime = `${hours}:${minutes}`; // Форматируем время в требуемый формат
+    //
+    //   gameitem.innerHTML = `
+    //     <div class="game-item__date">
+    //     ${formattedDate} ${formattedTime}
+    //     </div>
+    //     <p>${siteLanguage.statsPage.menuHeader.gameBackgamonsText}</p>
+    //     <p class="game-item__isWon">${
+    //       siteLanguage.profilePage.myGamesPage.statsItem.game
+    //   } <span> ${
+    //       game.isWinner
+    //           ? siteLanguage.profilePage.myGamesPage.statsItem.won
+    //           : siteLanguage.profilePage.myGamesPage.statsItem.lost
+    //   }!</span></p>
+    //     <p>${siteLanguage.profilePage.myGamesPage.statsItem.room}: ${
+    //       game.roomId
+    //   }</p>
+    //     <p>${siteLanguage.profilePage.myGamesPage.statsItem.table}: ${
+    //       game.tableId
+    //   }</p>
+    //     <p>${siteLanguage.profilePage.myGamesPage.statsItem.playersAmount}: ${
+    //       game.playerMode
+    //   }</p>
+    //     <p>${siteLanguage.profilePage.myGamesPage.statsItem.gameMode}: ${
+    //       game.gameMode == "CLASSIC"
+    //           ? siteLanguage.profilePage.myGamesPage.statsItem.classic
+    //           : siteLanguage.profilePage.myGamesPage.statsItem.telephone
+    //   }</p>
+    //     <p>${siteLanguage.profilePage.myGamesPage.statsItem.bet}: ${bet.toFixed(
+    //       2
+    //   )}₼</p>
+    //     ${
+    //       game.isWinner
+    //           ? `<p>${
+    //               siteLanguage.profilePage.myGamesPage.statsItem.pureWin
+    //           }: ${game.winSum.toFixed(2)}₼</p>
+    //           <p>${
+    //               siteLanguage.profilePage.myGamesPage.statsItem.winCommission
+    //           }: ${(game.winSum + bet).toFixed(2)}₼</p>
+    //           `
+    //           : `${siteLanguage.profilePage.myGamesPage.statsItem.totalBank}: ${(
+    //               bet * game.playerMode
+    //           ).toFixed(2)}₼`
+    //   }
+    //     <p>${
+    //       siteLanguage.profilePage.myGamesPage.statsItem.roomCommission
+    //   }: 15%</p>
+    //   `;
+    //
+    //   mainBlock.insertBefore(gameitem, mainBlock.firstChild);
+    // });
 
     // sort all games by date
     let games = document.querySelectorAll(".game-item");

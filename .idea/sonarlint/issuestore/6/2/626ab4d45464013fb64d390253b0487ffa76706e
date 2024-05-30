@@ -1,52 +1,52 @@
 
-mjavascript:S1128"%Remove this unused import of 'ondom'.(ß×ÖA8ªß ¬ü1J$b57366b1-2d5c-4fe9-90c6-3977a1fb3f7a
-ujavascript:S1128"-Remove this unused import of 'EventProvider'.(ß×ÖA8ªß ¬ü1J$187ef42d-447d-4fa7-9924-0b5caa5dbec1
-mjavascript:S1128"%Remove this unused import of 'range'.(ß×ÖA8ªß ¬ü1J$9c558bde-1a22-431c-bdd3-ee08b12ee042
-—javascript:S3863"O'D:\Proj from git\js\modules\backgammons\Utilities.js' imported multiple times.(ß×ÖA8«ß ¬ü1J$334b1ade-d691-41ea-9a16-b790117326f6
-yjavascript:S1128"+Remove this unused import of 'WSEventPool'.(ËÕà¦ÿÿÿÿÿ8«ß ¬ü1J$1e24e052-2c33-49f4-b7c8-068f4f280b2d
-tjavascript:S1128"&Remove this unused import of 'WSRoom'.(ËÕà¦ÿÿÿÿÿ8«ß ¬ü1J$748c569e-3d9c-4856-8bb1-1bf4d0d70bbd
-gjavascript:S125"Remove this commented out code.(åÍÑˆ8«ß ¬ü1J$778fba2a-1c30-44ce-b4a5-f8b6bbc3bfd6
-‚javascript:S1128"4Remove this unused import of 'getDominoRoomBetInfo'.(‘óÒæıÿÿÿÿ8«ß ¬ü1J$967a9e63-61e8-40bb-9a5c-bcba62734429
-ujavascript:S1128	",Remove this unused import of 'API_URL_PART'.(Ïƒîš8«ß ¬ü1J$419768dc-8e2b-4979-8d6e-ea2536ebe142
-yjavascript:S1128	"0Remove this unused import of 'IS_HOSTED_STATIC'.(Ïƒîš8«ß ¬ü1J$2ca3a09e-0b6e-4f7d-af2a-bfad0cb39409
-xjavascript:S1128	"/Remove this unused import of 'timeOffsetHours'.(Ïƒîš8¬ß ¬ü1J$d63f533b-c0fe-414d-8a84-e5ed0e43346d
+mjavascript:S1128"%Remove this unused import of 'ondom'.(ß×ÖA8ªß ¬ü1J$5d890a6f-cce2-4e68-be5a-dee8a09fa526
+ujavascript:S1128"-Remove this unused import of 'EventProvider'.(ß×ÖA8ªß ¬ü1J$1fea6ace-dc30-41e9-b971-d03389bd4894
+mjavascript:S1128"%Remove this unused import of 'range'.(ß×ÖA8ªß ¬ü1J$f9493dba-5517-4490-8792-a427318bfb90
+—javascript:S3863"O'D:\Proj from git\js\modules\backgammons\Utilities.js' imported multiple times.(ß×ÖA8«ß ¬ü1J$bbf79004-4a55-4f6b-b94d-aa68cc646fba
+yjavascript:S1128"+Remove this unused import of 'WSEventPool'.(ËÕà¦ÿÿÿÿÿ8«ß ¬ü1J$b109f598-353f-4584-bd07-9efe8dc5375c
+tjavascript:S1128"&Remove this unused import of 'WSRoom'.(ËÕà¦ÿÿÿÿÿ8«ß ¬ü1J$e6fe9bb7-3c01-4fec-adf0-1bb2f765d7cc
+gjavascript:S125"Remove this commented out code.(åÍÑˆ8«ß ¬ü1J$22807d88-2c2b-423a-bbb5-ca792627ca0e
+‚javascript:S1128"4Remove this unused import of 'getDominoRoomBetInfo'.(‘óÒæıÿÿÿÿ8«ß ¬ü1J$a52b4157-b223-486b-9110-1da94b06d7ad
+ujavascript:S1128	",Remove this unused import of 'API_URL_PART'.(Ïƒîš8«ß ¬ü1J$20dbc4d2-58f3-477d-b467-b397ae5fdfb0
+yjavascript:S1128	"0Remove this unused import of 'IS_HOSTED_STATIC'.(Ïƒîš8«ß ¬ü1J$e00f01d7-7966-4c79-a02d-8bb771963226
+xjavascript:S1128	"/Remove this unused import of 'timeOffsetHours'.(Ïƒîš8¬ß ¬ü1J$dfee401d-548a-4cfa-b632-9731cf3eb31a
 {javascript:S1128
-"-Remove this unused import of 'NowClientTime'.(Ä»˜ÿÿÿÿÿ8¬ß ¬ü1J$d67b56bd-a14d-4f87-93c5-5f90d7079701
-javascript:S3863"O'D:\Proj from git\js\modules\backgammons\Utilities.js' imported multiple times.(Êø•ôøÿÿÿÿ8¬ß ¬ü1J$5aa13664-b3ca-41ec-b246-770a9e1e140d
-}javascript:S1128"4Remove this unused import of 'setGameSoundsAllowed'.(Ï‡ €8­ß ¬ü1J$5760abd4-edbe-4d52-bdcd-ed25efa42ca8
-rjavascript:S3504:")Unexpected var, use let or const instead.(Áççí8­ß ¬ü1J$c8f35110-4bf7-4548-9e4d-0d5af44e11f2
-‹javascript:S1481J"=Remove the declaration of the unused 'imageHandler' variable.(Í™ğÂşÿÿÿÿ8­ß ¬ü1J$d0bdc1d1-de93-421e-8a8f-5c954048d6cc
-ˆjavascript:S1854J":Remove this useless assignment to variable "imageHandler".(Í™ğÂşÿÿÿÿ8­ß ¬ü1J$99bcb27b-0cbe-46c0-95a1-4e56b9a577b8
-gjavascript:S125K"Remove this commented out code.(‹ñ†ù8­ß ¬ü1J$4a89bfce-1e43-452f-b517-d1f560f253d4
-gjavascript:S125N"Remove this commented out code.(ñä‹À8­ß ¬ü1J$d099c1a6-af40-4466-bba6-aeaea1185d42
-mjavascript:S125¦"Remove this commented out code.(·Óş½ùÿÿÿÿ8­ß ¬ü1J$1e52a1d5-845c-420c-a948-c85203f2d66f
-hjavascript:S125¬"Remove this commented out code.(ùçºó8®ß ¬ü1J$751142fa-05ef-4769-99c2-ef6b0fac497b
-ªjavascript:S2703¸"[Add the "let", "const" or "var" keyword to this declaration of "tsamp" to make it explicit.(Ãı±Êüÿÿÿÿ8¯ß ¬ü1J$e166d3dd-dca8-4546-af2b-b0fc5160d8fa
-xjavascript:S2094º")Unexpected class with only a constructor.(èŸ‹íşÿÿÿÿ8¯ß ¬ü1J$e3486fc4-e7f4-4400-be0a-e3a1770a6049
-javascript:S4624Æ"7Refactor this code to not use nested template literals.(à‡¹”8¯ß ¬ü1J$31d523c0-dd12-4881-a7a8-7724805cf476
-€javascript:S930Û"7This function expects no arguments, but 1 was provided.(à„æÎ8°ß ¬ü1J$3a5453a1-58c0-4d54-9e0e-f3f66c62dac7
-‹javascript:S1121á"AExtract the assignment of "TimersIntervals" from this expression.(ı‹ÇŞ8°ß ¬ü1J$dcc44ca0-4039-4e8f-91ce-3a6643586394
-hjavascript:S125ç"Remove this commented out code.(©­Œ8°ß ¬ü1J$12a9a491-e780-450f-bd55-a778d1d70ed8
-djavascript:S108†"Empty block statement.(ÒÌâ–øÿÿÿÿ8±ß ¬ü1J$bcd9b0b3-d87f-4f06-a1db-6fcebc20986c
-ƒjavascript:S1481•"9Remove the declaration of the unused 'autodice' variable.(¼¯ËÄ8²ß ¬ü1J$5eab29e0-db14-42c4-9592-21f1f15909b5
-€javascript:S1854•"6Remove this useless assignment to variable "autodice".(¼¯ËÄ8²ß ¬ü1J$6184235a-49cf-4358-8263-e70c2183497d
-mjavascript:S125œ"Remove this commented out code.(à§‹¤úÿÿÿÿ8²ß ¬ü1J$47b7fd1c-33a8-445a-bd39-80914c7c48ec
-javascript:S1121°"?Extract the assignment of "location.hash" from this expression.(Â±ä„ÿÿÿÿÿ8³ß ¬ü1J$b4e12d8e-422f-46b4-baea-4431069f7a21
-”javascript:S1848¸"EEither remove this useless object instantiation of "Toast" or use it.(ïùíîûÿÿÿÿ8³ß ¬ü1J$c3a976da-3b87-4a32-aa03-300e136f849c
-tjavascript:S3796Á"*Add a "return" statement to this callback.(–ùÒ8³ß ¬ü1J$ae3fd4d0-a4c1-4cd0-88e9-9e10d86d1d1e
-javascript:S3358Å"DExtract this nested ternary operation into an independent statement.(ßæ´“8³ß ¬ü1J$19b1e11d-774f-4664-934e-b387c3034011
-yjavascript:S3796Í"*Add a "return" statement to this callback.(ÀËã„şÿÿÿÿ8³ß ¬ü1J$d3d79e60-21c1-4c88-a9be-4b43479f259c
-yjavascript:S3796ğ"*Add a "return" statement to this callback.(­›Õ¿øÿÿÿÿ8´ß ¬ü1J$cfa1b328-a1c2-43eb-be78-f40c7b81fe21
-„javascript:S1481ş"5Remove the declaration of the unused 'lose' variable.(ïÊü¤øÿÿÿÿ8´ß ¬ü1J$a5fdd851-21a7-4474-8d50-c3141eb8a1da
-javascript:S1854ş"2Remove this useless assignment to variable "lose".(ïÊü¤øÿÿÿÿ8´ß ¬ü1J$700f7873-c405-4c9b-9893-cd8b66755c6c
-”javascript:S905"FExpected an assignment or function call and instead saw an expression.(ˆš×¢şÿÿÿÿ8µß ¬ü1J$89a34ac5-adbd-455a-85d3-cb715e7f1861
-©javascript:S3699"ZRemove this use of the output from "showNewPopup"; "showNewPopup" doesn't return anything.(ˆš×¢şÿÿÿÿ8¶ß ¬ü1J$b094652d-caa2-431d-9c2b-5605afe2aced
-javascript:S905‚"FExpected an assignment or function call and instead saw an expression.(Ô‰âÁ8¶ß ¬ü1J$3a86987d-b633-41ce-98cf-b18e5cc6932f
-¤javascript:S3699‚"ZRemove this use of the output from "showNewPopup"; "showNewPopup" doesn't return anything.(Ô‰âÁ8·ß ¬ü1J$4c1f931f-6161-47d8-84a5-ee76656f6728
-”javascript:S905ƒ"FExpected an assignment or function call and instead saw an expression.(ÓáÚËûÿÿÿÿ8·ß ¬ü1J$12379088-aee0-45e3-b099-53ce16d15ea3
-©javascript:S3699ƒ"ZRemove this use of the output from "showNewPopup"; "showNewPopup" doesn't return anything.(ÓáÚËûÿÿÿÿ8·ß ¬ü1J$01e91e59-4d56-4bd4-91ef-6b5086490ee6
-mjavascript:S125™"Remove this commented out code.(³ë”ûÿÿÿÿ8·ß ¬ü1J$6f971619-d61c-47ec-a5dd-3cf6f18586f2
-hjavascript:S125"Remove this commented out code.(·‡ì€8·ß ¬ü1J$4660b41f-1253-47c4-8e44-d5b38feabba7
-hjavascript:S125¤"Remove this commented out code.(·‡ì€8·ß ¬ü1J$e5548a70-edd0-4524-b608-30c731315a6f
-hjavascript:S125©"Remove this commented out code.(»Æ†¹8·ß ¬ü1J$74fbada8-14e8-4f86-8223-96a90ab81cc3
-hjavascript:S125Æ"Remove this commented out code.(ŠÎ‰ç8¸ß ¬ü1J$37092dea-1391-42c3-9e91-09b4882d17d1
+"-Remove this unused import of 'NowClientTime'.(Ä»˜ÿÿÿÿÿ8¬ß ¬ü1J$48c7302d-1766-4134-9333-ca18a3a2f0cc
+javascript:S3863"O'D:\Proj from git\js\modules\backgammons\Utilities.js' imported multiple times.(Êø•ôøÿÿÿÿ8¬ß ¬ü1J$595d2e10-b4d2-48ff-ac07-982920d24669
+}javascript:S1128"4Remove this unused import of 'setGameSoundsAllowed'.(Ï‡ €8­ß ¬ü1J$fed66afb-eabc-4336-83b5-6601051c68e1
+rjavascript:S3504:")Unexpected var, use let or const instead.(Áççí8­ß ¬ü1J$afc08544-edd0-4b06-bd49-7d4b2df3c683
+‹javascript:S1481J"=Remove the declaration of the unused 'imageHandler' variable.(Í™ğÂşÿÿÿÿ8­ß ¬ü1J$37833e34-5fb0-4304-a77e-5e0c3b39d344
+ˆjavascript:S1854J":Remove this useless assignment to variable "imageHandler".(Í™ğÂşÿÿÿÿ8­ß ¬ü1J$49009d9d-3a23-46b6-b2da-677415c79a31
+gjavascript:S125K"Remove this commented out code.(‹ñ†ù8­ß ¬ü1J$ea7143d5-629c-4f15-93e5-9eda312257be
+gjavascript:S125N"Remove this commented out code.(ñä‹À8­ß ¬ü1J$219f8a03-2f8e-418f-9b10-ad24d3f26489
+mjavascript:S125¦"Remove this commented out code.(·Óş½ùÿÿÿÿ8­ß ¬ü1J$014f39be-451e-461e-910e-d9f75acc5a16
+hjavascript:S125¬"Remove this commented out code.(ùçºó8®ß ¬ü1J$8dc9749e-0491-4858-8273-ef28e1796f0b
+ªjavascript:S2703¸"[Add the "let", "const" or "var" keyword to this declaration of "tsamp" to make it explicit.(Ãı±Êüÿÿÿÿ8¯ß ¬ü1J$830d93f7-2b04-4769-aab6-2a8a8bed6029
+xjavascript:S2094º")Unexpected class with only a constructor.(èŸ‹íşÿÿÿÿ8¯ß ¬ü1J$63b3527a-1f70-40e5-87be-4bf8ae870013
+javascript:S4624Æ"7Refactor this code to not use nested template literals.(à‡¹”8¯ß ¬ü1J$de71f0c2-d616-4ce0-bca0-6c4521e88259
+€javascript:S930Û"7This function expects no arguments, but 1 was provided.(à„æÎ8°ß ¬ü1J$0417425b-d29c-4a30-8257-43bef368167d
+‹javascript:S1121á"AExtract the assignment of "TimersIntervals" from this expression.(ı‹ÇŞ8°ß ¬ü1J$77b68602-4a8c-4e9b-8e3c-b951da8206b2
+hjavascript:S125ç"Remove this commented out code.(©­Œ8°ß ¬ü1J$e642e50c-bf6f-476a-9604-11a546805e72
+djavascript:S108†"Empty block statement.(ÒÌâ–øÿÿÿÿ8±ß ¬ü1J$b426c4f0-f4ce-40db-8727-28e45ff8cc40
+ƒjavascript:S1481•"9Remove the declaration of the unused 'autodice' variable.(¼¯ËÄ8²ß ¬ü1J$6ee93d29-40b4-48e9-a8cb-720be842636a
+€javascript:S1854•"6Remove this useless assignment to variable "autodice".(¼¯ËÄ8²ß ¬ü1J$964307ff-740c-4877-ad8a-8df8b2f83c7d
+mjavascript:S125œ"Remove this commented out code.(à§‹¤úÿÿÿÿ8²ß ¬ü1J$87b9b8ac-b22a-495b-ad15-9219ed823912
+javascript:S1121°"?Extract the assignment of "location.hash" from this expression.(Â±ä„ÿÿÿÿÿ8³ß ¬ü1J$f25db5f2-9472-43d4-b5f0-7157af1ab42c
+”javascript:S1848¸"EEither remove this useless object instantiation of "Toast" or use it.(ïùíîûÿÿÿÿ8³ß ¬ü1J$daabc63d-7aed-48af-a010-9fe7a2db9e4e
+tjavascript:S3796Á"*Add a "return" statement to this callback.(–ùÒ8³ß ¬ü1J$54a02806-d9d9-4b4f-8694-5b2a01020c28
+javascript:S3358Å"DExtract this nested ternary operation into an independent statement.(ßæ´“8³ß ¬ü1J$0b13de0e-4b7f-44e9-81af-561d32889a89
+yjavascript:S3796Í"*Add a "return" statement to this callback.(ÀËã„şÿÿÿÿ8³ß ¬ü1J$5a86a7be-49d1-4742-81cc-afcfb43fc6f8
+yjavascript:S3796ğ"*Add a "return" statement to this callback.(­›Õ¿øÿÿÿÿ8´ß ¬ü1J$38d45256-53f7-4b6c-9d19-ce3af01cf7de
+„javascript:S1481ş"5Remove the declaration of the unused 'lose' variable.(ïÊü¤øÿÿÿÿ8´ß ¬ü1J$6c42c8cc-fc5a-419a-a8fc-df243b41e36d
+javascript:S1854ş"2Remove this useless assignment to variable "lose".(ïÊü¤øÿÿÿÿ8´ß ¬ü1J$e639d9cd-7576-4201-aab9-25d160ca3ff7
+”javascript:S905"FExpected an assignment or function call and instead saw an expression.(ˆš×¢şÿÿÿÿ8µß ¬ü1J$f3d6d47a-d6de-4e7b-a96d-71413331d535
+©javascript:S3699"ZRemove this use of the output from "showNewPopup"; "showNewPopup" doesn't return anything.(ˆš×¢şÿÿÿÿ8¶ß ¬ü1J$54ff7d98-3ae0-4a42-ba6c-84ee2df71d84
+javascript:S905‚"FExpected an assignment or function call and instead saw an expression.(Ô‰âÁ8¶ß ¬ü1J$792c4de9-9c14-44d8-9909-2d7ab3469965
+¤javascript:S3699‚"ZRemove this use of the output from "showNewPopup"; "showNewPopup" doesn't return anything.(Ô‰âÁ8·ß ¬ü1J$c6976935-740c-4b9b-a233-df593885f73c
+”javascript:S905ƒ"FExpected an assignment or function call and instead saw an expression.(ÓáÚËûÿÿÿÿ8·ß ¬ü1J$2e090104-15d1-4a90-bf27-8d934b39bb4a
+©javascript:S3699ƒ"ZRemove this use of the output from "showNewPopup"; "showNewPopup" doesn't return anything.(ÓáÚËûÿÿÿÿ8·ß ¬ü1J$c8162088-1615-4634-9bd5-d65514fc0f38
+mjavascript:S125™"Remove this commented out code.(³ë”ûÿÿÿÿ8·ß ¬ü1J$87e084ce-88b6-48d1-92f8-7216c89a378b
+hjavascript:S125"Remove this commented out code.(·‡ì€8·ß ¬ü1J$76d9ad9c-c2ea-46ab-8166-d4dda55d58d5
+hjavascript:S125¤"Remove this commented out code.(·‡ì€8·ß ¬ü1J$4521398b-64b1-450b-af76-fde81bf7a5f3
+hjavascript:S125©"Remove this commented out code.(»Æ†¹8·ß ¬ü1J$ec91ece9-4ea4-48a0-9651-365ae6e2f18f
+hjavascript:S125Æ"Remove this commented out code.(ŠÎ‰ç8¸ß ¬ü1J$bd544e3a-493d-4413-a042-42be77c97c15

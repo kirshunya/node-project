@@ -40,6 +40,7 @@ router.get("/checkAuth", authMiddleware, userController.checkAuth);
 router.get("/leaders/:gameType", authMiddleware, userController.getLeaders);
 
 router.get("/get-games", authMiddleware, userController.getGames);
+router.get("/get-games-backgammon", authMiddleware, userController.getBackgammonGames);
 router.put("/exchange-tokens", authMiddleware, userController.exchangeTokens);
 
 // admin

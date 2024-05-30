@@ -114,3 +114,11 @@ M
 server/backgammons/Utility.js,d\4\d4e87325e224a11add5041794e9175a0b7f4afa7
 X
 (js/modules/backgammons/Configurations.js,7\a\7a9ad24890c1bd5354cb2e3b19dcf4d690476bf4
+N
+server/backgammons/BetsInfo.js,5\8\588c33e024b2a7d788164e8c3c6393c52a1621fb
+A
+style/profile.css,c\6\c6acf2d5b21599ee8083296f52c357106b4ede92
+F
+js/modules/localize.js,b\7\b799571b5858ff3b441ed7a50b48b940a6c63da8
+U
+%server/service/game-domino-service.js,8\1\81bd34d8246965974c9cc462e25d7def956b6ce0

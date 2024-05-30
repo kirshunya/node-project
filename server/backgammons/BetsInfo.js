@@ -12,6 +12,7 @@
  * @property {{[betId:number]:BetInfo}} DominoBETS
  */
 /** @type { BetsInfoList } */
+
 const BetsInfo = require('./../../json/bets.json');
 BetsInfo.BackgammonsBETS.mapPairs = (CB)=>Object.entries(BetsInfo.BackgammonsBETS).map(([betId, BetsInfo])=>CB(BetsInfo, +betId, BetsInfo.BackgammonsBETS));
 BetsInfo.BackgammonsBETS.get = (betId)=>BetsInfo.BackgammonsBETS[betId];

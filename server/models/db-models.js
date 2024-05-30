@@ -95,12 +95,12 @@ const BackgammonGamesHistory = sequelize.define('backgammongameshistory', {
   looserId: { type: DataTypes.INTEGER }, 
   commision: { type: DataTypes.FLOAT },
 });
-// User.hasMany(BackgammonGamesHistory, {
-//   foreignKey: 'winnerId'
-// })
-// User.hasMany(BackgammonGamesHistory, {
-//   foreignKey: 'looserId'
-// })
+User.hasMany(BackgammonGamesHistory, {
+  foreignKey: 'winnerId'
+})
+User.hasMany(BackgammonGamesHistory, {
+  foreignKey: 'looserId'
+})
 
 
 const Stats = sequelize.define("stat", {

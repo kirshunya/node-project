@@ -104,6 +104,7 @@ export async function changePassword(data) {
   }
 }
 
+
 export async function getUser() {
   try {
     const response = await $api.get(`/get-user`);
@@ -269,6 +270,17 @@ export async function getUserGames() {
     return await e.response;
   }
 }
+
+export async function getUserBackgammonGames() {
+  try {
+    const response = await $api.get(`/get-games-backgammon`);
+    return response.data; // Предполагается, что данные находятся в свойстве data ответа
+  } catch (e) {
+    console.error(e);
+    throw e; // Перебрасываем ошибку, чтобы она могла быть обработана на более высоком уровне
+  }
+}
+
 
 export async function setLotoSettings(roomId, body) {
   try {

@@ -1,4 +1,5 @@
 const userService = require("../service/user-service");
+const { Op } = require('sequelize');
 const { validationResult } = require("express-validator");
 const ApiError = require("../exceptions/api-error");
 const {
@@ -9,6 +10,7 @@ const {
   CurrencyRate,
   Payout,
   Deposit,
+  BackgammonGamesHistory,
 } = require("../models/db-models");
 const tokenService = require("../service/token-service");
 
@@ -77,6 +79,7 @@ class UserController {
     }
   }
 
+
   async getUser(req, res, next) {
     try {
       const authorizationHeader = req.headers.authorization;
@@ -88,6 +91,8 @@ class UserController {
       next(e);
     }
   }
+
+
 
   async checkAuth(req, res, next) {
     try {
@@ -148,6 +153,34 @@ class UserController {
       next(e);
     }
   }
+
+  async getBackgammonGames(req, res, next) {
+    try {
+      const { user } = req; // Извлекаем пользователя из запроса
+      if (!user ||!user.id) {
+        return res.status(401).json({ error: 'Unauthorized' }); // Проверяем, авторизован ли пользователь
+      }
+
+      // Получаем ID пользователя
+      const userId = user.id;
+
+      // Формируем запрос для получения игр, где пользователь является победителем или проигравшим
+      const games = await BackgammonGamesHistory.findAll({
+        where: {
+          [Op.or]: [
+            { winnerId: userId }, // Игры, где пользователь является победителем
+            { looserId: userId }  // Игры, где пользователь является проигравшим
+          ]
+        }
+      });
+
+      return res.json(games);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+
 
   async getBotWins(req, res, next) {
     try {

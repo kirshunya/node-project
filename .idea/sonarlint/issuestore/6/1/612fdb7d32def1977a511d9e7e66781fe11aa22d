@@ -1,6 +1,0 @@
-
-ejavascript:S1481G"=Remove the declaration of the unused 'refreshToken' variable.(Ôä°âøÿÿÿÿ8Îã…äù1
-bjavascript:S1854G":Remove this useless assignment to variable "refreshToken".(Ôä°âøÿÿÿÿ8Òã…äù1
-Fjavascript:S125H"Remove this commented out code.(«¼ùÿÿÿÿÿ8Òã…äù1
-}javascript:S3776¡"TRefactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed.(®´¹üÿÿÿÿ8Òã…äù1
-Gjavascript:S125‹"Remove this commented out code.(Ù˜ì¾ıÿÿÿÿ8Òã…äù1
