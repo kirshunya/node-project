@@ -106,7 +106,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     show() {
         const _container = document.getElementsByClassName('main__container')[0];
         const container = _container?_container:htmlelement('div', ["main__container","header__padding","footer__padding"]);
-        container.replaceChildren(this.htmlview?this.htmlview:this.init())
+        container.replaceChildren(this.init())
         return document.getElementsByTagName('main')[0].replaceChildren(container);
     }
     WSEventsRoute = {
@@ -128,6 +128,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
     }
     init() {
         const mutobserverCode = `backgsLobby${getRandomInt(-65341, 65341)}`;
+        const siteLanguage = window.siteLanguage;
         const container = htmlelement('div', 'domino-games games', {name:mutobserverCode}, {mutobserverCode});
         const swipers = [];
         const inited = BetsLoaded.then(({BackgammonsBETS})=>htmlcontainer(
@@ -142,7 +143,7 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                                 htmlcontainer(
                                     htmlelement('div', 'domino-room-header'), [
                                         htmlelement('img', 'domino-room-header__img', {src:'./img/loto-room-card-logo.png', alt:' '}),
-                                        htmltext('p', 'domino-room-header__title', ' Классическая '),
+                                        htmltext('p', 'domino-room-header__title', siteLanguage.dominoRoomsMenu.classic),
                                         htmltext('div', 'domino-room-header__rules', '<img src="./img/domino-menu-quest.png" alt="" />'),
                                     ]
                                 ),
@@ -163,12 +164,12 @@ export const BackgammonsLobbyHub = new class __T0BackgammonsLobbyHub {
                                         ),
                                         htmltext('div', "domino-room__info", `
                   <p class="domino-room-bet__text">
-                    Цена комнаты:
+                     ${siteLanguage.dominoRoomsMenu.gamePrice}:
                   </p>
                   <p class="domino-room-bet">${bet}₼</p>
                   <p class="domino-room-duration">
-                    <span>Одна игра</span>
-                    <span>Длительность игры: 5 минут</span>
+                    <span> ${siteLanguage.dominoRoomsMenu.classicDurationLabel}</span>
+                    <span>${siteLanguage.dominoRoomsMenu.gameDuration}</span>
                   </p>`
                                         )
                                     ]

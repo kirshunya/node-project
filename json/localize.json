@@ -299,7 +299,10 @@
       "classicMode": "Классик",
       "telephoneMode": "Телефон",
       "gameLable": "Игра",
-      "playersLable": "Игроков"
+      "playersLable": "Игроков",
+      "restart" : "Вы хотите сдаться ?",
+      "balance": "Баланс",
+      "skip": "Пропуск хода"
     },
     "words": {
       "yes": "да",
@@ -678,7 +681,8 @@
       "classicMode": "Klassik",
       "telephoneMode": "Telefon",
       "gameLable": "Oyun növü",
-      "playersLable": "Oyunçu"
+      "playersLable": "Oyunçu",
+      "restart" : "Təslim olmaq istəyirsiniz?"
     },
     "words": {
       "yes": "Bəli",
@@ -904,7 +908,8 @@
           "pureWin": "Pure Win",
           "winCommission": "Winning, minus commission",
           "totalBank": "Total Bank",
-          "roomCommission": "Room Commission"
+          "roomCommission": "Room Commission",
+          "skip": "Skip step"
         }
       },
       "bonusesPage": {
@@ -1057,7 +1062,8 @@
       "classicMode": "Classic",
       "telephoneMode": "Phone",
       "gameLable": "Game",
-      "playersLable": "Players"
+      "playersLable": "Players",
+      "restart" : "Do you want to give up?"
     },
     "words": {
       "yes": "Yes",
@@ -1436,7 +1442,8 @@
       "classicMode": "Класичний",
       "telephoneMode": "Телефон",
       "gameLable": "Гра",
-      "playersLable": "Гравці"
+      "playersLable": "Гравці",
+      "restart" : "Ви хочете здатися?"
     },
     "words": {
       "yes": "Так",
@@ -1812,7 +1819,8 @@
       "classicMode": "Klasik",
       "telephoneMode": "Telefon",
       "gameLable": "Oyun",
-      "playersLable": "Oyunçu"
+      "playersLable": "Oyunçu",
+      "restart" : "Vazgeçmek istiyor musun?"
     },
     "words": {
       "yes": "Evet",

@@ -470,7 +470,7 @@ export class BackgammonsRestartConfirmPopup extends showablePopup {
                   <img src="img/popup-alert.png" alt="" />
                 </div>
                 <div class="popup__text">
-                  Вы хотите сдаться?
+                  ${siteLanguage.popups.restart}
                 </div>
                 <div class="popup__buttons">
                   <button class="popup__button popup__submit-button red">${siteLanguage.words.yes}</button>
