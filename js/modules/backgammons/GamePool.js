@@ -70,6 +70,7 @@ export function lightstepbutton(active=true) {
 }//refac
 export function ShowGameTable(localUser, GameID) {
     debugPan.install()
+    const siteLanguage = window.siteLanguage;
     const main = document.getElementsByTagName('main')[0];
     const imageHandler = new ImageHandler(localUser.team);
     // const whiteFishIconPath = 'img/backgammons/whitepcell.png';
@@ -90,8 +91,8 @@ export function ShowGameTable(localUser, GameID) {
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
                       <img id="myImageElementTop" alt="" width="10" height="10"/>
-                      <p>${siteLanguage.profilePage.mainButtons.balanceBtnText}</p>
-                      <span>Баланс:</span><span class="Balance"> ₼ </span>
+                      <p>${siteLanguage.popups.balance}</p>
+                      <span></span><span class="Balance"> ₼ </span>
                   </div>
                 </div>
               </div>
@@ -148,8 +149,8 @@ export function ShowGameTable(localUser, GameID) {
                   <div class="profrows">
                     <span class="Nickname">Hasan</span>
                       <img id="myImageElementBottom" alt="" width="10" height="10"/>
-                      <p>${siteLanguage.profilePage.mainButtons.balanceBtnText}</p>
-                      <span>Баланс:</span><span class="Balance"> ₼ </span>
+                      <p>${siteLanguage.popups.balance}</p>
+                      <span></span><span class="Balance"> ₼ </span>
                   </div>
                 </div>
               </div>

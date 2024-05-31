@@ -158,14 +158,14 @@ export async function openRoomManagement() {
 
   if (!roomsControlPage) return;
   const mainRoomsButtons =
-    roomsControlPage.querySelectorAll(".mainRoomCheckbox");
+      roomsControlPage.querySelectorAll(".mainRoomCheckbox");
   // console.log(mainRoomsButtons);
   mainRoomsButtons.forEach((button) => {
     button.addEventListener("change", function () {
       const buttonLi = button.parentNode;
       const buttonParentBlock = buttonLi.parentNode;
       const allCheckboxInParent =
-        buttonParentBlock.querySelectorAll(".room-checkbox");
+          buttonParentBlock.querySelectorAll(".room-checkbox");
       allCheckboxInParent.forEach((checkbox) => {
         checkbox.checked = button.checked;
       });
@@ -208,13 +208,13 @@ export async function openRoomManagement() {
 
       if (pageAttribute == "loto") {
         let lotoPageCheckbox =
-          parent.querySelector(".mainRoomCheckbox")?.checked;
-        
+            parent.querySelector(".mainRoomCheckbox")?.checked;
+
         const lotoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
         const lotoRooms = lotoRoomsCheckbox.map((room) =>({
-            roomId: +room.getAttribute("roomId"),
-            isAvailable: !room.checked,
-          }));
+          roomId: +room.getAttribute("roomId"),
+          isAvailable: !room.checked,
+        }));
 
         const roomsControl = {
           loto: !lotoPageCheckbox || false,
@@ -230,7 +230,7 @@ export async function openRoomManagement() {
         }
       } else if (pageAttribute == "domino-classic") {
         let dominoPageCheckbox =
-          parent.querySelector(".mainRoomCheckbox")?.checked;
+            parent.querySelector(".mainRoomCheckbox")?.checked;
         let dominoRooms = [];
         let dominoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
         dominoRoomsCheckbox.forEach((room) => {
@@ -247,8 +247,8 @@ export async function openRoomManagement() {
 
         // console.log(roomsControl);
         let responce = await impHttp.updateRoomsControl(
-          roomsControl,
-          "domino-classic"
+            roomsControl,
+            "domino-classic"
         );
         if (responce.status == 200) {
           alert("Комнаты сохранены");
@@ -257,7 +257,7 @@ export async function openRoomManagement() {
         }
       } else if (pageAttribute == "domino-telephone") {
         let dominoPageCheckbox =
-          parent.querySelector(".mainRoomCheckbox")?.checked;
+            parent.querySelector(".mainRoomCheckbox")?.checked;
         let dominoRooms = [];
         let dominoRoomsCheckbox = parent.querySelectorAll(".room-checkbox");
         dominoRoomsCheckbox.forEach((room) => {
@@ -273,8 +273,8 @@ export async function openRoomManagement() {
         };
         // console.log(roomsControl);
         let responce = await impHttp.updateRoomsControl(
-          roomsControl,
-          "domino-telephone"
+            roomsControl,
+            "domino-telephone"
         );
         if (responce.status == 200) {
           alert("Комнаты сохранены");
@@ -284,7 +284,7 @@ export async function openRoomManagement() {
       }
     });
   });
-  
+
 }
 
 const getRoomManagementData = async () => {
@@ -314,17 +314,17 @@ const getRoomManagementData = async () => {
   });
 
   const mainDominoClassicRoomCheckbox = document.querySelector(
-    ".mainDominoClassicRoomCheckbox"
+      ".mainDominoClassicRoomCheckbox"
   );
   mainDominoClassicRoomCheckbox.checked = !roomsControl.dominoClassic;
 
   const dominoClassicCheckboxes = document.querySelectorAll(
-    ".domino-classic-page-toggle-input"
+      ".domino-classic-page-toggle-input"
   );
   dominoClassicCheckboxes.forEach((checkbox) => {
     const roomId = checkbox.getAttribute("roomId");
     const room = roomsControl.dominoClassicRooms.find(
-      (room) => room.roomId == +roomId
+        (room) => room.roomId == +roomId
     );
     if (room && checkbox) {
       checkbox.checked = !room.isAvailable;
@@ -332,17 +332,17 @@ const getRoomManagementData = async () => {
   });
 
   const mainDominoTelephoneRoomCheckbox = document.querySelector(
-    ".mainDominoTelephoneRoomCheckbox"
+      ".mainDominoTelephoneRoomCheckbox"
   );
   mainDominoTelephoneRoomCheckbox.checked = !roomsControl.dominoTelephone;
 
   const dominoTelephoneCheckboxes = document.querySelectorAll(
-    ".domino-telephone-room-checkbox"
+      ".domino-telephone-room-checkbox"
   );
   dominoTelephoneCheckboxes.forEach((checkbox) => {
     const roomId = checkbox.getAttribute("roomId");
     const room = roomsControl.dominoTelephoneRooms.find(
-      (room) => room.roomId == +roomId
+        (room) => room.roomId == +roomId
     );
     if (room && checkbox) {
       checkbox.checked = !room.isAvailable;
@@ -404,7 +404,7 @@ async function addNardRoomsControls(div) {
       const [inputLineFrag] = justElements.eInputLine(betId, '', defaultCommision*100, defaultScoreValue, targetLine, targetLinesList);
       targetLinesList.replaceChild(inputLineFrag, targetLine);
     } else if(targetButton.classList.contains("save-button")) {
-      
+
     }
   })
   function toggleBackgammons() {}
@@ -430,7 +430,7 @@ async function addNardRoomsControls(div) {
 
     const LinesById = {};
     Lines.map((Line)=>LinesById[Line.dataset.betid]=Line);
-    
+
     const NewLinesOrder = sortedBetCash.map(([betId, betInfo], newBetIdBm1)=>{
       betCash[newBetIdBm1+1]=betInfo;
       LinesById[betId].dataset.betid = newBetIdBm1+1;
