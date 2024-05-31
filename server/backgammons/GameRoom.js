@@ -31,13 +31,7 @@ class timersnapshot {
         return diff>0?diff:0;
     }
 }
-/**
- * start to start
- * pause to pause
- * resume to resume or complete timer if not success
- * success to decline completing on resume
- *
- */
+
 const Timer = class {
     /** @type {int} in seconds*/
     userTime = USERTIME
@@ -556,13 +550,41 @@ class GameStarted extends RoomState(3) {
         this.Slots = adv0_range(0, 24, { 0:[15,1], 12:[9,2], 1:black1, 2:black1, 3:black1, 4:black1, 5:black1, 6:black1, null:()=>[0,0] });
     }
     /** @param {ConnectionContext} ctx  */
-    rollDice(ctx) {
-        console.log('rollDice');
-        if(this.activeplayer.userId !== ctx.user.userId && this.Dices[0]) return {result:'nope'};
-        this.Dices = GameStarted._rollDices();
-        console.log('rollDice', this.Dices);
-        this.Room.event('state', {newstate: this.nextState(true)});
-        console.log('rollDice event');
+    static _rollDices() { return [getRandomInt(1, 6), getRandomInt(1, 6)]; }
+    stepIfValid(user, step, code) {
+        const result = this.Timers.curTimer.pauseWhile(()=>{//at the end ifn stopped/successed timer, this will be resumed;
+            const {ActiveTeam, Dices} = this;
+
+            const player = this.getPlayerByID(user.userId);
+            if(!player) return ((console.log('nope', this.Players), {result:'nope', user, player}))
+            if(!(player.debugger || player.team === ActiveTeam)) return ((console.log('nope', this.Players), {result:'nope', user, player}))
+
+            // Implement GameLogistics here
+            step.map(({from, to, points})=>{
+                this.slot(from).take(ActiveTeam);
+                this.slot(to).add(ActiveTeam);
+                // typeof to === 'string' && to =
+            });
+            this.Timers.curTimer.success();//if success step
+            return true;
+        });
+
+        // Исправленный фрагмент кода
+        if(result===true) {
+            const prevstate = { ActiveTeam:this.ActiveTeam, Dices:this.Dices };
+            if(this.Drops['whiteover'] === 15 || this.Drops['blackover'] === 15) {
+                this.Room.event('step', {step, prevstate, newstate:this.nextState(false, 'stop'), code});
+                updateRoomScene(this.Room.GameID, this.SlotsString, this.ActiveTeam, this.Dices.join`:`, JSON.stringify(this.Drops));
+                this.endGame(this.ActiveTeam, 'Player dropped all checkers', 'win');
+            } else {
+                this.Room.event('step', {step, prevstate, newstate:this.nextState(), code});
+                updateRoomScene(this.Room.GameID, this.SlotsString, this.ActiveTeam, this.Dices.join`:`, JSON.stringify(this.Drops));
+            }
+            return {result:'success'};
+        } else {
+            return {result:'nope'};
+        }
+
     }
     endGame(WinnerTeam, msg, code) {
         if(!Debug.TimersTurn&&code === 'timer') return; //debig
