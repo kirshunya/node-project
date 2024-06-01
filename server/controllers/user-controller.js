@@ -79,7 +79,6 @@ class UserController {
     }
   }
 
-
   async getUser(req, res, next) {
     try {
       const authorizationHeader = req.headers.authorization;
@@ -91,8 +90,6 @@ class UserController {
       next(e);
     }
   }
-
-
 
   async checkAuth(req, res, next) {
     try {
@@ -179,8 +176,6 @@ class UserController {
       next(e);
     }
   }
-
-
 
   async getBotWins(req, res, next) {
     try {

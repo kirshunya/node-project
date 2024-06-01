@@ -7,7 +7,6 @@ import * as impWSNavigation from "../ws-navigation.js";
 import * as impAdminNav from "./admin-navigation.js";
 import * as impPopup from "./popup.js";
 import * as impLocalization from "../localize.js";
-import { FCPromise } from "../backgammons/Utilities.js";
 
 export function registrationForm() {
   // let openFormButtons = document.querySelectorAll(".open-registration");
@@ -22,7 +21,7 @@ export function registrationForm() {
   }
 
   let openRegistrationButton =
-    registrationPopup.querySelector(".open-registration");
+      registrationPopup.querySelector(".open-registration");
   if (openRegistrationButton) {
     openRegistrationButton.addEventListener("click", function () {
       createRegistrationForm();
@@ -137,16 +136,17 @@ export function createRegistrationForm() {
     let errorBlock = document.querySelector(".auth-form-error");
     errorBlock.innerHTML = "";
     let passwordValue =
-      registrationPopup.querySelector(".password-input").value;
+        registrationPopup.querySelector(".password-input").value;
     let repeatPasswordValue = registrationPopup.querySelector(
-      ".repeat-password-input"
+        ".repeat-password-input"
     ).value;
 
     if (passwordValue != repeatPasswordValue) {
       errorBlock.innerHTML =
-        siteLanguage.authPage.registration.repeatPasswordText;
+          siteLanguage.authPage.registration.repeatPasswordText;
       return;
     }
+
 
     let email = registrationPopup.querySelector(".email-input").value;
     let password = registrationPopup.querySelector(".password-input").value;
@@ -157,9 +157,15 @@ export function createRegistrationForm() {
       errorBlock.innerHTML = siteLanguage.authPage.registration.longUsername;
       return;
     }
+
+    if (password.length <= 6) {
+      console.log(password);
+      errorBlock.innerHTML = siteLanguage.popups.passwordError;
+      return;
+    }
     const ageCheckbox = document.querySelector("#registration-age-checkbox");
     const termsCheckbox = document.querySelector(
-      "#registration-terms-checkbox"
+        "#registration-terms-checkbox"
     );
 
     if (!ageCheckbox.checked) {
@@ -248,7 +254,7 @@ export function createLoginForm() {
 </div>`;
 
   let openRegistrationButton =
-    registrationPopup.querySelector(".open-registration");
+      registrationPopup.querySelector(".open-registration");
   if (openRegistrationButton) {
     openRegistrationButton.addEventListener("click", function () {
       createRegistrationForm();
@@ -256,7 +262,7 @@ export function createLoginForm() {
   }
 
   const openForgotPassButton = document.querySelector(
-    ".form-body__forgot-pass"
+      ".form-body__forgot-pass"
   );
   openForgotPassButton.addEventListener("click", function () {
     impPopup.openForgotPassPopup();
@@ -320,7 +326,7 @@ export function createLoginForm() {
               location.hash = `#loto-room-${currentGames.roomId}`;
             }
             const localItemsToClear = JSON.parse(
-              localStorage.getItem("localItemsToClear")
+                localStorage.getItem("localItemsToClear")
             );
             if (localItemsToClear) {
               localItemsToClear.forEach((item) => {
@@ -332,9 +338,9 @@ export function createLoginForm() {
             break;
           case "domino":
             window.location.hash = `domino-room-table/${currentGames.roomId}/${
-              currentGames.tableId
+                currentGames.tableId
             }/${
-              currentGames.playerMode
+                currentGames.playerMode
             }/${currentGames.gameMode.toUpperCase()}`;
             // preloader.classList.add("d-none");
             break;
@@ -368,13 +374,13 @@ export async function getUser() {
     return false;
   }
 }
-export const onAuth = FCPromise(); // можно заменить на `new EventProvider();`
+
 export async function isAuth() {
   let response = await impHttpRequests.checkAuth();
 
   if (
-    (response.status == 200 || response.statusText == "OK") &&
-    response.data.username
+      (response.status == 200 || response.statusText == "OK") &&
+      response.data.username
   ) {
     let registrationPopup = document.querySelector(".registration");
     registrationPopup.classList.remove("opened");
@@ -395,7 +401,6 @@ export async function isAuth() {
     localStorage.setItem("user", JSON.stringify(user));
     window.isAdmin = response.data.isAdmin;
 
-    onAuth.resolve(user);
     return true;
   } else {
     return false;

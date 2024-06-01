@@ -17,13 +17,13 @@ class UserService {
   async registrationUser(username, name, email, password) {
     const candidateEmail = await User.findOne({ where: { email } });
     if (candidateEmail) {
-      throw ApiError.BadRequest(`Аккаунт с почтой ${email} уже существует`);
+      throw ApiError.BadRequest(`ERR_EMAIL_ALREADY_EXISTS`);
     }
 
     const candidateUsername = await User.findOne({ where: { username } });
     if (candidateUsername) {
       throw ApiError.BadRequest(
-        `Аккаунт с никнеймом ${username} уже существует`
+          `Аккаунт с никнеймом ${username} уже существует`
       );
     }
     const hashPassword = await bcrypt.hash(password, 3);
@@ -53,7 +53,7 @@ class UserService {
     const user = await User.findOne({ where: { username: username } });
     if (!user) {
       throw ApiError.BadRequest(
-        `Аккаунт с юзернеймом ${username} не существует`
+          `Аккаунт с юзернеймом ${username} не существует`
       );
     }
     const isPassEquals = await bcrypt.compare(password, user.password);
@@ -98,15 +98,15 @@ class UserService {
     const allUserGames = await UserGame.findAll();
 
     if (gameType == "loto") {
-      //получаем всех юзеров из лото
+      //получаем всех юзеров з лото
       let lotoStats = [];
       allStats.forEach((user) => {
         if (user.gameLotoPlayed > 0) {
           const userGames = allUserGames.filter(
-            (game) => game.userId == user.userId
+              (game) => game.userId == user.userId
           );
           const userWins = userGames.filter(
-            (game) => game.isWinner == true
+              (game) => game.isWinner == true
           ).length;
           let userDto = {
             username: user.user.username,
@@ -137,10 +137,10 @@ class UserService {
       });
       if (isUserInArr == false) {
         const userGames = allUserGames.filter(
-          (game) => game.userId == user.userId
+            (game) => game.userId == user.userId
         );
         const userWins = userGames.filter(
-          (game) => game.isWinner == true
+            (game) => game.isWinner == true
         ).length;
         let lotoTokens = 0;
         allStats.forEach((userStat) => {
@@ -159,7 +159,7 @@ class UserService {
 
       return lotoStats;
     } else if (gameType == "nards") {
-      //получаем всех юзеров из нард
+      //получаем всех юзеров з лото
       let nardsStats = [];
       allStats.forEach((user) => {
         if (user.gameNardsPlayed > 0) {
@@ -167,7 +167,6 @@ class UserService {
             username: user.user.username,
             moneyWon: user.moneyNardsWon,
             tokens: user.nardsTokens,
-            gamesWon: user.NardsWon,
           };
           nardsStats.push(userDto);
         }
@@ -184,7 +183,7 @@ class UserService {
       });
       return nardsStats;
     } else if (gameType == "domino") {
-      //получаем всех юзеров из домино
+      //получаем всех юзеров з лото
       let dominoStats = [];
       allStats.forEach((user) => {
         if (user.gameDominoPlayed > 0) {
@@ -214,7 +213,7 @@ class UserService {
     let allStats = await BotStats.findAll();
 
     if (gameType == "loto") {
-      //получаем всех юзеров из лото
+      //получаем всех юзеров з лото
       let lotoStats = [];
       allStats.forEach((bot) => {
         let botDto = {
@@ -225,7 +224,7 @@ class UserService {
       });
       return lotoStats;
     } else if (gameType == "nards") {
-      //получаем всех юзеров из нард
+      //получаем всех юзеров з лото
       let nardsStats = [];
       allStats.forEach((bot) => {
         let botDto = {
@@ -236,7 +235,7 @@ class UserService {
       });
       return nardsStats;
     } else if (gameType == "domino") {
-      //получаем всех юзеров из домино
+      //получаем всех юзеров з лото
       let dominoStats = [];
       allStats.forEach((bot) => {
         let botDto = {
@@ -266,7 +265,7 @@ class UserService {
         dominoLost: user.moneyDominoLost,
         moneyWon: user.moneyLotoWon + user.moneyDominoWon + user.moneyNardsWon,
         moneyLost:
-          user.moneyLotoLost + user.moneyDominoLost + user.moneyNardsLost,
+            user.moneyLotoLost + user.moneyDominoLost + user.moneyNardsLost,
       };
       usersStats.push(userDto);
     });

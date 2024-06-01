@@ -1170,6 +1170,13 @@ async function openUserGames() {
       }!</span></p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.room}: ${
           game.roomId
+        
+      }</p>
+        <p>${siteLanguage.profilePage.myGamesPage.statsItem.playersAmount}: ${
+          2
+      }</p>
+        <p>${siteLanguage.profilePage.myGamesPage.statsItem.gameMode}: ${
+          siteLanguage.profilePage.myGamesPage.statsItem.classic
       }</p>
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.bet}: ${bet.toFixed(
           2
@@ -1178,13 +1185,13 @@ async function openUserGames() {
           game.winnerId == userData.userId
               ? `<p>${
                   siteLanguage.profilePage.myGamesPage.statsItem.pureWin
-              }: ${2 * game.bet.toFixed(2) + 0.1 * game.bet.toFixed(2)}₼</p>
+              }: ${(game.bet.toFixed(2) * 2 - game.bet.toFixed(2) * 0.1 - game.bet.toFixed(2)).toFixed(2)}₼</p>
               <p>${
                   siteLanguage.profilePage.myGamesPage.statsItem.winCommission
-              }: ${(game.bet + bet).toFixed(2)}₼</p>
+              }: ${(game.bet.toFixed(2) * 2 - game.bet.toFixed(2) * 0.1).toFixed(2)}₼</p>
               `
               : `${siteLanguage.profilePage.myGamesPage.statsItem.totalBank}: ${(
-                  game.bet * 2 - (0.1 * game.bet)
+                  game.bet * 2 
               ).toFixed(2)}₼`
       }
         <p>${

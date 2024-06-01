@@ -19,4 +19,8 @@ module.exports = class ApiError extends Error {
   static BadRequest(message, errors = []) {
     return new ApiError(400, message, errors);
   }
+
+  static InvalidEmail(message = "Некорректный email") {
+    return new ApiError(400, message, [{ field: "email", message }]);
+  }
 };

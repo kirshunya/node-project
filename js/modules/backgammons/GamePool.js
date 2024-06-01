@@ -1,13 +1,9 @@
 import { ondom, getRandomInt, EventProvider, sleep, range, FCPromise } from './Utilities.js';
 import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.js'
-// import { GameModel, GameControllerCtxWithGmEntries } from './GameLogicsPro.js';
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
 import { BackgammonsLaunchingPopup, BackgammonsLosePopup, BackgammonsRestartConfirmPopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
-import { getDominoRoomBetInfo } from '../domino/domino-navigation.js';
-import { API_URL_PART, IS_HOSTED_STATIC, timeOffsetHours } from '../config.js';
-import { NowClientTime } from '../time.js';
 import { Toast } from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
@@ -69,14 +65,10 @@ export function lightstepbutton(active=true) {
   PermStepCompletor.classList.toggle('active');
 }//refac
 export function ShowGameTable(localUser, GameID) {
-    debugPan.install()
     const siteLanguage = window.siteLanguage;
+    console.log(siteLanguage);
+    debugPan.install()
     const main = document.getElementsByTagName('main')[0];
-    const imageHandler = new ImageHandler(localUser.team);
-    // const whiteFishIconPath = 'img/backgammons/whitepcell.png';
-    // const blackFishIconPath = 'img/backgammons/blackpcell.png';
-
-    //let localUser = JSON.parse(localStorage.getItem("user"));
     main.innerHTML = html`
     <div class="main__container footer__padding" style="max-width: 100vw">
       <section class="domino-game-page domino-game-page-classic" id="domino-game-page">
@@ -88,12 +80,16 @@ export function ShowGameTable(localUser, GameID) {
                 <div class="prof">
                   <div class="stimer" style="display:none">66</div>
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
-                  <div class="profrows">
-                    <span class="Nickname">Hasan</span>
-                      <img id="myImageElementTop" alt="" width="10" height="10"/>
-                      <p>${siteLanguage.popups.balance}</p>
-                      <span></span><span class="Balance"> ₼ </span>
-                  </div>
+                    <div class="profrows">
+                        <div class="nickname-container">
+                            <img id="myImageElementTop" alt="" width="20" height="20" />
+                            <span class="Nickname">Hasan</span>
+                        </div>
+                        <p>
+                            ${siteLanguage.popups.balance}
+                        </p>
+                        <span class="Balance"></span>
+                    </div>
                 </div>
               </div>
               <div class="pcontrs">
@@ -146,12 +142,14 @@ export function ShowGameTable(localUser, GameID) {
                 <div class="prof">
                   <div class="stimer" style="display:none">66</div>
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
-                  <div class="profrows">
-                    <span class="Nickname">Hasan</span>
-                      <img id="myImageElementBottom" alt="" width="10" height="10"/>
-                      <p>${siteLanguage.popups.balance}</p>
-                      <span></span><span class="Balance"> ₼ </span>
-                  </div>
+                    <div class="profrows">
+                        <div class="nickname-container">
+                            <img id="myImageElementBottom" alt="" width="25" height="25" />
+                            <span class="Nickname">Hasan</span>
+                        </div>
+                        <p></p>
+                        <span>${siteLanguage.popups.balance}</span><span class="Balance"> ₼ </span>
+                    </div>
                 </div>
               </div>
             </div>
@@ -170,15 +168,7 @@ export function ShowGameTable(localUser, GameID) {
         InitGame(ConnectionStables.Room.GameInitData, localUser, ws);
     })()
 }
-// const User = {userId: 0, username: 'debug'};
-// const Uspe = (team)=>({userId: User.userId, username: User.username, team})
-// let ef = {
-//     players: [Uspe(BoardConstants.WHITE.id), Uspe(BoardConstants.BLACK.id)],
-//     state: {ActiveTeam: BoardConstants.WHITE.id, Dices: [1,1]}
-// };
-// window.addEventListener('DOMContentLoaded', 
-//     ()=>WSEventPool.on('backgammons::GameStarted', ({players, state})=>ef = {players, state})
-// );
+
 /** @type {Number} in seconds*/
 const STEPTIME = 25;
 function ServerTimeStampCompinsationUser(timestamp, setter) {
@@ -252,18 +242,11 @@ export async function InitGame(GameInitData, localUser, ws) {
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
 
-
-
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
       get oppPan() { return document.getElementById('BottomPan') },
       initAvatars(user, opponent) {
           const {userPan, oppPan} = this;
-          if (userPan.team && oppPan.team != null )
-          {
-
-          }
-
           userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
           userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
           userPan.getElementsByClassName('Balance')[0].innerHTML =  user.balance;
