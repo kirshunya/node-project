@@ -437,7 +437,7 @@ export class BackgammonsEnterAsVisitorPopup extends showablePopup {
                   <img src="img/popup-alert.png" alt="" />
                 </div>
                 <div class="popup__text">
-                  Войти как наблюдатель?
+                ${siteLanguage.popups.spectate}
                 </div>
                 <div class="popup__buttons">
                   <button class="popup__button popup__submit-button red">${siteLanguage.words.yes}</button>

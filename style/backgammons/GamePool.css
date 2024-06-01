@@ -1,0 +1,15 @@
+.profrows {
+    /*display: flex;*/
+    align-items: center;
+    /*line-height: 15px; !* высота равна высоте картинки *!*/
+}
+
+.nickname-container {
+    /*display: flex;*/
+    align-items: center;
+    margin-right: 15px;
+}
+
+.Nickname {
+    margin-right: 10px;
+}

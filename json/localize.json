@@ -302,7 +302,10 @@
       "playersLable": "Игроков",
       "restart" : "Вы хотите сдаться ?",
       "balance": "Баланс",
-      "skip": "Пропуск хода"
+      "skip": "Пропуск хода",
+      "spectate": "Войти как наблюдатель?",
+      "spectateMode": "Режим Наблюдателя",
+      "exit" : "Выйти"
     },
     "words": {
       "yes": "да",
@@ -682,7 +685,10 @@
       "telephoneMode": "Telefon",
       "gameLable": "Oyun növü",
       "playersLable": "Oyunçu",
-      "restart" : "Təslim olmaq istəyirsiniz?"
+      "restart" : "Təslim olmaq istəyirsiniz?",
+      "spectate": "Tamaşaçı kimi daxil olun?",
+      "spectateMode": "Müşahidəçi rejimi",
+      "exit" : "Exit"
     },
     "words": {
       "yes": "Bəli",
@@ -1063,7 +1069,11 @@
       "telephoneMode": "Phone",
       "gameLable": "Game",
       "playersLable": "Players",
-      "restart" : "Do you want to give up?"
+      "restart" : "Do you want to give up?",
+      "spectate": "Login as spectator?",
+      "spectateMode": "Observer Mode",
+      "exit" : "Exit",
+      "balance": "Balance:"
     },
     "words": {
       "yes": "Yes",
@@ -1443,7 +1453,10 @@
       "telephoneMode": "Телефон",
       "gameLable": "Гра",
       "playersLable": "Гравці",
-      "restart" : "Ви хочете здатися?"
+      "restart" : "Ви хочете здатися?",
+      "spectate": "Увійти як спостерігач?",
+      "spectateMode": "Режим Спостерігача",
+      "exit" : "Вийти"
     },
     "words": {
       "yes": "Так",
@@ -1820,7 +1833,10 @@
       "telephoneMode": "Telefon",
       "gameLable": "Oyun",
       "playersLable": "Oyunçu",
-      "restart" : "Vazgeçmek istiyor musun?"
+      "restart" : "Vazgeçmek istiyor musun?",
+      "spectate": "İzleyici olarak giriş yapılsın mı?",
+      "spectateMode": "Gözlemci Modu",
+      "exit": "Çıkış"
     },
     "words": {
       "yes": "Evet",
