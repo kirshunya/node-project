@@ -144,7 +144,7 @@ export function ShowGameTable(localUser, GameID) {
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                     <div class="profrows">
                         <div class="nickname-container">
-                            <img id="myImageElementBottom" alt="" width="25" height="25" />
+                            
                             <span class="Nickname">Hasan</span>
                         </div>
                         <p></p>

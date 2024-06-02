@@ -699,13 +699,15 @@ export class BoardCanvas extends CanvasFunctions {
         // Загрузка изображения кнопки
         fabric.Image.fromURL('img/backgammons/Group 55 (1).png', (img) => {
             // Установка размера и положения изображения
-            img.scale(1.5);
-            img.left = centerX - img.width / 2;
-            img.top = centerY - img.height / 2;
+            // Получение координат центра холста
+            const scale = 2; // Увеличиваем масштаб до 2 раз
+            img.scale(scale);
+            img.left = centerX - (img.width * scale) / 2; // Пересчитываем положение по центру, учитывая масштаб
+            img.top = centerY - (img.height * scale) / 2;
 
             // Установка обработчика события mousedown
             img.on('mousedown', clickcallback ? clickcallback : () => {
-                this.gc.rollDices()
+                this.gc.rollDices();
                 this.canvas.remove(img);
             });
 
