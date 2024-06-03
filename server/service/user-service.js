@@ -17,7 +17,7 @@ class UserService {
   async registrationUser(username, name, email, password) {
     const candidateEmail = await User.findOne({ where: { email } });
     if (candidateEmail) {
-      throw ApiError.BadRequest(`ERR_EMAIL_ALREADY_EXISTS`);
+      throw ApiError.BadRequest(`ERR_EMAIL_ALREADY_EXISTS `);
     }
 
     const candidateUsername = await User.findOne({ where: { username } });
@@ -167,6 +167,7 @@ class UserService {
             username: user.user.username,
             moneyWon: user.moneyNardsWon,
             tokens: user.nardsTokens,
+            gamesWon: user.NardsWon,
           };
           nardsStats.push(userDto);
         }
