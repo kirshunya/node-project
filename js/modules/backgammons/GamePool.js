@@ -9,6 +9,7 @@ import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
 import { getBckgSoundValue, playBckgGameStart, playLose, playWin, setGameSoundsAllowed, toggleBckgSound } from '../audio.js';
 
+
 const probe = ()=>{};
 window.openEmojiPopup = probe
 window.openPhrasesPopup = probe
@@ -82,13 +83,13 @@ export function ShowGameTable(localUser, GameID) {
                   <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                     <div class="profrows">
                         <div class="nickname-container">
-                            <img id="myImageElementTop" alt="" width="20" height="20" />
+                            
                             <span class="Nickname">Hasan</span>
                         </div>
-                        <p>
-                            ${siteLanguage.popups.balance}
-                        </p>
-                        <span class="Balance"></span>
+                        <div class="right-float">
+                            <span class="Balance"></span>
+                            <img id="myImageElementTop" alt="" width="25" height="25" class="right-float-image"/>
+                        </div>
                     </div>
                 </div>
               </div>
@@ -148,7 +149,11 @@ export function ShowGameTable(localUser, GameID) {
                             <span class="Nickname">Hasan</span>
                         </div>
                         <p></p>
-                        <span>${siteLanguage.popups.balance}</span><span class="Balance"> ₼ </span>
+                        <div class="right-float">
+                            <span>${siteLanguage.popups.balance}</span><span class="Balance"> ₼ </span>
+                            <img id="myImageElementBottom" alt="" width="25" height="25" class="right-float-image"/>
+                        </div>
+                        
                     </div>
                 </div>
               </div>
@@ -241,19 +246,39 @@ export async function InitGame(GameInitData, localUser, ws) {
     let elcaPopup = null;
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
-
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
       get oppPan() { return document.getElementById('BottomPan') },
+
       initAvatars(user, opponent) {
           const {userPan, oppPan} = this;
-          userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
-          userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
-          userPan.getElementsByClassName('Balance')[0].innerHTML =  user.balance;
-          //
-          oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
-          oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
-          oppPan.getElementsByClassName('Balance')[0].innerHTML = opponent.balance;
+
+          if (localUser.username === user.username) {
+              userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
+              userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
+              userPan.getElementsByClassName('Balance')[0].innerHTML =  `${siteLanguage.popups.balance} ${user.balance} ₼`;
+          } else {
+              userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
+              userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
+              BetsLoaded.then(({ BackgammonsBETS }) => {
+                  const bet = BackgammonsBETS.get(GameInitData.GameID[0]).bet;
+                  userPan.getElementsByClassName('Balance')[0].innerHTML = `${siteLanguage.profilePage.myGamesPage.statsItem.bet} ${bet} ₼`;
+              });
+          }
+
+          if (localUser.username === opponent.username) {
+              oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
+              oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+              oppPan.getElementsByClassName('Balance')[0].innerHTML =  `${siteLanguage.popups.balance} ${opponent.balance} ₼`;
+          } else {
+              oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
+              oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
+              BetsLoaded.then(({ BackgammonsBETS }) => {
+                  const bet = BackgammonsBETS.get(GameInitData.GameID[0]).bet;
+                  oppPan.getElementsByClassName('Balance')[0].innerHTML = `${siteLanguage.profilePage.myGamesPage.statsItem.bet} ${bet} ₼`;
+              });
+          }
+
       },
       inited: false, isVisitor: false,
       initUI(isVisitor) {

@@ -13,3 +13,13 @@
 .Nickname {
     margin-right: 10px;
 }
+
+/* styles.css */
+.right-float {
+    float: right;
+}
+
+.right-float-image {
+    margin-left: 10px; /* или padding-left: 10px; */
+}
+
