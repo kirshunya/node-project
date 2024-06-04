@@ -1,10 +1,10 @@
-import { ondom, getRandomInt, EventProvider, sleep, range, FCPromise } from './Utilities.js';
+import {ondom, getRandomInt, EventProvider, sleep, range, FCPromise, ToastForEmodji, ToastForPhrase} from './Utilities.js';
 import { WSEventPool, ConnectionStables, WSRoom, connectWSRoutes } from './WSEP.js'
 import { GameProvider } from './GameLogicsPro.js';
 import { BoardConstants } from './BoardConstants.js';
 import { debugPan }  from '../../debug/debugPan.js';
 import { BackgammonsLaunchingPopup, BackgammonsLosePopup, BackgammonsRestartConfirmPopup, BackgammonsWinPopup, getPlayerAvatarImg, html, showablePopup, waitingPopup } from "./htmlcontainer.js";
-import { Toast } from './Utilities.js';
+import { Toast} from './Utilities.js';
 import { openEmojiPopup, openTextPopup } from './../pages/popup.js';
 import { BetsLoaded, fabricsloaded, popupsinited } from './syncronous.js';
 import { getBckgSoundValue, playBckgGameStart, playLose, playWin, setGameSoundsAllowed, toggleBckgSound } from '../audio.js';
@@ -65,6 +65,10 @@ export function lightstepbutton(active=true) {
   StepCompletor.classList.toggle('active', active);
   PermStepCompletor.classList.toggle('active');
 }//refac
+
+let opponent_name;
+let user_name;
+
 export function ShowGameTable(localUser, GameID) {
     const siteLanguage = window.siteLanguage;
     console.log(siteLanguage);
@@ -80,16 +84,18 @@ export function ShowGameTable(localUser, GameID) {
                 <div class="timer">1:00</div>
                 <div class="prof">
                   <div class="stimer" style="display:none">66</div>
-                  <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
+                    <img id="current-user-avatar" src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                     <div class="profrows">
                         <div class="nickname-container">
                             
                             <span class="Nickname">Hasan</span>
                         </div>
+
                         <div class="right-float">
                             <span class="Balance"></span>
                             <img id="myImageElementTop" alt="" width="25" height="25" class="right-float-image"/>
                         </div>
+                        
                     </div>
                 </div>
               </div>
@@ -142,7 +148,7 @@ export function ShowGameTable(localUser, GameID) {
                 <div class="timer">1:00</div>
                 <div class="prof">
                   <div class="stimer" style="display:none">66</div>
-                  <img src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
+                    <img id="opponent-avatar" src="img/avadef.jpeg" style="width:4.1rem; height: 4.1rem; border-radius: 5pt;">
                     <div class="profrows">
                         <div class="nickname-container">
                             
@@ -167,7 +173,49 @@ export function ShowGameTable(localUser, GameID) {
         
     </div>
   `;
-    //openBackgammonsWaitingPopup(GameID, localUser);
+    // Ссылки на кнопки
+    const smileChat = document.getElementById('smileChat');
+    const phraseChat = document.getElementById('phraseChat');
+
+    // Функция для разблокировки кнопок
+    function unlockButtons() {
+        smileChat.style.pointerEvents = 'auto';
+        smileChat.style.cursor = 'pointer';
+        smileChat.style.backgroundImage = `url(img/icons8-smile-chat-100.png)`;
+        phraseChat.style.pointerEvents = 'auto';
+        phraseChat.style.cursor = 'pointer';
+        phraseChat.style.backgroundImage = `url(img/chat50.png)`;
+    }
+
+    // Функция для блокировки кнопок
+    function lockButtons() {
+        phraseChat.style.pointerEvents = 'none';
+        phraseChat.style.cursor = 'not-allowed';
+        phraseChat.style.backgroundImage = `url(img/choose-mode-locked.png)`;
+        smileChat.style.pointerEvents = 'none';
+        smileChat.style.cursor = 'not-allowed';
+        smileChat.style.backgroundImage = `url(img/choose-mode-locked.png)`;
+    }
+
+
+    // Разблокировка кнопок через 5 секунд
+
+    function handleButtonClickSmile() {
+        let unlockTimeout;
+        lockButtons();
+        clearTimeout(unlockTimeout);
+        unlockTimeout = setTimeout(unlockButtons, 5000);
+    }
+    function handleButtonClickPhrase() {
+        let unlockTimeout;
+        lockButtons();
+        clearTimeout(unlockTimeout);
+        unlockTimeout = setTimeout(unlockButtons, 5000);
+    }
+
+    smileChat.addEventListener('click', handleButtonClickSmile);
+    phraseChat.addEventListener('click', handleButtonClickPhrase);
+
     (async()=>{
         while(!ConnectionStables.Room) await sleep(100);//what should to do to refac?? send to this function some promise of connection? and should create some clear functiotive..
         InitGame(ConnectionStables.Room.GameInitData, localUser, ws);
@@ -246,6 +294,7 @@ export async function InitGame(GameInitData, localUser, ws) {
     let elcaPopup = null;
     function showNewPopup(popup) { elcaPopup = elcaPopup?(elcaPopup.swapPopupToNewPopup(popup), popup):popup.showOnReady(); }
     function hidePopups() { elcaPopup&&elcaPopup.close(true); }
+
     const UsersPanUI = {
       get userPan() { return document.getElementById('TopPan'); },
       get oppPan() { return document.getElementById('BottomPan') },
@@ -278,7 +327,8 @@ export async function InitGame(GameInitData, localUser, ws) {
                   oppPan.getElementsByClassName('Balance')[0].innerHTML = `${siteLanguage.profilePage.myGamesPage.statsItem.bet} ${bet} ₼`;
               });
           }
-
+        opponent_name = opponent.username
+        user_name = user.username
       },
       inited: false, isVisitor: false,
       initUI(isVisitor) {
@@ -404,46 +454,91 @@ export async function InitGame(GameInitData, localUser, ws) {
       },
     }
     RoomStatesInitRouter[curState](GameInitData);
+
     const WSEventRoutes = {
-      ['RoomStateChanged']:({newStateId, stateData})=>{ onChange?.(); prevState = curState; curState = newStateId; RoomStatesInitRouter[newStateId](stateData); }, 
-      ['diceTeamRoll']:({value, index})=>gp.eventHandlers.diceTeamRoll(+index+1, +value),
-      ['diceTeamRollCompletesLaunching']:({dices, timeval})=>{
-        const Timers = [
-          new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval/1000, 'red'),
-          new Timer(UsersPanUI.oppPan,  [0, timeval._timestamp], timeval.timeval/1000, 'red')
-        ];
-        resetTimersIntervals(startTogetherTimer(Timers));
-      },
-      ['discontAll']:()=>{
-        // location.hash = '#backgammons-menu';
-        window.history.back();
-        ConnectionStables.disconnect();
-      },
-      ['step']:({step, prevstate, newstate, code})=>{
-        // if(localUser.userId === 2)
-        //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
-        setActiveTimer(newstate.ActiveTeam);
-        code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
-                       || gp.eventHandlers.ustep(step, newstate, prevstate)
-      }, ['state']:({newstate})=>{
-        // if(localUser.userId === 2)
-        //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
-        setActiveTimer(newstate.ActiveTeam);
-        gp.eventHandlers.state(newstate)
-      }, ['end']:({winner})=>{
-        // alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
-        // alert('popup Win');
-        // window.hash = '#backgammons-menu';
-      }, ['restart__']:()=>{
-        alert(`Кто-то нажал на рестарт игры`);
-        window.location.reload();
-      }, ['emoji']:({userId, username, emojiId})=>{
-        const emojiSRC = `img/emojis/${emojiId}.png`;
-        return new Toast({title:`эмодзи от ${username||userId}`, text:`<img src="${emojiSRC}" style="width:5rem; height:5rem">`, autohide:true, interval:3000});
-      }, ['phrase']:({userId, username, phraseId})=>{
-        return new Toast({title:`фраза от ${username||userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`], autohide:true, interval:3000});
-      }
+        ['RoomStateChanged']: ({newStateId, stateData}) => {
+            onChange?.();
+            prevState = curState;
+            curState = newStateId;
+            RoomStatesInitRouter[newStateId](stateData);
+        },
+        ['diceTeamRoll']: ({value, index}) => gp.eventHandlers.diceTeamRoll(+index + 1, +value),
+        ['diceTeamRollCompletesLaunching']: ({dices, timeval}) => {
+            const Timers = [
+                new Timer(UsersPanUI.userPan, [0, timeval._timestamp], timeval.timeval / 1000, 'red'),
+                new Timer(UsersPanUI.oppPan, [0, timeval._timestamp], timeval.timeval / 1000, 'red')
+            ];
+            resetTimersIntervals(startTogetherTimer(Timers));
+        },
+        ['discontAll']: () => {
+            // location.hash = '#backgammons-menu';
+            window.history.back();
+            ConnectionStables.disconnect();
+        },
+        ['step']: ({step, prevstate, newstate, code}) => {
+            // if(localUser.userId === 2)
+            //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+            setActiveTimer(newstate.ActiveTeam);
+            code !== ncode && gp.eventHandlers.step(step, newstate, prevstate)
+            || gp.eventHandlers.ustep(step, newstate, prevstate)
+        }, ['state']: ({newstate}) => {
+            // if(localUser.userId === 2)
+            //     localUser.team = [BoardConstants.WHITE, BoardConstants.BLACK][newstate.ActiveTeam-1];//debug
+            setActiveTimer(newstate.ActiveTeam);
+            gp.eventHandlers.state(newstate)
+        }, ['end']: ({winner}) => {
+            // alert(`Победа ${winner===BoardConstants.WHITE.id?'Белого':'Чёрного'} Игрока!`);
+            // alert('popup Win');
+            // window.hash = '#backgammons-menu';
+        }, ['restart__']: () => {
+            alert(`Кто-то нажал на рестарт игры`);
+            window.location.reload();
+        }, ['emoji']: ({userId, username, emojiId}) => {
+            const emojiSRC = `img/emojis/${emojiId}.png`;
+            console.log(user_name);
+            console.log(username);
+            if (username === user_name) {
+                new ToastForEmodji({
+                    text: `<img src="${emojiSRC}" style="width:5rem; height:5rem">`,
+                    autohide: true,
+                    interval: 3000,
+
+                    targetElement: document.getElementById( 'current-user-avatar')
+                });
+            } else {
+                new ToastForEmodji({
+                    text: `<img src="${emojiSRC}" style="width:5rem; height:5rem">`,
+                    autohide: true,
+                    interval: 3000,
+                    targetElement: document.getElementById( 'opponent-avatar')
+                });
+            }
+      }, ['phrase']:({userId, username, phraseId})=> {
+            //const emojiSRC = `img/emojis/${emojiId}.png`;
+            console.log(user_name);
+            console.log(username);
+            if (username === user_name) {
+                new ToastForPhrase({
+                    text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`],
+                    autohide: true,
+                    interval: 3000,
+                    targetElement: document.getElementById( 'current-user-avatar')
+                });
+            } else {
+                new ToastForPhrase({
+                    text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`],
+                    autohide: true,
+                    interval: 3000,
+                    targetElement: document.getElementById( 'opponent-avatar')
+                });
+            }
+        }
     }
+
+    // {
+    //     return new Toast({title:`фраза от ${username||userId}`, text: window.siteLanguage.dominoPhrases[`phrase${phraseId}`], autohide:true, interval:3000});
+    // }
+
     connectWSRoutes(WSEventRoutes)
     function startTogetherTimer(Timers) {
       Timers.map(timer=>timer.enable(true));

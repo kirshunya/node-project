@@ -211,11 +211,84 @@ export class Toast {
       document.querySelector('.toast-container').append(this._el);
     }
    }
-   
-// var gm, gc;
-// const Poll = new __PollTs();
-// const scripts = new JustEnoughEvents();
-// const __Ultra__ = new JustEnoughEvents({});
-// const sendstep = async (moves, req=API.step(moves))=>
-//                                 req.then(console.log.bind(console, 'sendstep'))&&req;
-// var sendstep;
+
+export class ToastForEmodji {
+    constructor({ text, autohide, interval, targetElement }) {
+        this.text = text;
+        this.autohide = autohide;
+        this.interval = interval;
+        this.targetElement = targetElement;
+        this.toastElement = this.createToastElement();
+
+        this.show();
+        if (this.autohide) {
+            setTimeout(() => this.hide(), this.interval);
+        }
+    }
+
+    createToastElement() {
+        const toastDiv = document.createElement('div');
+        toastDiv.className = 'toast-for-emodji';
+        toastDiv.innerHTML = this.text;
+        toastDiv.style.position = 'absolute';
+        toastDiv.style.zIndex = 1000; // Ensure it is above other elements
+
+        return toastDiv;
+    }
+
+    show() {
+        document.body.appendChild(this.toastElement);
+        const rect = this.targetElement.getBoundingClientRect();
+        this.toastElement.style.left = `${rect.left + window.pageXOffset}px`;
+        this.toastElement.style.top = `${rect.top + 10}px`; // Adjust as needed
+    }
+
+    hide() {
+        if (this.toastElement) {
+            document.body.removeChild(this.toastElement);
+        }
+    }
+}
+
+export class ToastForPhrase {
+    constructor({ text, autohide, interval, targetElement }) {
+        this.text = text;
+        this.autohide = autohide;
+        this.interval = interval;
+        this.targetElement = targetElement;
+        this.toastElement = this.createToastElement();
+
+        this.show();
+        if (this.autohide) {
+            setTimeout(() => this.hide(), this.interval);
+        }
+    }
+
+    createToastElement() {
+        const toastDiv = document.createElement('div');
+        toastDiv.className = 'toast-for-emodji';
+        toastDiv.innerHTML = this.text;
+        toastDiv.style.position = 'absolute';
+        toastDiv.style.zIndex = 1000; // Ensure it is above other elements
+        toastDiv.style.border = '2px solid #000'; // Граница вокруг тоста
+        toastDiv.style.backgroundColor = '#fff'; // Заливка внутри тоста
+        toastDiv.style.padding = '10px'; // Отступы внутри тоста для текста
+        toastDiv.style.borderRadius = '5px'; // Закругление углов тоста
+        return toastDiv;
+    }
+
+    show() {
+        document.body.appendChild(this.toastElement);
+        const rect = this.targetElement.getBoundingClientRect();
+        this.toastElement.style.left = `${rect.left + window.pageXOffset}px`;
+        this.toastElement.style.top = `${rect.top + 10}px`; // Adjust as needed
+    }
+
+    hide() {
+        if (this.toastElement) {
+            document.body.removeChild(this.toastElement);
+        }
+    }
+}
+
+

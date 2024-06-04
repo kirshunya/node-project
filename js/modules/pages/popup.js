@@ -1459,15 +1459,15 @@ export const openEmojiPopup = () => {
       }
 
       window.ws.send(
-        JSON.stringify({
-          method: "sendEmoji",
-          roomId: +location.hash.split("/")[1],
-          tableId: +location.hash.split("/")[2],
-          playerMode: +location.hash.split("/")[3],
-          gameMode: location.hash.split("/")[4],
-          emojiId: +e.target.getAttribute("emojiId"),
-          userId: JSON.parse(localStorage.getItem("user")).userId,
-        })
+          JSON.stringify({
+            method: "sendEmoji",
+            roomId: +location.hash.split("/")[1],
+            tableId: +location.hash.split("/")[2],
+            playerMode: +location.hash.split("/")[3],
+            gameMode: location.hash.split("/")[4],
+            emojiId: +e.target.getAttribute("emojiId"),
+            userId: JSON.parse(localStorage.getItem("user")).userId,
+          })
       );
       close(popupElement);
 
@@ -1498,6 +1498,8 @@ export const openEmojiPopup = () => {
     emojiPopupContent.appendChild(emojiItem);
   }
 };
+
+
 
 export const openTextPopup = () => {
   const siteLanguage = window.siteLanguage;

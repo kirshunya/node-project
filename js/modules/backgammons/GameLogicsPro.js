@@ -437,8 +437,8 @@ function showToast(pts, playername, colour) {
     if(!pts.length) return;
     const siteLanguage = window.siteLanguage
     return new Toast({
-        title: "Пропуск хода",
-        text:`Игрок <font color="blue">${playername}</font> цвета <font color="darkgreen">[${colour.name}]</font> пропускает ходы: <font color="darkgreen">[${pts.join(', ')}]</font>`,
+        title: `${siteLanguage.popups.skip}`,
+        text:`${siteLanguage.popups.player} <font color="blue">${playername}</font> цвета <font color="darkgreen">[${colour.name}]</font> пропускает ходы: <font color="darkgreen">[${pts.join(', ')}]</font>`,
         autohide:true,
         interval:5000
     })
