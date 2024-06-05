@@ -305,7 +305,12 @@ export async function InitGame(GameInitData, localUser, ws) {
           if (localUser.username === user.username) {
               userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
               userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
-              userPan.getElementsByClassName('Balance')[0].innerHTML =  `${siteLanguage.popups.balance} ${user.balance} ₼`;
+              BetsLoaded.then(({ BackgammonsBETS }) => {
+                  const bet = BackgammonsBETS.get(GameInitData.GameID[0]).bet;
+                  userPan.getElementsByClassName('Balance')[0].innerHTML = `${siteLanguage.profilePage.myGamesPage.statsItem.bet} ${bet} ₼`;
+                  userPan.getElementsByClassName('Balance')[0].innerHTML =  `${siteLanguage.popups.balance} ${user.balance - bet} ₼`;
+              });
+
           } else {
               userPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(user);
               userPan.getElementsByClassName('Nickname')[0].innerHTML = user.username;
@@ -318,7 +323,12 @@ export async function InitGame(GameInitData, localUser, ws) {
           if (localUser.username === opponent.username) {
               oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
               oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;
-              oppPan.getElementsByClassName('Balance')[0].innerHTML =  `${siteLanguage.popups.balance} ${opponent.balance} ₼`;
+
+              BetsLoaded.then(({ BackgammonsBETS }) => {
+                  const bet = BackgammonsBETS.get(GameInitData.GameID[0]).bet;
+                  oppPan.getElementsByClassName('Balance')[0].innerHTML = `${siteLanguage.profilePage.myGamesPage.statsItem.bet} ${bet} ₼`;
+                  oppPan.getElementsByClassName('Balance')[0].innerHTML =  `${siteLanguage.popups.balance} ${opponent.balance - bet} ₼`;
+              });
           } else {
               oppPan.getElementsByTagName('img')[0].src = getPlayerAvatarImg(opponent);
               oppPan.getElementsByClassName('Nickname')[0].innerHTML = opponent.username;

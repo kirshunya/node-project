@@ -755,27 +755,27 @@ export const getBackgammonRoomBetInfo = (roomId) => {
     case 1:
       return {
         bet: 1,
-        commission: 0.2,
+        commission: 0.1,
       };
     case 2:
       return {
         bet: 3,
-        commission: 0.15,
+        commission: 0.3,
       };
     case 3:
       return {
         bet: 5,
-        commission: 0.45,
+        commission: 0.5,
       };
     case 4:
       return {
         bet: 10,
-        commission: 0.75,
+        commission: 1,
       };
     case 5:
       return {
         bet: 20,
-        commission: 1.5,
+        commission: 2,
       };
   }
 };

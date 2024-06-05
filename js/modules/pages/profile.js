@@ -1132,7 +1132,7 @@ async function openUserGames() {
     console.log(userData.userId);
 
     backgammonGames.forEach((game, index) => {
-
+      console.log(game.roomId);
       let gameitem = document.createElement("div");
       gameitem.classList.add(
           "user-game__item",
@@ -1178,7 +1178,7 @@ async function openUserGames() {
         <p>${siteLanguage.profilePage.myGamesPage.statsItem.gameMode}: ${
           siteLanguage.profilePage.myGamesPage.statsItem.classic
       }</p>
-        <p>${siteLanguage.profilePage.myGamesPage.statsItem.bet}: ${bet.toFixed(
+        <p>${siteLanguage.profilePage.myGamesPage.statsItem.bet}: ${game.bet.toFixed(
           2
       )}₼</p>
         ${
